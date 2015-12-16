@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2014-2015 GraphDefined GmbH
- * This file is part of WWCP Core <https://github.com/GraphDefined/WWCP_Core>
+ * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
