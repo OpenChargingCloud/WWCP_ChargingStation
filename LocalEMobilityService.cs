@@ -45,15 +45,15 @@ namespace org.GraphDefined.WWCP.LocalService
 
         #region Properties
 
-        #region EVSPId
+        #region EVSP
 
-        private readonly EVSP_Id _EVSPId;
+        private readonly EVSP _EVSP;
 
-        public EVSP_Id EVSPId
+        public EVSP EVSP
         {
             get
             {
-                return _EVSPId;
+                return _EVSP;
             }
         }
 
@@ -74,6 +74,8 @@ namespace org.GraphDefined.WWCP.LocalService
         #endregion
 
 
+        #region AllTokens
+
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> AllTokens
         {
             get
@@ -81,6 +83,10 @@ namespace org.GraphDefined.WWCP.LocalService
                 return AuthorizationDatabase;
             }
         }
+
+        #endregion
+
+        #region AuthorizedTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> AuthorizedTokens
         {
@@ -90,6 +96,10 @@ namespace org.GraphDefined.WWCP.LocalService
             }
         }
 
+        #endregion
+
+        #region NotAuthorizedTokens
+
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> NotAuthorizedTokens
         {
             get
@@ -97,6 +107,10 @@ namespace org.GraphDefined.WWCP.LocalService
                 return AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.NotAuthorized);
             }
         }
+
+        #endregion
+
+        #region BlockedTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> BlockedTokens
         {
@@ -108,23 +122,32 @@ namespace org.GraphDefined.WWCP.LocalService
 
         #endregion
 
+        #endregion
+
         #region Events
 
         #endregion
 
         #region Constructor(s)
 
-        public LocalEMobilityService(EVSP_Id          EVSPId,
-                                     Authorizator_Id  AuthorizatorId = null)
+        internal LocalEMobilityService(EVSP             EVSP,
+                                       Authorizator_Id  AuthorizatorId = null)
         {
-            this._EVSPId                = EVSPId;
+
+            this._EVSP                  = EVSP;
             this._AuthorizatorId        = (AuthorizatorId == null) ? Authorizator_Id.Parse("eMI3 Local E-Mobility Database") : AuthorizatorId;
+
             this.AuthorizationDatabase  = new ConcurrentDictionary<Auth_Token,     TokenAuthorizationResultType>();
             this.SessionDatabase        = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
+
+            EVSP.EMobilityService = this;
+
         }
 
         #endregion
 
+
+        // User and credential management
 
         #region AddToken(Token, AuthenticationResult = AuthenticationResult.Allowed)
 
@@ -154,6 +177,8 @@ namespace org.GraphDefined.WWCP.LocalService
 
         #endregion
 
+
+        // Incoming from the roaming network
 
         #region AuthorizeStart(OperatorId, AuthToken, EVSEId = null, SessionId = null, PartnerProductId = null, PartnerSessionId = null, QueryTimeout = null)
 
@@ -207,7 +232,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new AuthStartResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStartResultType.Success,
                                    SessionId            = _SessionId,
-                                   ProviderId           = EVSPId
+                                   ProviderId           = EVSP.Id
                                });
 
                 }
@@ -221,7 +246,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new HTTPResponse(),
                                new AuthStartResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStartResultType.Error,
-                                   ProviderId           = EVSPId,
+                                   ProviderId           = EVSP.Id,
                                    Description          = "Token is blocked!"
                                });
 
@@ -234,7 +259,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new HTTPResponse(),
                                new AuthStartResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStartResultType.Unspecified,
-                                   ProviderId           = EVSPId,
+                                   ProviderId           = EVSP.Id,
                                });
 
                 #endregion
@@ -248,7 +273,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new HTTPResponse(),
                                new AuthStartResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStartResultType.Unspecified,
-                                   ProviderId           = EVSPId,
+                                   ProviderId           = EVSP.Id,
                                    Description          = "Unkown token!"
                                });
 
@@ -312,7 +337,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                        new AuthStopResult(AuthorizatorId) {
                                            AuthorizationResult  = AuthorizeStopResultType.Success,
                                            SessionId            = SessionId,
-                                           ProviderId           = EVSPId
+                                           ProviderId           = EVSP.Id
                                        });
 
                         #endregion
@@ -325,7 +350,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                        new HTTPResponse(),
                                        new AuthStopResult(AuthorizatorId) {
                                            AuthorizationResult  = AuthorizeStopResultType.Error,
-                                           ProviderId           = EVSPId,
+                                           ProviderId           = EVSP.Id,
                                            Description          = "Invalid token for given session identification!"
                                        });
                         }
@@ -342,7 +367,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                    new HTTPResponse(),
                                    new AuthStopResult(AuthorizatorId) {
                                        AuthorizationResult  = AuthorizeStopResultType.Error,
-                                       ProviderId           = EVSPId,
+                                       ProviderId           = EVSP.Id,
                                        Description          = "Invalid session identification!"
                                    });
                     }
@@ -358,7 +383,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new HTTPResponse(),
                                new AuthStopResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStopResultType.Error,
-                                   ProviderId           = EVSPId,
+                                   ProviderId           = EVSP.Id,
                                    Description          = "Token is blocked!"
                                });
 
@@ -371,7 +396,7 @@ namespace org.GraphDefined.WWCP.LocalService
                                new HTTPResponse(),
                                new AuthStopResult(AuthorizatorId) {
                                    AuthorizationResult  = AuthorizeStopResultType.Error,
-                                   ProviderId           = EVSPId,
+                                   ProviderId           = EVSP.Id,
                                });
 
                 #endregion
@@ -385,7 +410,7 @@ namespace org.GraphDefined.WWCP.LocalService
                            new HTTPResponse(),
                            new AuthStopResult(AuthorizatorId) {
                                AuthorizationResult  = AuthorizeStopResultType.Unspecified,
-                               ProviderId           = EVSPId,
+                               ProviderId           = EVSP.Id,
                                Description          = "Unkown token!"
                            });
 
@@ -464,6 +489,22 @@ namespace org.GraphDefined.WWCP.LocalService
                                                    SendCDRResult.InvalidSessionId(AuthorizatorId));
 
         }
+
+        #endregion
+
+
+
+        // Outgoing to the roaming network
+
+        #region RemoteStart
+
+        #endregion
+
+        #region RemoteStop
+
+        #endregion
+
+        #region Reserve
 
         #endregion
 
