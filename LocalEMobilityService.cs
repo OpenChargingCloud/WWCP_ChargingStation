@@ -21,8 +21,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-
-using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using System.Collections.Concurrent;
 
 #endregion
@@ -44,6 +42,20 @@ namespace org.GraphDefined.WWCP.LocalService
         #endregion
 
         #region Properties
+
+        #region RoamingNetwork
+
+        private readonly RoamingNetwork _RoamingNetwork;
+
+        public RoamingNetwork RoamingNetwork
+        {
+            get
+            {
+                return _RoamingNetwork;
+            }
+        }
+
+        #endregion
 
         #region EVSP
 
@@ -134,10 +146,11 @@ namespace org.GraphDefined.WWCP.LocalService
                                        Authorizator_Id  AuthorizatorId = null)
         {
 
+            this._RoamingNetwork        = EVSP.RoamingNetwork;
             this._EVSP                  = EVSP;
             this._AuthorizatorId        = (AuthorizatorId == null) ? Authorizator_Id.Parse("eMI3 Local E-Mobility Database") : AuthorizatorId;
 
-            this.AuthorizationDatabase  = new ConcurrentDictionary<Auth_Token,     TokenAuthorizationResultType>();
+            this.AuthorizationDatabase  = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase        = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
 
             EVSP.EMobilityService = this;
@@ -180,7 +193,7 @@ namespace org.GraphDefined.WWCP.LocalService
 
         // Incoming from the roaming network
 
-        #region AuthorizeStart(OperatorId, AuthToken, EVSEId = null, SessionId = null, PartnerProductId = null, PartnerSessionId = null, QueryTimeout = null)
+        #region AuthorizeStart(OperatorId, AuthToken, EVSEId = null, ChargingProductId = null, SessionId = null, QueryTimeout = null)
 
         /// <summary>
         /// Create an authorize start request.
@@ -188,17 +201,15 @@ namespace org.GraphDefined.WWCP.LocalService
         /// <param name="OperatorId">An EVSE operator identification.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="EVSEId">An optional EVSE identification.</param>
+        /// <param name="ChargingProductId">An optional charging product identification.</param>
         /// <param name="SessionId">An optional session identification.</param>
-        /// <param name="PartnerProductId">An optional partner product identification.</param>
-        /// <param name="PartnerSessionId">An optional partner session identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<HTTPResponse<AuthStartResult>> AuthorizeStart(EVSEOperator_Id     OperatorId,
-                                                                        Auth_Token          AuthToken,
-                                                                        EVSE_Id             EVSEId            = null,
-                                                                        ChargingSession_Id  SessionId         = null,
-                                                                        ChargingProduct_Id  PartnerProductId  = null,
-                                                                        ChargingSession_Id  PartnerSessionId  = null,
-                                                                        TimeSpan?           QueryTimeout      = null)
+        public async Task<AuthStartEVSEResult> AuthorizeStart(EVSEOperator_Id     OperatorId,
+                                                              Auth_Token          AuthToken,
+                                                              EVSE_Id             EVSEId             = null,
+                                                              ChargingProduct_Id  ChargingProductId  = null,
+                                                              ChargingSession_Id  SessionId          = null,
+                                                              TimeSpan?           QueryTimeout       = null)
 
         {
 
@@ -211,7 +222,6 @@ namespace org.GraphDefined.WWCP.LocalService
                 throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
 
             #endregion
-
 
             TokenAuthorizationResultType AuthenticationResult;
 
@@ -227,13 +237,9 @@ namespace org.GraphDefined.WWCP.LocalService
 
                     SessionDatabase.TryAdd(_SessionId, new SessionInfo(AuthToken));
 
-                    return new HTTPResponse<AuthStartResult>(
-                               new HTTPResponse(),
-                               new AuthStartResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStartResultType.Success,
-                                   SessionId            = _SessionId,
-                                   ProviderId           = EVSP.Id
-                               });
+                    return AuthStartEVSEResult.Authorized(AuthorizatorId,
+                                                          _SessionId,
+                                                          EVSP.Id);
 
                 }
 
@@ -242,25 +248,16 @@ namespace org.GraphDefined.WWCP.LocalService
                 #region Token is blocked!
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-                    return new HTTPResponse<AuthStartResult>(
-                               new HTTPResponse(),
-                               new AuthStartResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStartResultType.Error,
-                                   ProviderId           = EVSP.Id,
-                                   Description          = "Token is blocked!"
-                               });
+                    return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
+                                                             EVSP.Id,
+                                                             "Token is blocked!");
 
                 #endregion
 
                 #region ...fall through!
 
                 else
-                    return new HTTPResponse<AuthStartResult>(
-                               new HTTPResponse(),
-                               new AuthStartResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStartResultType.Unspecified,
-                                   ProviderId           = EVSP.Id,
-                               });
+                    return AuthStartEVSEResult.Unspecified(AuthorizatorId);
 
                 #endregion
 
@@ -269,13 +266,9 @@ namespace org.GraphDefined.WWCP.LocalService
             #region Unkown Token!
 
             else
-                return new HTTPResponse<AuthStartResult>(
-                               new HTTPResponse(),
-                               new AuthStartResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStartResultType.Unspecified,
-                                   ProviderId           = EVSP.Id,
-                                   Description          = "Unkown token!"
-                               });
+                return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
+                                                         EVSP.Id,
+                                                         "Unkkown token!");
 
             #endregion
 
@@ -283,7 +276,49 @@ namespace org.GraphDefined.WWCP.LocalService
 
         #endregion
 
-        #region AuthorizeStop(OperatorId, SessionId, AuthToken, EVSEId = null, PartnerSessionId = null, QueryTimeout = null)
+        #region AuthorizeStart(OperatorId, AuthToken, ChargingStationId, ChargingProductId = null, SessionId = null, QueryTimeout = null)
+
+        /// <summary>
+        /// Create an AuthorizeStart request.
+        /// </summary>
+        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingStationId">A charging station identification.</param>
+        /// <param name="ChargingProductId">An optional charging product identification.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="QueryTimeout">An optional timeout for this query.</param>
+        public async Task<AuthStartChargingStationResult>
+
+            AuthorizeStart(EVSEOperator_Id     OperatorId,
+                           Auth_Token          AuthToken,
+                           ChargingStation_Id  ChargingStationId,
+                           ChargingProduct_Id  ChargingProductId  = null,   // [maxlength: 100]
+                           ChargingSession_Id  SessionId          = null,
+                           TimeSpan?           QueryTimeout       = null)
+
+        {
+
+            #region Initial checks
+
+            if (OperatorId        == null)
+                throw new ArgumentNullException("OperatorId",         "The given parameter must not be null!");
+
+            if (AuthToken         == null)
+                throw new ArgumentNullException("AuthToken",          "The given parameter must not be null!");
+
+            if (ChargingStationId == null)
+                throw new ArgumentNullException("ChargingStationId",  "The given parameter must not be null!");
+
+            #endregion
+
+            //ToDo: Implement AuthorizeStart(...ChargingStationId...)
+            return AuthStartChargingStationResult.Error(AuthorizatorId, "Not implemented!");
+
+        }
+
+        #endregion
+
+        #region AuthorizeStop(OperatorId, SessionId, AuthToken, EVSEId = null, QueryTimeout = null)
 
         /// <summary>
         /// Create an authorize stop request.
@@ -292,14 +327,12 @@ namespace org.GraphDefined.WWCP.LocalService
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="EVSEId">An optional EVSE identification.</param>
-        /// <param name="PartnerSessionId">An optional partner session identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<HTTPResponse<AuthStopResult>> AuthorizeStop(EVSEOperator_Id      OperatorId,
-                                                                      ChargingSession_Id   SessionId,
-                                                                      Auth_Token           AuthToken,
-                                                                      EVSE_Id              EVSEId            = null,   // OICP v2.0: Optional
-                                                                      ChargingSession_Id   PartnerSessionId  = null,   // OICP v2.0: Optional [50]
-                                                                      TimeSpan?            QueryTimeout      = null)
+        public async Task<AuthStopEVSEResult> AuthorizeStop(EVSEOperator_Id      OperatorId,
+                                                        ChargingSession_Id   SessionId,
+                                                        Auth_Token           AuthToken,
+                                                        EVSE_Id              EVSEId            = null,
+                                                        TimeSpan?            QueryTimeout      = null)
 
         {
 
@@ -332,13 +365,11 @@ namespace org.GraphDefined.WWCP.LocalService
                         #region Authorized
 
                         if (AuthToken == SessionInfo.Token)
-                            return new HTTPResponse<AuthStopResult>(
-                                       new HTTPResponse(),
-                                       new AuthStopResult(AuthorizatorId) {
-                                           AuthorizationResult  = AuthorizeStopResultType.Success,
-                                           SessionId            = SessionId,
-                                           ProviderId           = EVSP.Id
-                                       });
+                            return new AuthStopEVSEResult(AuthorizatorId) {
+                                       AuthorizationResult  = AuthStopEVSEResultType.Success,
+                                       SessionId            = SessionId,
+                                       ProviderId           = EVSP.Id
+                                   };
 
                         #endregion
 
@@ -346,13 +377,11 @@ namespace org.GraphDefined.WWCP.LocalService
 
                         else
                         {
-                            return new HTTPResponse<AuthStopResult>(
-                                       new HTTPResponse(),
-                                       new AuthStopResult(AuthorizatorId) {
-                                           AuthorizationResult  = AuthorizeStopResultType.Error,
-                                           ProviderId           = EVSP.Id,
-                                           Description          = "Invalid token for given session identification!"
-                                       });
+                            return new AuthStopEVSEResult(AuthorizatorId) {
+                                       AuthorizationResult  = AuthStopEVSEResultType.Error,
+                                       ProviderId           = EVSP.Id,
+                                       Description          = "Invalid token for given session identification!"
+                                   };
                         }
 
                         #endregion
@@ -363,13 +392,11 @@ namespace org.GraphDefined.WWCP.LocalService
 
                     else
                     {
-                        return new HTTPResponse<AuthStopResult>(
-                                   new HTTPResponse(),
-                                   new AuthStopResult(AuthorizatorId) {
-                                       AuthorizationResult  = AuthorizeStopResultType.Error,
-                                       ProviderId           = EVSP.Id,
-                                       Description          = "Invalid session identification!"
-                                   });
+                        return new AuthStopEVSEResult(AuthorizatorId) {
+                                   AuthorizationResult  = AuthStopEVSEResultType.Error,
+                                   ProviderId           = EVSP.Id,
+                                   Description          = "Invalid session identification!"
+                               };
                     }
 
                     #endregion
@@ -379,25 +406,21 @@ namespace org.GraphDefined.WWCP.LocalService
                 #region Blocked
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-                    return new HTTPResponse<AuthStopResult>(
-                               new HTTPResponse(),
-                               new AuthStopResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStopResultType.Error,
-                                   ProviderId           = EVSP.Id,
-                                   Description          = "Token is blocked!"
-                               });
+                    return new AuthStopEVSEResult(AuthorizatorId) {
+                               AuthorizationResult  = AuthStopEVSEResultType.Error,
+                               ProviderId           = EVSP.Id,
+                               Description          = "Token is blocked!"
+                           };
 
                 #endregion
 
                 #region ...fall through!
 
                 else
-                    return new HTTPResponse<AuthStopResult>(
-                               new HTTPResponse(),
-                               new AuthStopResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthorizeStopResultType.Error,
-                                   ProviderId           = EVSP.Id,
-                               });
+                    return new AuthStopEVSEResult(AuthorizatorId) {
+                               AuthorizationResult  = AuthStopEVSEResultType.Error,
+                               ProviderId           = EVSP.Id,
+                           };
 
                 #endregion
 
@@ -406,15 +429,53 @@ namespace org.GraphDefined.WWCP.LocalService
             #region Unkown Token!
 
             else
-                return new HTTPResponse<AuthStopResult>(
-                           new HTTPResponse(),
-                           new AuthStopResult(AuthorizatorId) {
-                               AuthorizationResult  = AuthorizeStopResultType.Unspecified,
-                               ProviderId           = EVSP.Id,
-                               Description          = "Unkown token!"
-                           });
+                return new AuthStopEVSEResult(AuthorizatorId) {
+                           AuthorizationResult  = AuthStopEVSEResultType.Unspecified,
+                           ProviderId           = EVSP.Id,
+                           Description          = "Unkown token!"
+                       };
 
             #endregion
+
+        }
+
+        #endregion
+
+        #region AuthorizeStop(OperatorId, SessionId, AuthToken, ChargingStationId, QueryTimeout = null)
+
+        /// <summary>
+        /// Create an authorize stop request.
+        /// </summary>
+        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingStationId">A charging station identification.</param>
+        /// <param name="QueryTimeout">An optional timeout for this query.</param>
+        public async Task<AuthStopChargingStationResult> AuthorizeStop(EVSEOperator_Id      OperatorId,
+                                                                       ChargingSession_Id   SessionId,
+                                                                       Auth_Token           AuthToken,
+                                                                       ChargingStation_Id   ChargingStationId,
+                                                                       TimeSpan?            QueryTimeout      = null)
+
+        {
+
+            #region Initial checks
+
+            if (OperatorId == null)
+                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+
+            if (SessionId  == null)
+                throw new ArgumentNullException("SessionId",  "The given parameter must not be null!");
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+
+            #endregion
+
+            return new AuthStopChargingStationResult(AuthorizatorId) {
+                       AuthorizationResult  = AuthStopChargingStationResultType.Error,
+                       ProviderId           = EVSP.Id,
+                   };
 
         }
 
@@ -427,10 +488,9 @@ namespace org.GraphDefined.WWCP.LocalService
         /// </summary>
         /// <param name="EVSEId">An EVSE identification.</param>
         /// <param name="SessionId">The session identification from the Authorize Start request.</param>
-        /// <param name="PartnerProductId"></param>
+        /// <param name="PartnerProductId">An optional charging product identification.</param>
         /// <param name="SessionStart">The timestamp of the session start.</param>
         /// <param name="SessionEnd">The timestamp of the session end.</param>
-        /// <param name="PartnerSessionId">An optional partner session identification.</param>
         /// <param name="ChargingStart">An optional charging start timestamp.</param>
         /// <param name="ChargingEnd">An optional charging end timestamp.</param>
         /// <param name="MeterValueStart">An optional initial value of the energy meter.</param>
@@ -441,7 +501,7 @@ namespace org.GraphDefined.WWCP.LocalService
         /// <param name="HubOperatorId">An optional identification of the hub operator.</param>
         /// <param name="HubProviderId">An optional identification of the hub provider.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<HTTPResponse<SendCDRResult>>
+        public async Task<SendCDRResult>
 
             SendChargeDetailRecord(EVSE_Id              EVSEId,
                                    ChargingSession_Id   SessionId,
@@ -449,7 +509,6 @@ namespace org.GraphDefined.WWCP.LocalService
                                    DateTime             SessionStart,
                                    DateTime             SessionEnd,
                                    AuthInfo             AuthInfo, // REMOVE ME!
-                                   ChargingSession_Id   PartnerSessionId      = null,
                                    DateTime?            ChargingStart         = null,
                                    DateTime?            ChargingEnd           = null,
                                    Double?              MeterValueStart       = null,
@@ -482,11 +541,9 @@ namespace org.GraphDefined.WWCP.LocalService
             SessionInfo _SessionInfo = null;
 
             if (SessionDatabase.TryRemove(SessionId, out _SessionInfo))
-                return new HTTPResponse<SendCDRResult>(new HTTPResponse(),
-                                                       SendCDRResult.Forwarded(AuthorizatorId));
+                return SendCDRResult.Forwarded(AuthorizatorId);
 
-            return new HTTPResponse<SendCDRResult>(new HTTPResponse(),
-                                                   SendCDRResult.InvalidSessionId(AuthorizatorId));
+            return SendCDRResult.InvalidSessionId(AuthorizatorId);
 
         }
 
