@@ -248,9 +248,9 @@ namespace org.GraphDefined.WWCP.LocalService
                 #region Token is blocked!
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-                    return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
-                                                             EVSP.Id,
-                                                             "Token is blocked!");
+                    return AuthStartEVSEResult.Blocked(AuthorizatorId,
+                                                       EVSP.Id,
+                                                       "Token is blocked!");
 
                 #endregion
 
@@ -265,10 +265,9 @@ namespace org.GraphDefined.WWCP.LocalService
 
             #region Unkown Token!
 
-            else
-                return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
-                                                         EVSP.Id,
-                                                         "Unkkown token!");
+            return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
+                                                     EVSP.Id,
+                                                     "Unkkown token!");
 
             #endregion
 
@@ -311,8 +310,53 @@ namespace org.GraphDefined.WWCP.LocalService
 
             #endregion
 
-            //ToDo: Implement AuthorizeStart(...ChargingStationId...)
-            return AuthStartChargingStationResult.Error(AuthorizatorId, "Not implemented!");
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    var _SessionId = ChargingSession_Id.New;
+
+                    SessionDatabase.TryAdd(_SessionId, new SessionInfo(AuthToken));
+
+                    return AuthStartChargingStationResult.Authorized(AuthorizatorId,
+                                                                     _SessionId,
+                                                                     EVSP.Id);
+
+                }
+
+                #endregion
+
+                #region Token is blocked!
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStartChargingStationResult.Blocked(AuthorizatorId,
+                                                                  EVSP.Id,
+                                                                  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStartChargingStationResult.Unspecified(AuthorizatorId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStartChargingStationResult.NotAuthorized(AuthorizatorId,
+                                                                EVSP.Id,
+                                                                "Unkkown token!");
+
+            #endregion
 
         }
 
@@ -328,11 +372,11 @@ namespace org.GraphDefined.WWCP.LocalService
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="EVSEId">An optional EVSE identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStopEVSEResult> AuthorizeStop(EVSEOperator_Id      OperatorId,
-                                                        ChargingSession_Id   SessionId,
-                                                        Auth_Token           AuthToken,
-                                                        EVSE_Id              EVSEId            = null,
-                                                        TimeSpan?            QueryTimeout      = null)
+        public async Task<AuthStopEVSEResult> AuthorizeStop(EVSEOperator_Id     OperatorId,
+                                                            ChargingSession_Id  SessionId,
+                                                            Auth_Token          AuthToken,
+                                                            EVSE_Id             EVSEId        = null,
+                                                            TimeSpan?           QueryTimeout  = null)
 
         {
 
@@ -349,93 +393,62 @@ namespace org.GraphDefined.WWCP.LocalService
 
             #endregion
 
+            #region Check session identification
+
+            SessionInfo SessionInfo = null;
+
+            if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
+                return AuthStopEVSEResult.InvalidSessionId(AuthorizatorId);
+
+            #endregion
+
             TokenAuthorizationResultType AuthenticationResult;
 
             if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
             {
 
+                #region Token is authorized
+
                 if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
                 {
 
-                    SessionInfo SessionInfo = null;
+                    // Authorized
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
+                        return AuthStopEVSEResult.Authorized(AuthorizatorId,
+                                                             EVSP.Id);
 
-                    if (SessionDatabase.TryGetValue(SessionId, out SessionInfo))
-                    {
-
-                        #region Authorized
-
-                        if (AuthToken == SessionInfo.Token)
-                            return new AuthStopEVSEResult(AuthorizatorId) {
-                                       AuthorizationResult  = AuthStopEVSEResultType.Success,
-                                       SessionId            = SessionId,
-                                       ProviderId           = EVSP.Id
-                                   };
-
-                        #endregion
-
-                        #region Invalid Token for SessionId!
-
-                        else
-                        {
-                            return new AuthStopEVSEResult(AuthorizatorId) {
-                                       AuthorizationResult  = AuthStopEVSEResultType.Error,
-                                       ProviderId           = EVSP.Id,
-                                       Description          = "Invalid token for given session identification!"
-                                   };
-                        }
-
-                        #endregion
-
-                    }
-
-                    #region Invalid SessionId!
-
+                    // Invalid Token for SessionId!
                     else
-                    {
-                        return new AuthStopEVSEResult(AuthorizatorId) {
-                                   AuthorizationResult  = AuthStopEVSEResultType.Error,
-                                   ProviderId           = EVSP.Id,
-                                   Description          = "Invalid session identification!"
-                               };
-                    }
-
-                    #endregion
+                        return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
+                                                                EVSP.Id,
+                                                                "Invalid token for given session identification!");
 
                 }
 
-                #region Blocked
+                #endregion
+
+                #region Token is blocked
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-                    return new AuthStopEVSEResult(AuthorizatorId) {
-                               AuthorizationResult  = AuthStopEVSEResultType.Error,
-                               ProviderId           = EVSP.Id,
-                               Description          = "Token is blocked!"
-                           };
+                    return AuthStopEVSEResult.Blocked(AuthorizatorId,
+                                                      EVSP.Id,
+                                                      "Token is blocked!");
 
                 #endregion
 
                 #region ...fall through!
 
                 else
-                    return new AuthStopEVSEResult(AuthorizatorId) {
-                               AuthorizationResult  = AuthStopEVSEResultType.Error,
-                               ProviderId           = EVSP.Id,
-                           };
+                    return AuthStopEVSEResult.Unspecified(AuthorizatorId);
 
                 #endregion
 
             }
 
-            #region Unkown Token!
-
-            else
-                return new AuthStopEVSEResult(AuthorizatorId) {
-                           AuthorizationResult  = AuthStopEVSEResultType.Unspecified,
-                           ProviderId           = EVSP.Id,
-                           Description          = "Unkown token!"
-                       };
-
-            #endregion
+            // Unkown Token!
+            return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
+                                                    EVSP.Id,
+                                                    "Unkown token!");
 
         }
 
