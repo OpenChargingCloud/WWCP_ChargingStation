@@ -485,10 +485,7 @@ namespace org.GraphDefined.WWCP.LocalService
 
             #endregion
 
-            return new AuthStopChargingStationResult(AuthorizatorId) {
-                       AuthorizationResult  = AuthStopChargingStationResultType.Error,
-                       ProviderId           = EVSP.Id,
-                   };
+            return AuthStopChargingStationResult.Error(AuthorizatorId);
 
         }
 
