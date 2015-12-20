@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2015 GraphDefined GmbH
+ * Copyright (c) 2014-2016 GraphDefined GmbH
  * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -27,7 +27,7 @@ using System.Collections.Concurrent;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.LocalService
+namespace org.GraphDefined.WWCP.EMSP
 {
 
     public static class LocalEMobilityServiceExtentions
