@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Hermod.Sockets.TCP;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
+using System.Threading;
 
 #endregion
 
@@ -285,16 +286,72 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        #region Reserve(Timestamp, CancellationToken, 
 
+        public async Task<ReservationResult> Reserve(DateTime                Timestamp,
+                                                     CancellationToken       CancellationToken,
+                                                     EVSP_Id                 ProviderId,
+                                                     ChargingReservation_Id  ReservationId,
+                                                     DateTime?               StartTime,
+                                                     TimeSpan?               Duration,
+                                                     ChargingProduct_Id      ChargingProductId  = null,
+                                                     IEnumerable<Auth_Token> RFIDIds            = null,
+                                                     IEnumerable<eMA_Id>     eMAIds             = null,
+                                                     IEnumerable<UInt32>     PINs               = null)
+        {
 
+            return ReservationResult.OutOfService;
 
-        #region RemoteStart => (...)
+        }
 
-        public Task<RemoteStartEVSEResult> RemoteStart(EVSE_Id                 EVSEId,
-                                                       ChargingProduct_Id      ChargingProductId,
-                                                       ChargingReservation_Id  ReservationId,
-                                                       ChargingSession_Id      SessionId,
-                                                       eMA_Id                  eMAId)
+        #endregion
+
+        #region RemoteStart(Timestamp, CancellationToken, ChargingStationId, ChargingProductId, ReservationId, SessionId, eMAId)
+
+        /// <summary>
+        /// Initiate a remote start of the given charging session at the given charging station
+        /// and for the given provider/eMAId.
+        /// </summary>
+        /// <param name="ChargingStationId">The unique identification of a charging station.</param>
+        /// <param name="ChargingProductId">The unique identification of the choosen charging product at the given EVSE.</param>
+        /// <param name="ReservationId">The unique identification for a charging reservation.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <returns>A RemoteStartResult task.</returns>
+        public async Task<RemoteStartChargingStationResult> RemoteStart(DateTime                Timestamp,
+                                                                        CancellationToken       CancellationToken,
+                                                                        ChargingStation_Id      ChargingStationId,
+                                                                        ChargingProduct_Id      ChargingProductId,
+                                                                        ChargingReservation_Id  ReservationId,
+                                                                        ChargingSession_Id      SessionId,
+                                                                        eMA_Id                  eMAId)
+        {
+
+            return RemoteStartChargingStationResult.OutOfService;
+
+        }
+
+        #endregion
+
+        #region RemoteStart(Timestamp, CancellationToken, EVSEId, ChargingProductId, ReservationId, SessionId, eMAId)
+
+        /// <summary>
+        /// Initiate a remote start of the given charging session at the given EVSE
+        /// and for the given Provider/eMAId.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ChargingProductId">The unique identification of the choosen charging product at the given EVSE.</param>
+        /// <param name="ReservationId">The unique identification for a charging reservation.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <returns>A RemoteStartResult task.</returns>
+        public async Task<RemoteStartEVSEResult> RemoteStart(DateTime                Timestamp,
+                                                             CancellationToken       CancellationToken,
+                                                             EVSE_Id                 EVSEId,
+                                                             ChargingProduct_Id      ChargingProductId,
+                                                             ChargingReservation_Id  ReservationId,
+                                                             ChargingSession_Id      SessionId,
+                                                             eMA_Id                  eMAId)
         {
 
             // SessionId_AlreadyInUse,
@@ -311,7 +368,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 if (_EVSE.Status.Value == EVSEStatusType.Available)
                 {
                     _EVSE.CurrentChargingSession = ChargingSession_Id.New;
-                    return Task.FromResult(RemoteStartEVSEResult.Success(_EVSE.CurrentChargingSession));
+                    return RemoteStartEVSEResult.Success(_EVSE.CurrentChargingSession);
                 }
 
                 #endregion
@@ -324,11 +381,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     if (_EVSE.ReservationId == ReservationId)
                     {
                         _EVSE.CurrentChargingSession = ChargingSession_Id.New;
-                        return Task.FromResult(RemoteStartEVSEResult.Success(_EVSE.CurrentChargingSession));
+                        return RemoteStartEVSEResult.Success(_EVSE.CurrentChargingSession);
                     }
 
                     else
-                        return Task.FromResult(RemoteStartEVSEResult.Reserved);
+                        return RemoteStartEVSEResult.Reserved;
 
                 }
 
@@ -338,7 +395,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.Charging)
                 {
-                    return Task.FromResult(RemoteStartEVSEResult.AlreadyInUse);
+                    return RemoteStartEVSEResult.AlreadyInUse;
                 }
 
                 #endregion
@@ -347,7 +404,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.OutOfService)
                 {
-                    return Task.FromResult(RemoteStartEVSEResult.OutOfService);
+                    return RemoteStartEVSEResult.OutOfService;
                 }
 
                 #endregion
@@ -356,27 +413,58 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.Offline)
                 {
-                    return Task.FromResult(RemoteStartEVSEResult.Offline);
+                    return RemoteStartEVSEResult.Offline;
                 }
 
                 #endregion
 
                 else
-                    return Task.FromResult(RemoteStartEVSEResult.Error());
+                    return RemoteStartEVSEResult.Error();
 
             }
 
-            return Task.FromResult(RemoteStartEVSEResult.UnknownEVSE);
+            return RemoteStartEVSEResult.UnknownEVSE;
 
         }
 
         #endregion
 
-        #region RemoteStop => (...)
+        #region RemoteStop(Timestamp, CancellationToken, ChargingStationId, ReservationHandling, SessionId)
 
-        public Task<RemoteStopEVSEResult> RemoteStop(EVSE_Id              EVSEId,
-                                                     ReservationHandling  ReservationHandling,
-                                                     ChargingSession_Id   SessionId)
+        /// <summary>
+        /// Initiate a remote stop of the given charging session at the given charging station.
+        /// </summary>
+        /// <param name="ChargingStationId">The unique identification of a charging station.</param>
+        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <returns>A RemoteStopResult task.</returns>
+        public async Task<RemoteStopChargingStationResult> RemoteStop(DateTime             Timestamp,
+                                                                      CancellationToken    CancellationToken,
+                                                                      ChargingStation_Id   ChargingStationId,
+                                                                      ReservationHandling  ReservationHandling,
+                                                                      ChargingSession_Id   SessionId)
+        {
+
+            return RemoteStopChargingStationResult.OutOfService;
+
+        }
+
+        #endregion
+
+        #region RemoteStop(Timestamp, CancellationToken, EVSEId, ReservationHandling, SessionId)
+
+        /// <summary>
+        /// Initiate a remote stop of the given charging session at the given EVSE.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <returns>A RemoteStopResult task.</returns>
+        public async Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
+                                                           CancellationToken    CancellationToken,
+                                                           EVSE_Id              EVSEId,
+                                                           ReservationHandling  ReservationHandling,
+                                                           ChargingSession_Id   SessionId)
         {
 
             EVSE _EVSE = null;
@@ -388,7 +476,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 if (_EVSE.Status.Value == EVSEStatusType.Available)
                 {
-                    return Task.FromResult(RemoteStopEVSEResult.InvalidSessionId(SessionId));
+                    return RemoteStopEVSEResult.InvalidSessionId(SessionId);
                 }
 
                 #endregion
@@ -397,7 +485,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.Reserved)
                 {
-                    return Task.FromResult(RemoteStopEVSEResult.InvalidSessionId(SessionId));
+                    return RemoteStopEVSEResult.InvalidSessionId(SessionId);
                 }
 
                 #endregion
@@ -410,11 +498,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     if (_EVSE.CurrentChargingSession == SessionId)
                     {
                         _EVSE.CurrentChargingSession = null;
-                        return Task.FromResult(RemoteStopEVSEResult.Success);
+                        return RemoteStopEVSEResult.Success;
                     }
 
                     else
-                        return Task.FromResult(RemoteStopEVSEResult.InvalidSessionId(SessionId));
+                        return RemoteStopEVSEResult.InvalidSessionId(SessionId);
 
                 }
 
@@ -424,7 +512,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.OutOfService)
                 {
-                    return Task.FromResult(RemoteStopEVSEResult.OutOfService);
+                    return RemoteStopEVSEResult.OutOfService;
                 }
 
                 #endregion
@@ -433,27 +521,31 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.Offline)
                 {
-                    return Task.FromResult(RemoteStopEVSEResult.Offline);
+                    return RemoteStopEVSEResult.Offline;
                 }
 
                 #endregion
 
                 else
-                    return Task.FromResult(RemoteStopEVSEResult.Error());
+                    return RemoteStopEVSEResult.Error();
 
             }
 
-            return Task.FromResult(RemoteStopEVSEResult.UnknownEVSE);
+            return RemoteStopEVSEResult.UnknownEVSE;
 
         }
 
         #endregion
 
 
+        #region AuthenticateToken(AuthToken)
 
+        public Boolean AuthenticateToken(Auth_Token AuthToken)
+        {
+            return false;
+        }
 
-
-
+        #endregion
 
 
         #region Connect()
@@ -480,15 +572,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-
-        #region AuthRFID(UID)
-
-        public Boolean AuthRFID(String UID)
-        {
-            return false;
-        }
-
-        #endregion
 
     }
 

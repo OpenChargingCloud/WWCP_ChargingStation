@@ -37,6 +37,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public static class ExtentionMethods
     {
 
+        #region CreateNewVirtualStation(this ChargingPool, ChargingStationId = null, Configurator = null, OnSuccess = null, OnError = null)
+
+        /// <summary>
+        /// Create a new virtual charging station.
+        /// </summary>
+        /// <param name="ChargingPool">A charging pool.</param>
+        /// <param name="ChargingStationId">The charging station identification for the charging station to create.</param>
+        /// <param name="Configurator"></param>
+        /// <param name="OnSuccess"></param>
+        /// <param name="OnError"></param>
+        /// <returns></returns>
         public static ChargingStation CreateNewVirtualStation(this ChargingPool                         ChargingPool,
                                                               ChargingStation_Id                        ChargingStationId  = null,
                                                               Action<ChargingStation>                   Configurator       = null,
@@ -44,21 +55,25 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                               Action<ChargingPool, ChargingStation_Id>  OnError            = null)
         {
 
+            #region Initial checks
+
             if (ChargingPool == null)
-                throw new ArgumentNullException("ChargingPool", "The given parameter must not be null!");
+                throw new ArgumentNullException("ChargingPool", "The given charging pool must not be null!");
 
-            var LocalChargingStation   = ChargingPool.CreateNewStation(ChargingStationId,
-                                                                       Configurator,
-                                                                       OnSuccess,
-                                                                       OnError);
+            #endregion
 
-            var RemoteChargingStation  = new VirtualChargingStation(LocalChargingStation);
+            var _ChargingStation  = ChargingPool.CreateNewStation(ChargingStationId,
+                                                                  Configurator,
+                                                                  OnSuccess,
+                                                                  OnError);
 
-            LocalChargingStation.RemoteChargingStation  = RemoteChargingStation;
+            _ChargingStation.RemoteChargingStation  = new VirtualChargingStation(_ChargingStation);
 
-            return LocalChargingStation;
+            return _ChargingStation;
 
         }
+
+        #endregion
 
     }
 
