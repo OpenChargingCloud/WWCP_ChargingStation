@@ -193,6 +193,23 @@ namespace org.GraphDefined.WWCP.EMSP
 
         // Incoming from the roaming network
 
+
+        public async Task<Acknowledgement> PushEVSEStatus(IEnumerable<KeyValuePair<EVSE_Id, EVSEStatusType>> EVSEStatus, ActionType OICPAction = ActionType.update, EVSEOperator_Id OperatorId = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        {
+            return new Acknowledgement(true);
+        }
+
+        public async Task PushEVSEStatus(EVSEStatusDiff EVSEStatusDiff, TimeSpan? QueryTimeout = default(TimeSpan?))
+        {
+            return;
+        }
+
+        public async Task<SendCDRResult> SendChargeDetailRecord(ChargeDetailRecord ChargeDetailRecord, TimeSpan? QueryTimeout = default(TimeSpan?))
+        {
+            return SendCDRResult.Forwarded(_AuthorizatorId);
+        }
+
+
         #region AuthorizeStart(OperatorId, AuthToken, ChargingProductId = null, SessionId = null, QueryTimeout = null)
 
         /// <summary>
