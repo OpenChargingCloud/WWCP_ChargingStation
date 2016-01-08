@@ -75,6 +75,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
         private readonly Authorizator_Id _AuthorizatorId;
 
+        public event OnEVSEDataPushDelegate OnEVSEDataPush;
+        public event OnEVSEDataPushedDelegate OnEVSEDataPushed;
+
         public Authorizator_Id AuthorizatorId
         {
             get
