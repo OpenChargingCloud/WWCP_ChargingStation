@@ -100,13 +100,13 @@
       <Project>{98e75e5f-03b6-4003-a6c1-cb94e3888010}</Project>
       <Name>WWCP_XML</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_OCPI\WWCP_OCPI_2_0\WWCP_OCPI_2_0.csproj">
+    <ProjectReference Include="..\..\WWCP_OCPI\WWCP_OCPIv2_0\WWCP_OCPIv2_0.csproj">
       <Project>{820584ca-46a2-4eb7-8b26-ef43025d042a}</Project>
-      <Name>WWCP_OCPI_2_0</Name>
+      <Name>WWCP_OCPIv2_0</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_OICP\WWCP_OICP_2_0\WWCP_OICP_2_0.csproj">
+    <ProjectReference Include="..\..\WWCP_OICP\WWCP_OICPv2_0\WWCP_OICPv2_0.csproj">
       <Project>{4bb02c38-48c3-41cb-99f6-a1888881b942}</Project>
-      <Name>WWCP_OICP_2_0</Name>
+      <Name>WWCP_OICPv2_0</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
