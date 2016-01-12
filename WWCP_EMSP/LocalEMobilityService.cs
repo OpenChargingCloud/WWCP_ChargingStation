@@ -1683,8 +1683,6 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="MeterValuesInBetween">An optional enumeration of meter values during the charging session.</param>
         /// <param name="ConsumedEnergy">The optional amount of consumed energy.</param>
         /// <param name="MeteringSignature">An optional signature for the metering values.</param>
-        /// <param name="HubOperatorId">An optional identification of the hub operator.</param>
-        /// <param name="HubProviderId">An optional identification of the hub provider.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         public async Task<SendCDRResult>
 
@@ -1701,8 +1699,6 @@ namespace org.GraphDefined.WWCP.EMSP
                                    IEnumerable<Double>  MeterValuesInBetween  = null,
                                    Double?              ConsumedEnergy        = null,
                                    String               MeteringSignature     = null,
-                                   HubOperator_Id       HubOperatorId         = null,
-                                   EVSP_Id              HubProviderId         = null,
                                    TimeSpan?            QueryTimeout          = null)
 
         {
