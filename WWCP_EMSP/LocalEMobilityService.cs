@@ -291,7 +291,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 //var result = await _CPORoaming.PushEVSEData(GroupedEVSEs.
                 //                                                SelectMany(group => group).
-                //                                                ToLookup  (evse  => evse.ChargingStation.ChargingPool.EVSEOperator,
+                //                                                ToLookup  (evse  => evse.EVSEOperator,
                 //                                                           evse  => evse.AsOICPEVSEDataRecord(_EVSEDataRecordProcessing)),
                 //                                            ActionType.AsOICPActionType(),
                 //                                            OperatorId,
@@ -358,8 +358,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                       OperatorId,
                                       OperatorName.IsNotNullOrEmpty()
                                           ? OperatorName
-                                          : EVSE.EVSEOperator.Name.Any()
-                                                ? EVSE.EVSEOperator.Name.FirstText
+                                          : EVSE.Operator.Name.Any()
+                                                ? EVSE.Operator.Name.FirstText
                                                 : null,
                                       null,
                                       QueryTimeout);
@@ -410,7 +410,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
             if (_EVSEs.Any())
-                return await PushEVSEData(_EVSEs.ToLookup(evse => evse.ChargingStation.ChargingPool.EVSEOperator,
+                return await PushEVSEData(_EVSEs.ToLookup(evse => evse.Operator,
                                                           evse => evse),
                                           ActionType,
                                           OperatorId,
@@ -761,7 +761,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
               //  var result = await _CPORoaming.PushEVSEStatus(GroupedEVSEs.
               //                                                    SelectMany(group => group).
-              //                                                    ToLookup  (evse  => evse.ChargingStation.ChargingPool.EVSEOperator.Id,
+              //                                                    ToLookup  (evse  => evse.EVSEOperator.Id,
               //                                                               evse  => new EVSEStatusRecord(evse.Id, evse.Status.Value.AsOICPEVSEStatus())),
               //                                                ActionType.AsOICPActionType(),
               //                                                OperatorId,
@@ -876,7 +876,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
             if (_EVSEs.Any())
-                return await PushEVSEStatus(_EVSEs.ToLookup(evse => evse.ChargingStation.ChargingPool.EVSEOperator,
+                return await PushEVSEStatus(_EVSEs.ToLookup(evse => evse.Operator,
                                                             evse => evse),
                                             ActionType,
                                             OperatorId,
@@ -1730,10 +1730,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        public async Task<SendCDRResult> SendChargeDetailRecord(ChargeDetailRecord ChargeDetailRecord, TimeSpan? QueryTimeout = default(TimeSpan?))
+        #region SendChargeDetailRecord(ChargeDetailRecord, QueryTimeout = null)
+
+        public async Task<SendCDRResult> SendChargeDetailRecord(ChargeDetailRecord ChargeDetailRecord, TimeSpan? QueryTimeout = null)
         {
             return SendCDRResult.Forwarded(_AuthorizatorId);
         }
+
+        #endregion
 
         #endregion
 
