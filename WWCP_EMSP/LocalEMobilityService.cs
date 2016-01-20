@@ -1734,7 +1734,21 @@ namespace org.GraphDefined.WWCP.EMSP
 
         public async Task<SendCDRResult> SendChargeDetailRecord(ChargeDetailRecord ChargeDetailRecord, TimeSpan? QueryTimeout = null)
         {
-            return SendCDRResult.Forwarded(_AuthorizatorId);
+
+            #region Initial checks
+
+            if (ChargeDetailRecord == null)
+                throw new ArgumentNullException("ChargeDetailRecord",  "The given charge detail record must not be null!");
+
+            #endregion
+
+            SessionInfo _SessionInfo = null;
+
+            if (SessionDatabase.TryRemove(ChargeDetailRecord.SessionId, out _SessionInfo))
+                return SendCDRResult.Forwarded(AuthorizatorId);
+
+            return SendCDRResult.InvalidSessionId(AuthorizatorId);
+
         }
 
         #endregion
