@@ -445,7 +445,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                       ChargingSession_Id   SessionId)
         {
 
-            return RemoteStopChargingStationResult.OutOfService;
+            return RemoteStopChargingStationResult.OutOfService(SessionId);
 
         }
 
@@ -498,7 +498,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     if (_EVSE.CurrentChargingSession == SessionId)
                     {
                         _EVSE.CurrentChargingSession = null;
-                        return RemoteStopEVSEResult.Success;
+                        return RemoteStopEVSEResult.Success(SessionId);
                     }
 
                     else
@@ -512,7 +512,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.OutOfService)
                 {
-                    return RemoteStopEVSEResult.OutOfService;
+                    return RemoteStopEVSEResult.OutOfService(SessionId);
                 }
 
                 #endregion
@@ -521,17 +521,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 else if (_EVSE.Status.Value == EVSEStatusType.Offline)
                 {
-                    return RemoteStopEVSEResult.Offline;
+                    return RemoteStopEVSEResult.Offline(SessionId);
                 }
 
                 #endregion
 
                 else
-                    return RemoteStopEVSEResult.Error();
+                    return RemoteStopEVSEResult.Error(SessionId);
 
             }
 
-            return RemoteStopEVSEResult.UnknownEVSE;
+            return RemoteStopEVSEResult.UnknownEVSE(SessionId);
 
         }
 
