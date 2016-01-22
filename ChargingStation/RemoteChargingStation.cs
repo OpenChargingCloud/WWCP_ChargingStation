@@ -41,7 +41,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     /// <summary>
     /// A demo implementation of a remote charging station.
     /// </summary>
-    public class RemoteChargingStationREal
+    public class RemoteChargingStation
     {
 
         #region Data
@@ -221,9 +221,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region EVSEs
 
-        private readonly ConcurrentDictionary<EVSE_Id, NetworkEVSEStub> _EVSEs;
+        private readonly ConcurrentDictionary<EVSE_Id, RemoteEVSE> _EVSEs;
 
-        public IEnumerable<NetworkEVSEStub> EVSEs
+        public IEnumerable<RemoteEVSE> EVSEs
         {
             get
             {
@@ -264,12 +264,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region EVSEAddition
 
-        internal readonly IVotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> EVSEAddition;
+        internal readonly IVotingNotificator<DateTime, RemoteChargingStation, RemoteEVSE, Boolean> EVSEAddition;
 
         /// <summary>
         /// Called whenever an EVSE will be or was added.
         /// </summary>
-        public IVotingSender<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> OnEVSEAddition
+        public IVotingSender<DateTime, RemoteChargingStation, RemoteEVSE, Boolean> OnEVSEAddition
         {
             get
             {
@@ -285,15 +285,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region (private) RemoteChargingStation()
 
-        private RemoteChargingStationREal()
+        private RemoteChargingStation()
         {
 
-            this._EVSEs                     = new ConcurrentDictionary<EVSE_Id, NetworkEVSEStub>();
+            this._EVSEs                     = new ConcurrentDictionary<EVSE_Id, RemoteEVSE>();
 
             #region Init events
 
             // ChargingStation events
-            this.EVSEAddition               = new VotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean>(() => new VetoVote(), true);
+            this.EVSEAddition               = new VotingNotificator<DateTime, RemoteChargingStation, RemoteEVSE, Boolean>(() => new VetoVote(), true);
           //  this.EVSERemoval                = new VotingNotificator<DateTime, ChargingStation, EVSE, Boolean>(() => new VetoVote(), true);
 
           //  // EVSE events
@@ -319,7 +319,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="EVSEOperatorTimeout">The timeout connecting to the EVSE operator backend.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
         /// <param name="AutoConnect">Connect to the EVSE operator backend automatically on startup. Default is false.</param>
-        public RemoteChargingStationREal(ChargingStation_Id  Id,
+        public RemoteChargingStation(ChargingStation_Id  Id,
                                          String              EVSEOperatorDNS      = "",
                                          Boolean             UseIPv4              = true,
                                          Boolean             UseIPv6              = false,
