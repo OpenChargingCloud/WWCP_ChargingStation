@@ -44,7 +44,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public static ChargingStation CreateNewRemoteStation(this ChargingPool                         ChargingPool,
                                                              ChargingStation_Id                        ChargingStationId                  = null,
                                                              Action<ChargingStation>                   ChargingStationConfigurator        = null,
-                                                             Action<RemoteChargingStation>             RemoteChargingStationConfigurator  = null,
+                                                             Action<NetworkChargingStationStub>            RemoteChargingStationConfigurator  = null,
                                                              Action<ChargingStation>                   OnSuccess                          = null,
                                                              Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
         {
@@ -62,7 +62,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                  OnError,
                                                  newstation => {
 
-                                                     var remotestation = new RemoteChargingStation(newstation);
+                                                     var remotestation = new NetworkChargingStationStub(newstation);
 
                                                      if (RemoteChargingStationConfigurator != null)
                                                          RemoteChargingStationConfigurator(remotestation);

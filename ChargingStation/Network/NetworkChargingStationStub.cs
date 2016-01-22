@@ -1,0 +1,637 @@
+﻿/*
+ * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ *
+ * Licensed under the Affero GPL license, Version 3.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.gnu.org/licenses/agpl.html
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#region Usings
+
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+
+using org.GraphDefined.Vanaheimr.Illias;
+using org.GraphDefined.Vanaheimr.Illias.Votes;
+using org.GraphDefined.Vanaheimr.Styx.Arrows;
+using org.GraphDefined.Vanaheimr.Hermod;
+using org.GraphDefined.Vanaheimr.Hermod.DNS;
+
+#endregion
+
+namespace org.GraphDefined.WWCP.ChargingStations
+{
+
+    /// <summary>
+    /// A remote charging station attached via a computer network (TCP/IP).
+    /// </summary>
+    public class NetworkChargingStationStub : INetworkChargingStation
+    {
+
+        #region Data
+
+        public static readonly TimeSpan  DefaultQueryTimeout  = TimeSpan.FromSeconds(180);
+
+        #endregion
+
+        #region Properties
+
+        #region ChargingStationId
+
+        private ChargingStation_Id _Id;
+
+        public ChargingStation_Id Id
+        {
+            get
+            {
+                return _Id;
+            }
+        }
+
+        #endregion
+
+        #region ChargingStation
+
+        private readonly ChargingStation _ChargingStation;
+
+        public ChargingStation ChargingStation
+        {
+            get
+            {
+                return _ChargingStation;
+            }
+        }
+
+        #endregion
+
+        #region Description
+
+        internal I18NString _Description;
+
+        /// <summary>
+        /// An optional (multi-language) description of this charging station.
+        /// </summary>
+        [Optional]
+        public I18NString Description
+        {
+
+            get
+            {
+
+                return _Description;
+
+            }
+
+            set
+            {
+
+                if (value == _Description)
+                    return;
+
+                _Description = value;
+
+            }
+
+        }
+
+        #endregion
+
+
+        #region IPTransport
+
+        private readonly IPTransport _IPTransport;
+
+        public IPTransport IPTransport
+        {
+            get
+            {
+                return _IPTransport;
+            }
+        }
+
+        #endregion
+
+        #region DNSClient
+
+        private readonly DNSClient _DNSClient;
+
+        public DNSClient DNSClient
+        {
+            get
+            {
+                return _DNSClient;
+            }
+        }
+
+        #endregion
+
+        #region Hostname
+
+        private readonly String _Hostname;
+
+        public String Hostname
+        {
+            get
+            {
+                return _Hostname;
+            }
+        }
+
+        #endregion
+
+        #region TCPPort
+
+        private readonly IPPort _TCPPort;
+
+        public IPPort TCPPort
+        {
+            get
+            {
+                return _TCPPort;
+            }
+        }
+
+        #endregion
+
+        #region Service
+
+        private readonly String _Service;
+
+        public String Service
+        {
+            get
+            {
+                return _Service;
+            }
+        }
+
+        #endregion
+
+        #region UseTLS
+
+        private readonly Boolean _UseTLS;
+
+        public Boolean UseTLS
+        {
+            get
+            {
+                return _UseTLS;
+            }
+        }
+
+        #endregion
+
+        #region VirtualHost
+
+        private readonly String _VirtualHost;
+
+        public String VirtualHost
+        {
+            get
+            {
+                return _VirtualHost;
+            }
+        }
+
+        #endregion
+
+        #region URIPrefix
+
+        private readonly String _URIPrefix;
+
+        public String URIPrefix
+        {
+            get
+            {
+                return _URIPrefix;
+            }
+        }
+
+        #endregion
+
+        #region QueryTimeout
+
+        private readonly TimeSpan _QueryTimeout;
+
+        public TimeSpan QueryTimeout
+        {
+            get
+            {
+                return _QueryTimeout;
+            }
+        }
+
+        #endregion
+
+
+        #region Status
+
+        private ChargingStationStatusType _Status;
+
+        public ChargingStationStatusType Status
+        {
+            get
+            {
+                return _Status;
+            }
+        }
+
+        #endregion
+
+        #region EVSEs
+
+        private readonly ConcurrentDictionary<EVSE_Id, NetworkEVSEStub> _EVSEs;
+
+        public IEnumerable<NetworkEVSEStub> EVSEs
+        {
+            get
+            {
+                return _EVSEs.Select(kvp => kvp.Value);
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Events
+
+        #region Connected
+
+        public event CSConnectedDelegate Connected;
+
+        #endregion
+
+        #region EVSEOperatorTimeoutReached
+
+        public event CSEVSEOperatorTimeoutReachedDelegate EVSEOperatorTimeoutReached;
+
+        #endregion
+
+        #region Disconnected
+
+        public event CSDisconnectedDelegate Disconnected;
+
+        #endregion
+
+        #region StateChanged
+
+        public event CSStateChangedDelegate StateChanged;
+
+        #endregion
+
+
+        #region EVSEAddition
+
+        internal readonly IVotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> EVSEAddition;
+
+        /// <summary>
+        /// Called whenever an EVSE will be or was added.
+        /// </summary>
+        public IVotingSender<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> OnEVSEAddition
+        {
+            get
+            {
+                return EVSEAddition;
+            }
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Constructor(s)
+
+        #region NetworkChargingStationStub(ChargingStation)
+
+        /// <summary>
+        /// A charging station.
+        /// </summary>
+        /// <param name="ChargingStation">A local charging station.</param>
+        public NetworkChargingStationStub(ChargingStation  ChargingStation)
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException("ChargingStation", "The given charging station parameter must not be null!");
+
+            #endregion
+
+            this._Id               = ChargingStation.Id;
+            this._ChargingStation  = ChargingStation;
+            this._Status           = ChargingStationStatusType.Available;
+            this._EVSEs            = new ConcurrentDictionary<EVSE_Id, NetworkEVSEStub>();
+
+            #region Init events
+
+            // ChargingStation events
+            this.EVSEAddition               = new VotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean>(() => new VetoVote(), true);
+          //  this.EVSERemoval                = new VotingNotificator<DateTime, ChargingStation, EVSE, Boolean>(() => new VetoVote(), true);
+
+          //  // EVSE events
+          //  this.SocketOutletAddition       = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+          //  this.SocketOutletRemoval        = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+
+            #endregion
+
+        }
+
+        #endregion
+
+        #region NetworkChargingStationStub(Id, IPTransport = IPv4only, DNSClient = null, Hostname = DefaultHostname, TCPPort = null, ...)
+
+        /// <summary>
+        /// A virtual WWCP charging station.
+        /// </summary>
+        /// <param name="ChargingStation">A local charging station.</param>
+        /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
+        public NetworkChargingStationStub(ChargingStation  ChargingStation,
+                                          IPTransport      IPTransport   = IPTransport.IPv4only,
+                                          DNSClient        DNSClient     = null,
+                                          String           Hostname      = null,
+                                          IPPort           TCPPort       = null,
+                                          String           Service       = null,
+                                          Boolean          UseTLS        = false,
+                                          String           VirtualHost   = null,
+                                          String           URIPrefix     = null,
+                                          TimeSpan?        QueryTimeout  = null)
+
+            : this(ChargingStation)
+
+        {
+
+            this._IPTransport   = IPTransport;
+            this._DNSClient     = DNSClient != null              ? DNSClient          : new DNSClient(SearchForIPv4DNSServers: true,
+                                                                                                      SearchForIPv6DNSServers: false);
+            this._Hostname      = Hostname;
+            this._TCPPort       = TCPPort;
+            this._Service       = Service;
+            this._UseTLS        = UseTLS;
+            this._VirtualHost   = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
+            this._URIPrefix     = URIPrefix;
+            this._QueryTimeout  = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
+
+        }
+
+        #endregion
+
+        #endregion
+
+
+        #region CreateNewEVSE(EVSEId, Configurator = null, OnSuccess = null, OnError = null)
+
+        /// <summary>
+        /// Create and register a new EVSE having the given
+        /// unique EVSE identification.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of the new EVSE.</param>
+        /// <param name="Configurator">An optional delegate to configure the new EVSE after its creation.</param>
+        /// <param name="OnSuccess">An optional delegate called after successful creation of the EVSE.</param>
+        /// <param name="OnError">An optional delegate for signaling errors.</param>
+        public NetworkEVSEStub CreateNewEVSE(EVSE_Id                                 EVSEId,
+                                        Action<NetworkEVSEStub>                      Configurator  = null,
+                                        Action<NetworkEVSEStub>                      OnSuccess     = null,
+                                        Action<NetworkChargingStationStub, EVSE_Id>  OnError       = null)
+        {
+
+            #region Initial checks
+
+            if (EVSEId == null)
+                throw new ArgumentNullException("EVSEId", "The given EVSE identification must not be null!");
+
+            if (_EVSEs.ContainsKey(EVSEId))
+            {
+                if (OnError == null)
+                    throw new EVSEAlreadyExistsInStation(EVSEId, this.Id);
+                else
+                    OnError.FailSafeInvoke(this, EVSEId);
+            }
+
+            #endregion
+
+            var Now   = DateTime.Now;
+            var _EVSE = new NetworkEVSEStub(EVSEId, this);
+
+            Configurator.FailSafeInvoke(_EVSE);
+
+            if (EVSEAddition.SendVoting(Now, this, _EVSE))
+            {
+                if (_EVSEs.TryAdd(EVSEId, _EVSE))
+                {
+
+               //     _EVSE.OnPropertyChanged     += (Timestamp, Sender, PropertyName, OldValue, NewValue)
+               //                                     => UpdateEVSEData       (Timestamp, Sender as EVSE, PropertyName, OldValue, NewValue);
+               //
+               //     _EVSE.OnStatusChanged       += (Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus)
+               //                                     => UpdateEVSEStatus     (Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus);
+               //
+               //     _EVSE.OnAdminStatusChanged  += (Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus)
+               //                                     => UpdateEVSEAdminStatus(Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus);
+
+                    OnSuccess.FailSafeInvoke(_EVSE);
+                    EVSEAddition.SendNotification(Now, this, _EVSE);
+               //     UpdateEVSEStatus(Now, _EVSE, new Timestamped<EVSEStatusType>(Now, EVSEStatusType.Unspecified), _EVSE.Status);
+
+                    return _EVSE;
+
+                }
+            }
+
+            //Debug.WriteLine("EVSE '" + EVSEId + "' was not created!");
+            return null;
+
+        }
+
+        #endregion
+
+
+
+        #region Reserve(Timestamp, CancellationToken, ...)
+
+        public virtual async Task<ReservationResult> ReserveEVSE(DateTime                 Timestamp,
+                                                                 CancellationToken        CancellationToken,
+                                                                 EventTracking_Id         EventTrackingId,
+                                                                 EVSP_Id                  ProviderId,
+                                                                 ChargingReservation_Id   ReservationId,
+                                                                 DateTime?                StartTime,
+                                                                 TimeSpan?                Duration,
+                                                                 EVSE_Id                  EVSEId,
+                                                                 ChargingProduct_Id       ChargingProductId  = null,
+                                                                 IEnumerable<Auth_Token>  RFIDIds            = null,
+                                                                 IEnumerable<eMA_Id>      eMAIds             = null,
+                                                                 IEnumerable<UInt32>      PINs               = null,
+                                                                 TimeSpan?                QueryTimeout       = null)
+        {
+
+            return ReservationResult.OutOfService;
+
+        }
+
+        #endregion
+
+
+        #region RemoteStart(Timestamp, CancellationToken, EVSEId, ChargingProductId, ReservationId, SessionId, eMAId)
+
+        /// <summary>
+        /// Initiate a remote start of the given charging session at the given EVSE
+        /// and for the given Provider/eMAId.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ChargingProductId">The unique identification of the choosen charging product at the given EVSE.</param>
+        /// <param name="ReservationId">The unique identification for a charging reservation.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <returns>A RemoteStartResult task.</returns>
+        public virtual async Task<RemoteStartEVSEResult> RemoteStart(DateTime                Timestamp,
+                                                                     CancellationToken       CancellationToken,
+                                                                     EventTracking_Id        EventTrackingId,
+                                                                     EVSE_Id                 EVSEId,
+                                                                     ChargingProduct_Id      ChargingProductId,
+                                                                     ChargingReservation_Id  ReservationId,
+                                                                     ChargingSession_Id      SessionId,
+                                                                     EVSP_Id                 ProviderId,
+                                                                     eMA_Id                  eMAId,
+                                                                     TimeSpan?               QueryTimeout  = null)
+        {
+
+            return RemoteStartEVSEResult.OutOfService;
+
+        }
+
+        #endregion
+
+        #region RemoteStart(Timestamp, CancellationToken, ChargingProductId, ReservationId, SessionId, eMAId)
+
+        /// <summary>
+        /// Initiate a remote start of the given charging session at the given charging station
+        /// and for the given provider/eMAId.
+        /// </summary>
+        /// <param name="ChargingProductId">The unique identification of the choosen charging product at the given EVSE.</param>
+        /// <param name="ReservationId">The unique identification for a charging reservation.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <returns>A RemoteStartResult task.</returns>
+        public virtual async Task<RemoteStartChargingStationResult> RemoteStart(DateTime                Timestamp,
+                                                                                CancellationToken       CancellationToken,
+                                                                                EventTracking_Id        EventTrackingId,
+                                                                                ChargingProduct_Id      ChargingProductId,
+                                                                                ChargingReservation_Id  ReservationId,
+                                                                                ChargingSession_Id      SessionId,
+                                                                                EVSP_Id                 ProviderId,
+                                                                                eMA_Id                  eMAId,
+                                                                                TimeSpan?               QueryTimeout  = null)
+        {
+
+            return RemoteStartChargingStationResult.OutOfService;
+
+        }
+
+        #endregion
+
+
+        #region RemoteStop(Timestamp, CancellationToken, SessionId, ReservationHandling)
+
+        /// <summary>
+        /// Initiate a remote stop of the given charging session at the given EVSE.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <returns>A RemoteStopResult task.</returns>
+        public virtual async Task<RemoteStopResult> RemoteStop(DateTime             Timestamp,
+                                                               CancellationToken    CancellationToken,
+                                                               EventTracking_Id     EventTrackingId,
+                                                               ChargingSession_Id   SessionId,
+                                                               ReservationHandling  ReservationHandling,
+                                                               EVSP_Id              ProviderId,
+                                                               TimeSpan?            QueryTimeout  = null)
+        {
+
+            return RemoteStopResult.OutOfService(SessionId);
+
+        }
+
+        #endregion
+
+        #region RemoteStop(Timestamp, CancellationToken, EVSEId, SessionId, ReservationHandling)
+
+        /// <summary>
+        /// Initiate a remote stop of the given charging session at the given EVSE.
+        /// </summary>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <returns>A RemoteStopResult task.</returns>
+        public virtual async Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
+                                                                   CancellationToken    CancellationToken,
+                                                                   EventTracking_Id     EventTrackingId,
+                                                                   EVSE_Id              EVSEId,
+                                                                   ChargingSession_Id   SessionId,
+                                                                   ReservationHandling  ReservationHandling,
+                                                                   EVSP_Id              ProviderId,
+                                                                   TimeSpan?            QueryTimeout  = null)
+        {
+
+            return RemoteStopEVSEResult.OutOfService(SessionId);
+
+        }
+
+        #endregion
+
+        #region RemoteStop(Timestamp, CancellationToken, ChargingStationId, SessionId, ReservationHandling)
+
+        /// <summary>
+        /// Initiate a remote stop of the given charging session at the given charging station.
+        /// </summary>
+        /// <param name="ChargingStationId">The unique identification of a charging station.</param>
+        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="SessionId">The unique identification for this charging session.</param>
+        /// <returns>A RemoteStopResult task.</returns>
+        public virtual async Task<RemoteStopChargingStationResult> RemoteStop(DateTime             Timestamp,
+                                                                              CancellationToken    CancellationToken,
+                                                                              EventTracking_Id     EventTrackingId,
+                                                                              ChargingStation_Id   ChargingStationId,
+                                                                              ChargingSession_Id   SessionId,
+                                                                              ReservationHandling  ReservationHandling,
+                                                                              EVSP_Id              ProviderId,
+                                                                              TimeSpan?            QueryTimeout  = null)
+        {
+
+            return RemoteStopChargingStationResult.OutOfService(SessionId);
+
+        }
+
+        #endregion
+
+
+
+        IEnumerable<EVSE> IRemoteChargingStation.EVSEs
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
+        {
+            return this.CreateNewEVSE(EVSEId);
+        }
+
+    }
+
+}

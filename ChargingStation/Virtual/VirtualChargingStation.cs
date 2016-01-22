@@ -763,41 +763,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region AuthenticateToken(AuthToken)
-
-        public Boolean AuthenticateToken(Auth_Token AuthToken)
-        {
-            return false;
-        }
-
-        #endregion
-
-
-        #region Connect()
-
-        /// <summary>
-        /// Connect to the given EVSE operator backend.
-        /// </summary>
-        public TCPConnectResult Connect()
-        {
-            return _TCPClient.Connect();
-        }
-
-        #endregion
-
-        #region Disconnect()
-
-        /// <summary>
-        /// Disconnect from the given EVSE operator backend.
-        /// </summary>
-        public TCPDisconnectResult Disconnect()
-        {
-            return _TCPClient.Disconnect();
-        }
-
-        #endregion
-
-
 
         IEnumerable<EVSE> IRemoteChargingStation.EVSEs
         {
@@ -811,6 +776,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
             return this.CreateNewEVSE(EVSEId);
         }
+
+
+
+
+        //-- Client-side methods -----------------------------------------
+
+        #region AuthenticateToken(AuthToken)
+
+        public Boolean AuthenticateToken(Auth_Token AuthToken)
+        {
+            return false;
+        }
+
+        #endregion
+
+
 
     }
 

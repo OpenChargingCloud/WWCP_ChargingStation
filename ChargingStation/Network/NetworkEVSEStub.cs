@@ -38,11 +38,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
     /// This is meant to be one electrical circuit which can charge a electric vehicle
     /// independently. Thus there could be multiple interdependent power sockets.
     /// </summary>
-    public class RemoteEVSE : AEMobilityEntity<EVSE_Id>,
-                              IEquatable<RemoteEVSE>, IComparable<RemoteEVSE>, IComparable,
-                              IEnumerable<SocketOutlet>,
-                              IStatus<EVSEStatusType>,
-                              IRemoteEVSE
+    public class NetworkEVSEStub : AEMobilityEntity<EVSE_Id>,
+                                   IEquatable<NetworkEVSEStub>, IComparable<NetworkEVSEStub>, IComparable,
+                                   IEnumerable<SocketOutlet>,
+                                   IStatus<EVSEStatusType>,
+                                   IRemoteEVSE
     {
 
         #region Data
@@ -510,7 +510,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region ChargingStation
 
-        private readonly RemoteChargingStation _ChargingStation;
+        private readonly NetworkChargingStationStub _ChargingStation;
 
         /// <summary>
         /// The charging station of this EVSE.
@@ -555,7 +555,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="EVSE">The EVSE.</param>
         /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
         /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnStatusChangedDelegate(DateTime Timestamp, RemoteEVSE EVSE, Timestamped<EVSEStatusType> OldEVSEStatus, Timestamped<EVSEStatusType> NewEVSEStatus);
+        public delegate void OnStatusChangedDelegate(DateTime Timestamp, NetworkEVSEStub EVSE, Timestamped<EVSEStatusType> OldEVSEStatus, Timestamped<EVSEStatusType> NewEVSEStatus);
 
         /// <summary>
         /// An event fired whenever the dynamic status of the EVSE changed.
@@ -573,7 +573,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="EVSE">The EVSE.</param>
         /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
         /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnAdminStatusChangedDelegate(DateTime Timestamp, RemoteEVSE EVSE, Timestamped<EVSEAdminStatusType> OldEVSEStatus, Timestamped<EVSEAdminStatusType> NewEVSEStatus);
+        public delegate void OnAdminStatusChangedDelegate(DateTime Timestamp, NetworkEVSEStub EVSE, Timestamped<EVSEAdminStatusType> OldEVSEStatus, Timestamped<EVSEAdminStatusType> NewEVSEStatus);
 
         /// <summary>
         /// An event fired whenever the admin status of the EVSE changed.
@@ -661,10 +661,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">The parent charging station.</param>
         /// <param name="MaxStatusListSize">The maximum size of the EVSE status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the EVSE admin status list.</param>
-        internal RemoteEVSE(EVSE_Id                Id,
-                            RemoteChargingStation  ChargingStation,
-                            UInt16                 MaxStatusListSize       = DefaultMaxEVSEStatusListSize,
-                            UInt16                 MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+        internal NetworkEVSEStub(EVSE_Id                     Id,
+                                 NetworkChargingStationStub  ChargingStation,
+                                 UInt16                      MaxStatusListSize       = DefaultMaxEVSEStatusListSize,
+                                 UInt16                      MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
 
             : base(Id)
 
@@ -1056,7 +1056,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 throw new ArgumentNullException("The given object must not be null!");
 
             // Check if the given object is a virtual EVSE.
-            var RemoteEVSE = Object as RemoteEVSE;
+            var RemoteEVSE = Object as NetworkEVSEStub;
             if ((Object) RemoteEVSE == null)
                 throw new ArgumentException("The given object is not a virtual EVSE!");
 
@@ -1072,7 +1072,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Compares two instances of this object.
         /// </summary>
         /// <param name="RemoteEVSE">An virtual EVSE to compare with.</param>
-        public Int32 CompareTo(RemoteEVSE RemoteEVSE)
+        public Int32 CompareTo(NetworkEVSEStub RemoteEVSE)
         {
 
             if ((Object) RemoteEVSE == null)
@@ -1102,7 +1102,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 return false;
 
             // Check if the given object is a virtual EVSE.
-            var RemoteEVSE = Object as RemoteEVSE;
+            var RemoteEVSE = Object as NetworkEVSEStub;
             if ((Object) RemoteEVSE == null)
                 return false;
 
@@ -1119,7 +1119,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="RemoteEVSE">A virtual EVSE to compare with.</param>
         /// <returns>True if both match; False otherwise.</returns>
-        public Boolean Equals(RemoteEVSE RemoteEVSE)
+        public Boolean Equals(NetworkEVSEStub RemoteEVSE)
         {
 
             if ((Object) RemoteEVSE == null)

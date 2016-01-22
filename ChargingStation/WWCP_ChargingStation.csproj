@@ -46,11 +46,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Remote\ExtentionMethods.cs" />
-    <Compile Include="Remote\RemoteEVSE.cs" />
+    <Compile Include="Network\ExtentionMethods.cs" />
+    <Compile Include="Network\NetworkEVSEStub.cs" />
+    <Compile Include="Remote\RemoteChargingStationReal.cs" />
     <Compile Include="Virtual\ExtentionMethods.cs" />
-    <Compile Include="Remote\RemoteEVSEOperator.cs" />
-    <Compile Include="Remote\RemoteChargingStation.cs" />
+    <Compile Include="Network\RemoteEVSEOperator.cs" />
+    <Compile Include="Network\NetworkChargingStationStub.cs" />
     <Compile Include="Virtual\VirtualChargingStation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Virtual\VirtualEVSE.cs" />
