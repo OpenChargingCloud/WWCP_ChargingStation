@@ -17,6 +17,7 @@
 
 #region Usings
 
+using org.GraphDefined.Vanaheimr.Illias;
 using System;
 using System.Linq;
 using System.Threading;
@@ -63,12 +64,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStart(DateTime                Timestamp,
                         CancellationToken       CancellationToken,
+                        EventTracking_Id        EventTrackingId,
                         EVSE_Id                 EVSEId,
                         ChargingProduct_Id      ChargingProductId,
                         ChargingReservation_Id  ReservationId,
                         ChargingSession_Id      SessionId,
                         EVSP_Id                 ProviderId,
-                        eMA_Id                  eMAId)
+                        eMA_Id                  eMAId,
+                        TimeSpan?               QueryTimeout  = null)
 
         {
 
@@ -83,12 +86,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      (Timestamp,
                                                       this,
                                                       CancellationToken,
+                                                      EventTrackingId,
                                                       EVSEId,
                                                       ChargingProductId,
                                                       ReservationId,
                                                       SessionId,
                                                       ProviderId,
-                                                      eMAId)));
+                                                      eMAId,
+                                                      QueryTimeout)));
 
             return results.
                        Where(result => result.Result != RemoteStartEVSEResultType.Unspecified).
@@ -99,9 +104,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
 
 
-        public Task<RemoteStopEVSEResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EVSE_Id EVSEId, ReservationHandling ReservationHandling, ChargingSession_Id SessionId)
+        public Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
+                                                     CancellationToken    CancellationToken,
+                                                     EventTracking_Id     EventTrackingId,
+                                                     EVSE_Id              EVSEId,
+                                                     ReservationHandling  ReservationHandling,
+                                                     ChargingSession_Id   SessionId,
+                                                     TimeSpan?            QueryTimeout  = null)
         {
+
             throw new NotImplementedException();
+
         }
 
     }

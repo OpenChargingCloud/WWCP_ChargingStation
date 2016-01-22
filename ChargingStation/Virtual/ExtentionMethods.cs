@@ -18,13 +18,6 @@
 #region Usings
 
 using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using org.GraphDefined.Vanaheimr.Illias;
-using org.GraphDefined.Vanaheimr.Hermod.Sockets.TCP;
-using org.GraphDefined.Vanaheimr.Hermod.DNS;
 
 #endregion
 
@@ -34,7 +27,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     /// <summary>
     /// Extention methods
     /// </summary>
-    public static class ExtentionMethods
+    public static partial class ExtentionMethods
     {
 
         #region CreateNewVirtualStation(this ChargingPool, ChargingStationId = null, Configurator = null, OnSuccess = null, OnError = null)
@@ -47,7 +40,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Configurator"></param>
         /// <param name="OnSuccess"></param>
         /// <param name="OnError"></param>
-        /// <returns></returns>
         public static ChargingStation CreateNewVirtualStation(this ChargingPool                         ChargingPool,
                                                               ChargingStation_Id                        ChargingStationId  = null,
                                                               Action<ChargingStation>                   Configurator       = null,

@@ -821,6 +821,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         public async Task<ReservationResult> Reserve(DateTime                Timestamp,
                                                      CancellationToken       CancellationToken,
+                                                     EventTracking_Id        EventTrackingId,
                                                      EVSP_Id                 ProviderId,
                                                      ChargingReservation_Id  ReservationId,
                                                      DateTime?               StartTime,
@@ -828,7 +829,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      ChargingProduct_Id      ChargingProductId  = null,
                                                      IEnumerable<Auth_Token> RFIDIds            = null,
                                                      IEnumerable<eMA_Id>     eMAIds             = null,
-                                                     IEnumerable<UInt32>     PINs               = null)
+                                                     IEnumerable<UInt32>     PINs               = null,
+                                                     TimeSpan?               QueryTimeout       = null)
         {
 
             #region Try to remove an existing reservation if this is an update!
@@ -898,11 +900,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <returns>A RemoteStartResult task.</returns>
         public async Task<RemoteStartEVSEResult> RemoteStart(DateTime                Timestamp,
                                                              CancellationToken       CancellationToken,
+                                                             EventTracking_Id        EventTrackingId,
                                                              ChargingProduct_Id      ChargingProductId,
                                                              ChargingReservation_Id  ReservationId,
                                                              ChargingSession_Id      SessionId,
                                                              EVSP_Id                 ProviderId,
-                                                             eMA_Id                  eMAId)
+                                                             eMA_Id                  eMAId,
+                                                             TimeSpan?               QueryTimeout  = null)
         {
 
             if (_ChargingStation == null)
@@ -911,12 +915,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
             return await _ChargingStation.
                              RemoteStart(Timestamp,
                                          CancellationToken,
+                                         EventTrackingId,
                                          Id,
                                          ChargingProductId,
                                          ReservationId,
                                          SessionId,
                                          ProviderId,
-                                         eMAId);
+                                         eMAId,
+                                         QueryTimeout);
 
         }
 
@@ -933,9 +939,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <returns>A RemoteStopResult task.</returns>
         public async Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
                                                            CancellationToken    CancellationToken,
+                                                           EventTracking_Id     EventTrackingId,
                                                            ChargingSession_Id   SessionId,
                                                            ReservationHandling  ReservationHandling,
-                                                           EVSP_Id              ProviderId)
+                                                           EVSP_Id              ProviderId,
+                                                           TimeSpan?            QueryTimeout  = null)
         {
 
             if (_ChargingStation == null)
@@ -946,9 +954,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var result2 = await _ChargingStation.
                                     RemoteStop(Timestamp,
                                                CancellationToken,
+                                               EventTrackingId,
                                                SessionId,
                                                ReservationHandling,
-                                               ProviderId);
+                                               ProviderId,
+                                               QueryTimeout);
 
             switch (result2.Result)
             {
