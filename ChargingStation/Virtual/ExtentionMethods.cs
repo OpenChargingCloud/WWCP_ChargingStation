@@ -30,21 +30,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public static partial class ExtentionMethods
     {
 
-        #region CreateNewVirtualStation(this ChargingPool, ChargingStationId = null, Configurator = null, OnSuccess = null, OnError = null)
+        #region CreateNewVirtualStation(this ChargingPool, ChargingStationId = null, ChargingStationConfigurator = null, VirtualChargingStationConfigurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
         /// Create a new virtual charging station.
         /// </summary>
         /// <param name="ChargingPool">A charging pool.</param>
-        /// <param name="ChargingStationId">The charging station identification for the charging station to create.</param>
-        /// <param name="Configurator"></param>
-        /// <param name="OnSuccess"></param>
-        /// <param name="OnError"></param>
+        /// <param name="ChargingStationId">The charging station identification for the charging station to be created.</param>
+        /// <param name="ChargingStationConfigurator">An optional delegate to configure the new (local) charging station.</param>
+        /// <param name="VirtualChargingStationConfigurator">An optional delegate to configure the new virtual charging station.</param>
+        /// <param name="OnSuccess">An optional delegate for reporting success.</param>
+        /// <param name="OnError">An optional delegate for reporting an error.</param>
         public static ChargingStation CreateNewVirtualStation(this ChargingPool                         ChargingPool,
-                                                              ChargingStation_Id                        ChargingStationId  = null,
-                                                              Action<ChargingStation>                   Configurator       = null,
-                                                              Action<ChargingStation>                   OnSuccess          = null,
-                                                              Action<ChargingPool, ChargingStation_Id>  OnError            = null)
+                                                              ChargingStation_Id                        ChargingStationId                   = null,
+                                                              Action<ChargingStation>                   ChargingStationConfigurator         = null,
+                                                              Action<VirtualChargingStation>            VirtualChargingStationConfigurator  = null,
+                                                              Action<ChargingStation>                   OnSuccess                           = null,
+                                                              Action<ChargingPool, ChargingStation_Id>  OnError                             = null)
         {
 
             #region Initial checks
@@ -54,14 +56,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var _ChargingStation  = ChargingPool.CreateNewStation(ChargingStationId,
-                                                                  Configurator,
-                                                                  OnSuccess,
-                                                                  OnError);
+            return ChargingPool.CreateNewStation(ChargingStationId,
+                                                 ChargingStationConfigurator,
+                                                 OnSuccess,
+                                                 OnError,
+                                                 newstation => {
 
-            _ChargingStation.RemoteChargingStation  = new VirtualChargingStation(_ChargingStation);
+                                                     var virtualstation = new VirtualChargingStation(newstation);
 
-            return _ChargingStation;
+                                                     if (VirtualChargingStationConfigurator != null)
+                                                         VirtualChargingStationConfigurator(virtualstation);
+
+                                                     return virtualstation;
+
+                                                 }) ;
 
         }
 

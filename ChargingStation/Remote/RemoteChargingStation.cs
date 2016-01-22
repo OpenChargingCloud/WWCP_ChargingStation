@@ -549,7 +549,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             try
             {
 
-                var httpresult = await new HTTPClient(BDLive_Hostname, BDLive_IPPort, false, _DNSClient).
+                var httpresult = await new HTTPClient(BDLive_Hostname,
+                                                      BDLive_IPPort,
+                                                      UseTLS:     false,
+                                                      DNSClient:  _DNSClient).
 
                                            Execute(client => client.POST(BDLive_URIPrefix + "/EVSEs/" + EVSEId.ToFormat(IdFormatType.OLD).Replace("+", ""),
 

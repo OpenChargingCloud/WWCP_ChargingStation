@@ -30,21 +30,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public static partial class ExtentionMethods
     {
 
-        #region CreateNewRemoteStation(this ChargingPool, ChargingStationId = null, Configurator = null, OnSuccess = null, OnError = null)
+        #region CreateNewRemoteStation(this ChargingPool, ChargingStationId = null, ChargingStationConfigurator = null, RemoteChargingStationConfigurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
-        /// Create a new virtual charging station.
+        /// Create a new remote charging station.
         /// </summary>
         /// <param name="ChargingPool">A charging pool.</param>
-        /// <param name="ChargingStationId">The charging station identification for the charging station to create.</param>
-        /// <param name="Configurator"></param>
-        /// <param name="OnSuccess"></param>
-        /// <param name="OnError"></param>
+        /// <param name="ChargingStationId">The charging station identification for the charging station to be created.</param>
+        /// <param name="ChargingStationConfigurator">An optional delegate to configure the new (local) charging station.</param>
+        /// <param name="RemoteChargingStationConfigurator">An optional delegate to configure the new (remote) charging station.</param>
+        /// <param name="OnSuccess">An optional delegate for reporting success.</param>
+        /// <param name="OnError">An optional delegate for reporting an error.</param>
         public static ChargingStation CreateNewRemoteStation(this ChargingPool                         ChargingPool,
-                                                             ChargingStation_Id                        ChargingStationId  = null,
-                                                             Action<ChargingStation>                   Configurator       = null,
-                                                             Action<ChargingStation>                   OnSuccess          = null,
-                                                             Action<ChargingPool, ChargingStation_Id>  OnError            = null)
+                                                             ChargingStation_Id                        ChargingStationId                  = null,
+                                                             Action<ChargingStation>                   ChargingStationConfigurator        = null,
+                                                             Action<RemoteChargingStation>             RemoteChargingStationConfigurator  = null,
+                                                             Action<ChargingStation>                   OnSuccess                          = null,
+                                                             Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
         {
 
             #region Initial checks
@@ -54,14 +56,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var _ChargingStation  = ChargingPool.CreateNewStation(ChargingStationId,
-                                                                  Configurator,
-                                                                  OnSuccess,
-                                                                  OnError);
+            return ChargingPool.CreateNewStation(ChargingStationId,
+                                                 ChargingStationConfigurator,
+                                                 OnSuccess,
+                                                 OnError,
+                                                 newstation => {
 
-            _ChargingStation.RemoteChargingStation  = new RemoteChargingStation(_ChargingStation);
+                                                     var remotestation = new RemoteChargingStation(newstation);
 
-            return _ChargingStation;
+                                                     if (RemoteChargingStationConfigurator != null)
+                                                         RemoteChargingStationConfigurator(remotestation);
+
+                                                     return remotestation;
+
+                                                 }) ;
 
         }
 
