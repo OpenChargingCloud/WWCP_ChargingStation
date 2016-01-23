@@ -269,43 +269,123 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
-        #region Connected
 
-        public event CSConnectedDelegate Connected;
-
-        #endregion
-
-        #region EVSEOperatorTimeoutReached
-
-        public event CSEVSEOperatorTimeoutReachedDelegate EVSEOperatorTimeoutReached;
-
-        #endregion
-
-        #region Disconnected
-
-        public event CSDisconnectedDelegate Disconnected;
-
-        #endregion
-
-        #region StateChanged
-
-        public event CSStateChangedDelegate StateChanged;
-
-        #endregion
-
+        // EVSE events
 
         #region EVSEAddition
 
-        internal readonly IVotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> EVSEAddition;
+        internal readonly IVotingNotificator<DateTime, IRemoteChargingStation, IRemoteEVSE, Boolean> EVSEAddition;
 
         /// <summary>
         /// Called whenever an EVSE will be or was added.
         /// </summary>
-        public IVotingSender<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean> OnEVSEAddition
+        public IVotingSender<DateTime, IRemoteChargingStation, IRemoteEVSE, Boolean> OnEVSEAddition
         {
             get
             {
                 return EVSEAddition;
+            }
+        }
+
+        #endregion
+
+        #region OnEVSEDataChanged
+
+        /// <summary>
+        /// An event fired whenever the static data of any subordinated EVSE changed.
+        /// </summary>
+        public event OnEVSEDataChangedDelegate OnEVSEDataChanged;
+
+        #endregion
+
+        #region OnEVSE(Admin)StatusChanged
+
+        /// <summary>
+        /// An event fired whenever the dynamic status of any subordinated EVSE changed.
+        /// </summary>
+        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
+
+        /// <summary>
+        /// An event fired whenever the admin status of any subordinated EVSE changed.
+        /// </summary>
+        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
+
+        #endregion
+
+        #region OnReserveEVSE / OnReservedEVSE
+
+        /// <summary>
+        /// An event fired whenever a reserve EVSE command was received.
+        /// </summary>
+        public event OnReserveEVSEDelegate   OnReserveEVSE;
+
+        /// <summary>
+        /// An event fired whenever a reserve EVSE command completed.
+        /// </summary>
+        public event OnEVSEReservedDelegate  OnEVSEReserved;
+
+        #endregion
+
+        #region OnRemoteEVSEStart / OnRemoteEVSEStarted
+
+        /// <summary>
+        /// An event fired whenever a remote start EVSE command was received.
+        /// </summary>
+        public event OnRemoteEVSEStartDelegate    OnRemoteEVSEStart;
+
+        /// <summary>
+        /// An event fired whenever a remote start EVSE command completed.
+        /// </summary>
+        public event OnRemoteEVSEStartedDelegate  OnRemoteEVSEStarted;
+
+        #endregion
+
+        #region OnRemoteEVSEStop / OnRemoteEVSEStopped
+
+        /// <summary>
+        /// An event fired whenever a remote stop EVSE command was received.
+        /// </summary>
+        public event OnRemoteEVSEStopDelegate     OnRemoteEVSEStop;
+
+        /// <summary>
+        /// An event fired whenever a remote stop EVSE command completed.
+        /// </summary>
+        public event OnRemoteEVSEStoppedDelegate  OnRemoteEVSEStopped;
+
+        #endregion
+
+
+        // Socket events
+
+        #region SocketOutletAddition
+
+        internal readonly IVotingNotificator<DateTime, VirtualEVSE, SocketOutlet, Boolean> SocketOutletAddition;
+
+        /// <summary>
+        /// Called whenever a socket outlet will be or was added.
+        /// </summary>
+        public IVotingSender<DateTime, VirtualEVSE, SocketOutlet, Boolean> OnSocketOutletAddition
+        {
+            get
+            {
+                return SocketOutletAddition;
+            }
+        }
+
+        #endregion
+
+        #region SocketOutletRemoval
+
+        internal readonly IVotingNotificator<DateTime, VirtualEVSE, SocketOutlet, Boolean> SocketOutletRemoval;
+
+        /// <summary>
+        /// Called whenever a socket outlet will be or was removed.
+        /// </summary>
+        public IVotingSender<DateTime, VirtualEVSE, SocketOutlet, Boolean> OnSocketOutletRemoval
+        {
+            get
+            {
+                return SocketOutletRemoval;
             }
         }
 
@@ -339,7 +419,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Init events
 
             // ChargingStation events
-            this.EVSEAddition               = new VotingNotificator<DateTime, NetworkChargingStationStub, NetworkEVSEStub, Boolean>(() => new VetoVote(), true);
+            this.EVSEAddition               = new VotingNotificator<DateTime, IRemoteChargingStation, IRemoteEVSE, Boolean>(() => new VetoVote(), true);
           //  this.EVSERemoval                = new VotingNotificator<DateTime, ChargingStation, EVSE, Boolean>(() => new VetoVote(), true);
 
           //  // EVSE events

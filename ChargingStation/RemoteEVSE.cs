@@ -864,7 +864,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration. HasValue ? Duration. Value : MaxReservationDuration,
                                                                 ProviderId,
-                                                                ChargingReservationType.AtEVSE,
+                                                                ChargingReservationLevel.EVSE,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,

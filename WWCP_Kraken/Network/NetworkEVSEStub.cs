@@ -363,7 +363,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         private ChargingReservation _Reservation;
 
         /// <summary>
-        /// The charging reservation.
+        /// The charging reservation, if available.
         /// </summary>
         [InternalUseOnly]
         public ChargingReservation Reservation
@@ -393,29 +393,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region CurrentChargingSession
+        #region ChargingSession
 
-        private ChargingSession_Id _CurrentChargingSession;
+        private ChargingSession _ChargingSession;
 
         /// <summary>
-        /// The current charging session at this EVSE.
+        /// The current charging session, if available.
         /// </summary>
         [InternalUseOnly]
-        public ChargingSession_Id CurrentChargingSession
+        public ChargingSession ChargingSession
         {
 
             get
             {
-                return _CurrentChargingSession;
+                return _ChargingSession;
             }
 
             set
             {
 
-                if (_CurrentChargingSession != value)
-                    SetProperty(ref _CurrentChargingSession, value);
+                if (_ChargingSession != value)
+                    SetProperty(ref _ChargingSession, value);
 
-                if (_CurrentChargingSession != null)
+                if (_ChargingSession != null)
                     SetStatus(EVSEStatusType.Charging);
                 else
                     SetStatus(EVSEStatusType.Available);
@@ -549,15 +549,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region OnStatusChanged
 
         /// <summary>
-        /// A delegate called whenever the dynamic status of the EVSE changed.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="EVSE">The EVSE.</param>
-        /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
-        /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnStatusChangedDelegate(DateTime Timestamp, NetworkEVSEStub EVSE, Timestamped<EVSEStatusType> OldEVSEStatus, Timestamped<EVSEStatusType> NewEVSEStatus);
-
-        /// <summary>
         /// An event fired whenever the dynamic status of the EVSE changed.
         /// </summary>
         public event OnStatusChangedDelegate OnStatusChanged;
@@ -565,15 +556,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
         #region OnAdminStatusChanged
-
-        /// <summary>
-        /// A delegate called whenever the admin status of the EVSE changed.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="EVSE">The EVSE.</param>
-        /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
-        /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnAdminStatusChangedDelegate(DateTime Timestamp, NetworkEVSEStub EVSE, Timestamped<EVSEAdminStatusType> OldEVSEStatus, Timestamped<EVSEAdminStatusType> NewEVSEStatus);
 
         /// <summary>
         /// An event fired whenever the admin status of the EVSE changed.
@@ -585,15 +567,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region OnNewReservation
 
         /// <summary>
-        /// A delegate called whenever a reservation was created.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="EVSE">The EVSE.</param>
-        /// <param name="Reservation">The new charging reservation.</param>
-        public delegate void OnNewReservationDelegate(DateTime Timestamp, EVSE EVSE, ChargingReservation Reservation);
-
-        /// <summary>
-        /// An event fired whenever reservation was created.
+        /// An event fired whenever a new charging reservation was created.
         /// </summary>
         public event OnNewReservationDelegate OnNewReservation;
 
@@ -602,28 +576,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region OnReservationDeleted
 
         /// <summary>
-        /// A delegate called whenever a reservation was deleted.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="EVSE">The EVSE.</param>
-        /// <param name="Reservation">The deleted charging reservation.</param>
-        public delegate void OnReservationDeletedDelegate(DateTime Timestamp, EVSE EVSE, ChargingReservation Reservation);
-
-        /// <summary>
-        /// An event fired whenever reservation was deleted.
+        /// An event fired whenever a charging reservation was deleted.
         /// </summary>
         public event OnReservationDeletedDelegate OnReservationDeleted;
 
         #endregion
 
+        #region OnNewChargingSession
+
+        /// <summary>
+        /// An event fired whenever a new charging session was created.
+        /// </summary>
+        public event OnNewChargingSessionDelegate OnNewChargingSession;
+
+        #endregion
+
         #region SocketOutletAddition
 
-        internal readonly IVotingNotificator<DateTime, EVSE, SocketOutlet, Boolean> SocketOutletAddition;
+        internal readonly IVotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean> SocketOutletAddition;
 
         /// <summary>
         /// Called whenever a socket outlet will be or was added.
         /// </summary>
-        public IVotingSender<DateTime, EVSE, SocketOutlet, Boolean> OnSocketOutletAddition
+        public IVotingSender<DateTime, IRemoteEVSE, SocketOutlet, Boolean> OnSocketOutletAddition
         {
             get
             {
@@ -635,12 +610,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region SocketOutletRemoval
 
-        internal readonly IVotingNotificator<DateTime, EVSE, SocketOutlet, Boolean> SocketOutletRemoval;
+        internal readonly IVotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean> SocketOutletRemoval;
 
         /// <summary>
         /// Called whenever a socket outlet will be or was removed.
         /// </summary>
-        public IVotingSender<DateTime, EVSE, SocketOutlet, Boolean> OnSocketOutletRemoval
+        public IVotingSender<DateTime, IRemoteEVSE, SocketOutlet, Boolean> OnSocketOutletRemoval
         {
             get
             {
@@ -696,8 +671,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Init events
 
-            this.SocketOutletAddition   = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
-            this.SocketOutletRemoval    = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+            this.SocketOutletAddition   = new VotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+            this.SocketOutletRemoval    = new VotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
 
             #endregion
 
@@ -864,7 +839,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration. HasValue ? Duration. Value : MaxReservationDuration,
                                                                 ProviderId,
-                                                                ChargingReservationType.AtEVSE,
+                                                                ChargingReservationLevel.EVSE,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,
