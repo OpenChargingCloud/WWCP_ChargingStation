@@ -1579,7 +1579,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
 
             if (EVSEId == null)
-                throw new ArgumentNullException("EVSEId",     "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId),     "The given parameter must not be null!");
 
             #endregion
 
@@ -1728,7 +1728,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEId           == null)
-                throw new ArgumentNullException("EVSEId",            "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId),            "The given parameter must not be null!");
 
             if (SessionId        == null)
                 throw new ArgumentNullException("SessionId",         "The given parameter must not be null!");

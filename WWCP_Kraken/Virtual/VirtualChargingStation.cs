@@ -444,7 +444,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (EVSEId == null)
-                throw new ArgumentNullException("EVSEId", "The given EVSE identification must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId), "The given EVSE identification must not be null!");
 
             if (_EVSEs.Any(evse => evse.Id == EVSEId))
             {
@@ -492,27 +492,43 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region ReserveEVSE(...ProviderId, ReservationId, StartTime, Duration, EVSEId, ...)
+        #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
-        public async Task<ReservationResult> ReserveEVSE(DateTime                 Timestamp,
-                                                         CancellationToken        CancellationToken,
-                                                         EventTracking_Id         EventTrackingId,
-                                                         EVSP_Id                  ProviderId,
-                                                         ChargingReservation_Id   ReservationId,
-                                                         DateTime?                StartTime,
-                                                         TimeSpan?                Duration,
-                                                         EVSE_Id                  EVSEId,
-                                                         ChargingProduct_Id       ChargingProductId  = null,
-                                                         IEnumerable<Auth_Token>  RFIDIds            = null,
-                                                         IEnumerable<eMA_Id>      eMAIds             = null,
-                                                         IEnumerable<UInt32>      PINs               = null,
-                                                         TimeSpan?                QueryTimeout       = null)
+        /// <summary>
+        /// Reserve the possibility to charge at the given EVSE.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
+        /// <param name="EVSEId">The unique identification of the EVSE to be reserved.</param>
+        /// <param name="StartTime">The starting time of the reservation.</param>
+        /// <param name="Duration">The duration of the reservation.</param>
+        /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
+        /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
+        /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
+        /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        public async Task<ReservationResult> Reserve(DateTime                 Timestamp,
+                                                     CancellationToken        CancellationToken,
+                                                     EventTracking_Id         EventTrackingId,
+                                                     EVSE_Id                  EVSEId,
+                                                     DateTime?                StartTime,
+                                                     TimeSpan?                Duration,
+                                                     ChargingReservation_Id   ReservationId      = null,
+                                                     EVSP_Id                  ProviderId         = null,
+                                                     ChargingProduct_Id       ChargingProductId  = null,
+                                                     IEnumerable<Auth_Token>  AuthTokens         = null,
+                                                     IEnumerable<eMA_Id>      eMAIds             = null,
+                                                     IEnumerable<UInt32>      PINs               = null,
+                                                     TimeSpan?                QueryTimeout       = null)
         {
 
             #region Initial checks
 
             if (EVSEId == null)
-                throw new ArgumentNullException("EVSEId",  "The given EVSE identification must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId),  "The given EVSE identification must not be null!");
 
             ReservationResult result = null;
 
@@ -529,13 +545,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                    Timestamp,
                                    EventTrackingId,
                                    _ChargingStation.ChargingPool.Operator.RoamingNetwork.Id,
-                                   ProviderId,
                                    ReservationId,
+                                   EVSEId,
                                    StartTime,
                                    Duration,
-                                   EVSEId,
+                                   ProviderId,
                                    ChargingProductId,
-                                   RFIDIds,
+                                   AuthTokens,
                                    eMAIds,
                                    PINs);
 
@@ -551,12 +567,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 result = await _VirtualEVSE.Reserve(Timestamp,
                                                     CancellationToken,
                                                     EventTrackingId,
-                                                    ProviderId,
-                                                    ReservationId,
                                                     StartTime,
                                                     Duration,
+                                                    ReservationId,
+                                                    ProviderId,
                                                     ChargingProductId,
-                                                    RFIDIds,
+                                                    AuthTokens,
                                                     eMAIds,
                                                     PINs,
                                                     QueryTimeout);
@@ -575,13 +591,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     Timestamp,
                                     EventTrackingId,
                                     _ChargingStation.ChargingPool.Operator.RoamingNetwork.Id,
-                                    ProviderId,
                                     ReservationId,
+                                    EVSEId,
                                     StartTime,
                                     Duration,
-                                    EVSEId,
+                                    ProviderId,
                                     ChargingProductId,
-                                    RFIDIds,
+                                    AuthTokens,
                                     eMAIds,
                                     PINs,
                                     result);
@@ -593,6 +609,44 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
+
+        #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
+
+        /// <summary>
+        /// Reserve the possibility to charge at the given EVSE.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
+        /// <param name="StartTime">The starting time of the reservation.</param>
+        /// <param name="Duration">The duration of the reservation.</param>
+        /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
+        /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
+        /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
+        /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        public async Task<ReservationResult> Reserve(DateTime                 Timestamp,
+                                                     CancellationToken        CancellationToken,
+                                                     EventTracking_Id         EventTrackingId,
+                                                     DateTime?                StartTime,
+                                                     TimeSpan?                Duration,
+                                                     ChargingReservation_Id   ReservationId      = null,
+                                                     EVSP_Id                  ProviderId         = null,
+                                                     ChargingProduct_Id       ChargingProductId  = null,
+                                                     IEnumerable<Auth_Token>  AuthTokens         = null,
+                                                     IEnumerable<eMA_Id>      eMAIds             = null,
+                                                     IEnumerable<UInt32>      PINs               = null,
+                                                     TimeSpan?                QueryTimeout       = null)
+        {
+
+            return ReservationResult.OutOfService;
+
+        }
+
+        #endregion
+
 
 
         #region RemoteStart(...EVSEId, ChargingProductId, ReservationId, SessionId, ProviderId, eMAId)
@@ -622,7 +676,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (EVSEId == null)
-                throw new ArgumentNullException("EVSEId",  "The given EVSE identification must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId),  "The given EVSE identification must not be null!");
 
             RemoteStartEVSEResult result = null;
 
@@ -772,7 +826,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (EVSEId == null)
-                throw new ArgumentNullException("EVSEId",     "The given EVSE identification must not be null!");
+                throw new ArgumentNullException(nameof(EVSEId),     "The given EVSE identification must not be null!");
 
             if (SessionId == null)
                 throw new ArgumentNullException("SessionId",  "The given charging session identification must not be null!");

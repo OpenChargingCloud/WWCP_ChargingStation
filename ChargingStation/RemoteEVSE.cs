@@ -827,7 +827,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      DateTime?               StartTime,
                                                      TimeSpan?               Duration,
                                                      ChargingProduct_Id      ChargingProductId  = null,
-                                                     IEnumerable<Auth_Token> RFIDIds            = null,
+                                                     IEnumerable<Auth_Token> AuthTokens            = null,
                                                      IEnumerable<eMA_Id>     eMAIds             = null,
                                                      IEnumerable<UInt32>     PINs               = null,
                                                      TimeSpan?               QueryTimeout       = null)
@@ -870,7 +870,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 ChargingStation.Id,
                                                                 Id,
                                                                 ChargingProductId,
-                                                                RFIDIds,
+                                                                AuthTokens,
                                                                 eMAIds,
                                                                 PINs);
 
