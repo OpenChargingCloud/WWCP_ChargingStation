@@ -34,7 +34,7 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <summary>
     /// A local E-Mobility service implementation.
     /// </summary>
-    public class LocalEMobilityService : IAuthServices
+    public class LocalEMobilityService : IeMobilityServiceProvider
     {
 
         #region Data
@@ -1080,7 +1080,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(EVSEOperator.AllEVSEs,
+            return await PushEVSEStatus(EVSEOperator.EVSEs,
                                         ActionType,
                                         EVSEOperator.Id,
                                         OperatorName.IsNotNullOrEmpty()
