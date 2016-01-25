@@ -49,29 +49,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Properties
 
-        #region ChargingStationId
+        #region Id
 
         private ChargingStation_Id _Id;
 
+        /// <summary>
+        /// The unique identification of this network charging station.
+        /// </summary>
         public ChargingStation_Id Id
         {
             get
             {
                 return _Id;
-            }
-        }
-
-        #endregion
-
-        #region ChargingStation
-
-        private readonly ChargingStation _ChargingStation;
-
-        public ChargingStation ChargingStation
-        {
-            get
-            {
-                return _ChargingStation;
             }
         }
 
@@ -251,6 +240,24 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #endregion
+
+        #region Links
+
+        #region ChargingStation
+
+        private readonly ChargingStation _ChargingStation;
+
+        public ChargingStation ChargingStation
+        {
+            get
+            {
+                return _ChargingStation;
+            }
+        }
+
+        #endregion
+
         #region EVSEs
 
         private readonly HashSet<NetworkEVSEStub> _EVSEs;
@@ -297,7 +304,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the static data of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEDataChangedDelegate OnEVSEDataChanged;
+        public event OnRemoteEVSEDataChangedDelegate OnRemoteEVSEDataChanged;
 
         #endregion
 
@@ -306,12 +313,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the dynamic status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
+        public event OnRemoteEVSEStatusChangedDelegate       OnRemoteEVSEStatusChanged;
 
         /// <summary>
         /// An event fired whenever the admin status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
+        public event OnRemoteEVSEAdminStatusChangedDelegate  OnRemoteEVSEAdminStatusChanged;
 
         #endregion
 
@@ -635,14 +642,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region TryRemoveReservation(ReservationId)
+        #region CancelReservation(ReservationId)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> TryRemoveReservation(ChargingReservation_Id ReservationId)
+        public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
+                                                     ChargingReservationCancellation  ReservationCancellation)
         {
 
             #region Initial checks
@@ -655,7 +663,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.TryRemoveReservation(ReservationId),
+                                MapFirst(evse => evse.CancelReservation(ReservationId, ReservationCancellation),
                                          Task.FromResult(false));
 
         }

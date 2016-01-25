@@ -342,91 +342,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region Reservation
-
-        private ChargingReservation _Reservation;
-
-        /// <summary>
-        /// The charging reservation, if available.
-        /// </summary>
-        [InternalUseOnly]
-        public ChargingReservation Reservation
-        {
-
-            get
-            {
-                return _Reservation;
-            }
-
-            set
-            {
-
-                // Skip, if the reservation is already known... 
-                if (_Reservation != value)
-                {
-
-                    _Reservation = value;
-
-                    var OnNewReservationLocal = OnNewReservation;
-                    if (OnNewReservationLocal != null)
-                        OnNewReservationLocal(DateTime.Now, this, _Reservation);
-
-                    if (_Reservation != null)
-                        SetStatus(EVSEStatusType.Reserved);
-                    else
-                        SetStatus(EVSEStatusType.Available);
-
-                }
-
-            }
-
-        }
-
-        #endregion
-
-        #region ChargingSession
-
-        private ChargingSession _ChargingSession;
-
-        /// <summary>
-        /// The current charging session, if available.
-        /// </summary>
-        [InternalUseOnly]
-        public ChargingSession ChargingSession
-        {
-
-            get
-            {
-                return _ChargingSession;
-            }
-
-            set
-            {
-
-                // Skip, if the charging session is already known... 
-                if (_ChargingSession != value)
-                {
-
-                    _ChargingSession = value;
-
-                    var OnNewChargingSessionLocal = OnNewChargingSession;
-                    if (OnNewChargingSessionLocal != null)
-                        OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
-
-                    if (_Reservation != null)
-                        SetStatus(EVSEStatusType.Charging);
-                    else
-                        SetStatus(EVSEStatusType.Available);
-
-                }
-
-            }
-
-        }
-
-        #endregion
-
-
         #region Status
 
         /// <summary>
@@ -519,6 +434,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #endregion
+
+        #region Links
 
         #region ChargingStation
 
@@ -576,32 +494,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region OnNewReservation
-
-        /// <summary>
-        /// An event fired whenever a new charging reservation was created.
-        /// </summary>
-        public event OnNewReservationDelegate OnNewReservation;
-
-        #endregion
-
-        #region OnReservationDeleted
-
-        /// <summary>
-        /// An event fired whenever a charging reservation was deleted.
-        /// </summary>
-        public event OnReservationDeletedDelegate OnReservationDeleted;
-
-        #endregion
-
-        #region OnNewChargingSession
-
-        /// <summary>
-        /// An event fired whenever a new charging session was created.
-        /// </summary>
-        public event OnNewChargingSessionDelegate OnNewChargingSession;
-
-        #endregion
 
         #region SocketOutletAddition
 
@@ -804,6 +696,117 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        #region (internal) UpdateStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal void UpdateStatus(DateTime                     Timestamp,
+                                   Timestamped<EVSEStatusType>  OldStatus,
+                                   Timestamped<EVSEStatusType>  NewStatus)
+        {
+
+            var OnStatusChangedLocal = OnStatusChanged;
+            if (OnStatusChangedLocal != null)
+                OnStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateAdminStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE admin status.</param>
+        /// <param name="NewStatus">The new EVSE admin status.</param>
+        internal void UpdateAdminStatus(DateTime                          Timestamp,
+                                        Timestamped<EVSEAdminStatusType>  OldStatus,
+                                        Timestamped<EVSEAdminStatusType>  NewStatus)
+        {
+
+            var OnAdminStatusChangedLocal = OnAdminStatusChanged;
+            if (OnAdminStatusChangedLocal != null)
+                OnAdminStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+
+        }
+
+        #endregion
+
+
+
+        #region Reservations...
+
+        #region Reservation
+
+        private ChargingReservation _Reservation;
+
+        /// <summary>
+        /// The charging reservation, if available.
+        /// </summary>
+        [InternalUseOnly]
+        public ChargingReservation Reservation
+        {
+
+            get
+            {
+                return _Reservation;
+            }
+
+            set
+            {
+
+                // Skip, if the reservation is already known... 
+                if (_Reservation != value)
+                {
+
+                    _Reservation = value;
+
+                    if (_Reservation != null)
+                    {
+
+                        SetStatus(EVSEStatusType.Reserved);
+
+                        var OnNewReservationLocal = OnNewReservation;
+                        if (OnNewReservationLocal != null)
+                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
+
+                    }
+
+                    else
+                        SetStatus(EVSEStatusType.Available);
+
+                }
+
+            }
+
+        }
+
+        #endregion
+
+        #region OnNewReservation
+
+        /// <summary>
+        /// An event fired whenever a new charging reservation was created.
+        /// </summary>
+        public event OnNewReservationDelegate OnNewReservation;
+
+        #endregion
+
+        #region OnReservationCancelled
+
+        /// <summary>
+        /// An event fired whenever a charging reservation was deleted.
+        /// </summary>
+        public event OnReservationCancelledDelegate OnReservationCancelled;
+
+        #endregion
+
         #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
         /// <summary>
@@ -884,6 +887,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusType.Available:
 
+                    // Will do: Status = EVSEStatusType.Reserved
                     this.Reservation = new ChargingReservation(Timestamp,
                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
@@ -898,8 +902,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                eMAIds,
                                                                PINs);
 
-                    //SetStatus(EVSEStatusType.Reserved);
-
                     return ReservationResult.Success(_Reservation);
 
                 default:
@@ -911,14 +913,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region TryRemoveReservation(ReservationId)
+        #region CancelReservation(ReservationId)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> TryRemoveReservation(ChargingReservation_Id ReservationId)
+        public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
+                                                     ChargingReservationCancellation  ReservationCancellation)
         {
 
             #region Initial checks
@@ -939,15 +942,84 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             _Reservation = null;
 
-            var OnReservationDeletedLocal = OnReservationDeleted;
-            if (OnReservationDeletedLocal != null)
-                OnReservationDeletedLocal(DateTime.Now, this, OldReservation);
+            var OnReservationCancelledLocal = OnReservationCancelled;
+            if (OnReservationCancelledLocal != null)
+                OnReservationCancelledLocal(DateTime.Now, this, OldReservation, ReservationCancellation);
 
             SetStatus(EVSEStatusType.Available);
 
             return true;
 
         }
+
+        #endregion
+
+        #endregion
+
+        #region RemoteStart/-Stop and Sessions...
+
+        #region ChargingSession
+
+        private ChargingSession _ChargingSession;
+
+        /// <summary>
+        /// The current charging session, if available.
+        /// </summary>
+        [InternalUseOnly]
+        public ChargingSession ChargingSession
+        {
+
+            get
+            {
+                return _ChargingSession;
+            }
+
+            set
+            {
+
+                // Skip, if the charging session is already known... 
+                if (_ChargingSession != value)
+                {
+
+                    _ChargingSession = value;
+
+                    if (_ChargingSession != null)
+                    {
+
+                        SetStatus(EVSEStatusType.Charging);
+
+                        var OnNewChargingSessionLocal = OnNewChargingSession;
+                        if (OnNewChargingSessionLocal != null)
+                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
+
+                    }
+
+                    else
+                        SetStatus(EVSEStatusType.Available);
+
+                }
+
+            }
+
+        }
+
+        #endregion
+
+        #region OnNewChargingSession
+
+        /// <summary>
+        /// An event fired whenever a new charging session was created.
+        /// </summary>
+        public event OnNewChargingSessionDelegate  OnNewChargingSession;
+
+        #endregion
+
+        #region OnNewChargeDetailRecord
+
+        /// <summary>
+        /// An event fired whenever a new charge detail record was created.
+        /// </summary>
+        public event OnNewChargeDetailRecordDelegate  OnNewChargeDetailRecord;
 
         #endregion
 
@@ -986,7 +1058,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-
             // SessionId_AlreadyInUse,
             // EVSE_NotReachable,
             // Start_Timeout
@@ -996,11 +1067,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (Status.Value == EVSEStatusType.Available)
             {
 
-                return RemoteStartEVSEResult.Success(new ChargingSession(SessionId) {
-                                                         ProviderId         = ProviderId,
-                                                         eMAId              = eMAId,
-                                                         ChargingProductId  = ChargingProductId
-                                                     });
+                // Will do: Status = EVSEStatusType.Charging;
+                ChargingSession  = new ChargingSession(SessionId) {
+                                                          ProviderId         = ProviderId,
+                                                          eMAId              = eMAId,
+                                                          ChargingProductId  = ChargingProductId
+                                                      };
+
+                var OnNewChargingSessionLocal = OnNewChargingSession;
+                if (OnNewChargingSessionLocal != null)
+                    OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
+
+                return RemoteStartEVSEResult.Success(ChargingSession);
 
             }
 
@@ -1015,12 +1093,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     Reservation.Id == ReservationId)
                 {
 
-                    return RemoteStartEVSEResult.Success(new ChargingSession(SessionId) {
-                                                             Reservation        = Reservation,
-                                                             ProviderId         = ProviderId,
-                                                             eMAId              = eMAId,
-                                                             ChargingProductId  = ChargingProductId
-                                                         });
+                    // Will do: Status = EVSEStatusType.Charging;
+                    ChargingSession = new ChargingSession(SessionId) {
+                                                              Reservation        = Reservation,
+                                                              ProviderId         = ProviderId,
+                                                              eMAId              = eMAId,
+                                                              ChargingProductId  = ChargingProductId
+                                                          };
+
+                    var OnNewChargingSessionLocal = OnNewChargingSession;
+                    if (OnNewChargingSessionLocal != null)
+                        OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
+
+                    return RemoteStartEVSEResult.Success(ChargingSession);
 
                 }
 
@@ -1114,8 +1199,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 if (ChargingSession.Id == SessionId)
                 {
+
+                    var _ChargeDetailRecord = new ChargeDetailRecord(_ChargingSession.Id,
+                                                                     _ChargingSession.Reservation);
+
+
+                    // Will do: Status = EVSEStatusType.Available
                     ChargingSession = null;
+
+                    var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
+                    if (OnNewChargeDetailRecordLocal != null)
+                        OnNewChargeDetailRecordLocal(DateTime.Now, this, _ChargeDetailRecord);
+
                     return RemoteStopEVSEResult.Success(SessionId, null, ReservationHandling);
+
                 }
 
                 else
@@ -1150,48 +1247,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-
-        #region (internal) UpdateStatus(Timestamp, OldStatus, NewStatus)
-
-        /// <summary>
-        /// Update the current status.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="OldStatus">The old EVSE status.</param>
-        /// <param name="NewStatus">The new EVSE status.</param>
-        internal void UpdateStatus(DateTime                     Timestamp,
-                                   Timestamped<EVSEStatusType>  OldStatus,
-                                   Timestamped<EVSEStatusType>  NewStatus)
-        {
-
-            var OnStatusChangedLocal = OnStatusChanged;
-            if (OnStatusChangedLocal != null)
-                OnStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
-
-        }
-
         #endregion
 
-        #region (internal) UpdateAdminStatus(Timestamp, OldStatus, NewStatus)
-
-        /// <summary>
-        /// Update the current status.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="OldStatus">The old EVSE admin status.</param>
-        /// <param name="NewStatus">The new EVSE admin status.</param>
-        internal void UpdateAdminStatus(DateTime                          Timestamp,
-                                        Timestamped<EVSEAdminStatusType>  OldStatus,
-                                        Timestamped<EVSEAdminStatusType>  NewStatus)
-        {
-
-            var OnAdminStatusChangedLocal = OnAdminStatusChanged;
-            if (OnAdminStatusChangedLocal != null)
-                OnAdminStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
-
-        }
-
-        #endregion
 
 
         #region IEnumerable<SocketOutlet> Members
@@ -1213,7 +1270,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
-
 
         #region IComparable<VirtualEVSE> Members
 
