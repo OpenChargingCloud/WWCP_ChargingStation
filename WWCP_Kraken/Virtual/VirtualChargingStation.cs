@@ -380,6 +380,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+
+        #region GetEVSEStatus(...)
+
+        public async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime                 Timestamp,
+                                                                 CancellationToken        CancellationToken,
+                                                                 EventTracking_Id         EventTrackingId,
+                                                                 TimeSpan?                QueryTimeout = null)
+        {
+
+            return _EVSEs.Select(evse => new EVSEStatus(evse.Id, evse.Status.Value));
+
+        }
+
+        #endregion
+
         #endregion
 
         #region Reservations...

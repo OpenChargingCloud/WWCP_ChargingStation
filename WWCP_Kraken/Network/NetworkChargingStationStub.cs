@@ -550,6 +550,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
 
 
+        public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime                 Timestamp,
+                                                                         CancellationToken        CancellationToken,
+                                                                         EventTracking_Id         EventTrackingId,
+                                                                         TimeSpan?                QueryTimeout = null)
+        {
+
+            return new EVSEStatus[] {
+                        new EVSEStatus(EVSE_Id.Parse("DE*822*E222*1"), EVSEStatusType.Charging)
+                    };
+
+        }
+
+
         #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
         /// <summary>
