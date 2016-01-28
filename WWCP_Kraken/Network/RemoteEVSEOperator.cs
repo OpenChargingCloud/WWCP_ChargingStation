@@ -54,8 +54,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                   OnRemoteStopEVSEDelegate   OnRemoteStopEVSE)
         {
 
-
-
+            this.OnRemoteStartEVSE += OnRemoteStartEVSE;
+            this.OnRemoteStopEVSE  += OnRemoteStopEVSE;
 
         }
 
