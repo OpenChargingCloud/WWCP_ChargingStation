@@ -48,14 +48,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region Data
 
         /// <summary>
-        /// The default max size of the EVSE status history.
+        /// The default max size of the status history.
         /// </summary>
-        public const UInt16 DefaultMaxEVSEStatusListSize = 50;
+        public const UInt16 DefaultMaxStatusListSize        = 50;
 
         /// <summary>
-        /// The default max size of the EVSE admin status history.
+        /// The default max size of the admin status history.
         /// </summary>
-        public const UInt16 DefaultMaxAdminStatusListSize = 50;
+        public const UInt16 DefaultMaxAdminStatusListSize   = 50;
 
         /// <summary>
         /// The maximum time span for a reservation.
@@ -542,7 +542,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="MaxAdminStatusListSize">The maximum size of the EVSE admin status list.</param>
         internal VirtualEVSE(EVSE_Id                 Id,
                              VirtualChargingStation  ChargingStation,
-                             UInt16                  MaxStatusListSize       = DefaultMaxEVSEStatusListSize,
+                             UInt16                  MaxStatusListSize       = DefaultMaxStatusListSize,
                              UInt16                  MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
 
             : base(Id)

@@ -17,17 +17,11 @@
 
 #region Usings
 
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-
-using org.GraphDefined.Vanaheimr.Hermod.HTTP;
-using System.Collections.Concurrent;
+using org.GraphDefined.WWCP.EMSP;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.EMSP
+namespace org.GraphDefined.WWCP
 {
 
     public static class LocalEMobilityServiceExtentions

@@ -38,6 +38,25 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public class VirtualChargingStation : IRemoteChargingStation
     {
 
+        #region Data
+
+        /// <summary>
+        /// The default max size of the status history.
+        /// </summary>
+        public const UInt16 DefaultMaxStatusListSize        = 50;
+
+        /// <summary>
+        /// The default max size of the admin status history.
+        /// </summary>
+        public const UInt16 DefaultMaxAdminStatusListSize   = 50;
+
+        /// <summary>
+        /// The maximum time span for a reservation.
+        /// </summary>
+        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
+
+        #endregion
+
         #region Properties
 
         #region Id
@@ -107,15 +126,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Links
 
-        #region ChargingStation
+        #region ChargingPool
 
-        private readonly ChargingStation _ChargingStation;
+        private readonly VirtualChargingPool _ChargingPool;
 
-        public ChargingStation ChargingStation
+        public VirtualChargingPool ChargingPool
         {
             get
             {
-                return _ChargingStation;
+                return _ChargingPool;
             }
         }
 
@@ -135,7 +154,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// A virtual WWCP charging station.
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
-        public VirtualChargingStation(ChargingStation  ChargingStation)
+        /// <param name="ChargingPool">The parent charging pool.</param>
+        /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
+        /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
+        public VirtualChargingStation(ChargingStation      ChargingStation,
+                                      VirtualChargingPool  ChargingPool,
+                                      UInt16               MaxStatusListSize       = DefaultMaxStatusListSize,
+                                      UInt16               MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
         {
 
             #region Initial checks
@@ -145,10 +170,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id               = ChargingStation.Id;
-            this._ChargingStation  = ChargingStation;
-            this._Status           = ChargingStationStatusType.Available;
-            this._EVSEs            = new HashSet<VirtualEVSE>();
+            this._Id            = ChargingStation.Id;
+            this._ChargingPool  = ChargingPool;
+            this._Status        = ChargingStationStatusType.Available;
+            this._EVSEs         = new HashSet<VirtualEVSE>();
 
         }
 
