@@ -150,8 +150,39 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Constructor(s)
 
+        #region VirtualChargingStation(ChargingStation, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+
         /// <summary>
-        /// A virtual WWCP charging station.
+        /// Create a virtual charging station.
+        /// </summary>
+        /// <param name="ChargingStation">A local charging station.</param>
+        /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
+        /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
+        public VirtualChargingStation(ChargingStation  ChargingStation,
+                                      UInt16           MaxStatusListSize       = DefaultMaxStatusListSize,
+                                      UInt16           MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging station must not be null!");
+
+            #endregion
+
+            this._Id            = ChargingStation.Id;
+            this._ChargingPool  = ChargingPool;
+            this._Status        = ChargingStationStatusType.Available;
+            this._EVSEs         = new HashSet<VirtualEVSE>();
+
+        }
+
+        #endregion
+
+        #region VirtualChargingStation(ChargingStation, ChargingPool, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+
+        /// <summary>
+        /// Create a virtual charging station.
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="ChargingPool">The parent charging pool.</param>
@@ -166,7 +197,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (ChargingStation == null)
-                throw new ArgumentNullException("ChargingStation", "The given charging station parameter must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging station must not be null!");
+
+            if (ChargingPool    == null)
+                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging pool must not be null!");
 
             #endregion
 
@@ -176,6 +210,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._EVSEs         = new HashSet<VirtualEVSE>();
 
         }
+
+        #endregion
 
         #endregion
 

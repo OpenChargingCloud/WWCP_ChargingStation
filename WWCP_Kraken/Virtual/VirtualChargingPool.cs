@@ -174,17 +174,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region CreateNewStation(ChargingStationId, Configurator = null, OnSuccess = null, OnError = null)
+        #region CreateNewStation(ChargingStation, Configurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
         /// Create and register a new charging station having the given
         /// unique charging station identification.
         /// </summary>
-        /// <param name="ChargingStationId">The unique identification of the new charging station.</param>
+        /// <param name="ChargingStation">A charging station.</param>
         /// <param name="Configurator">An optional delegate to configure the new charging station after its creation.</param>
         /// <param name="OnSuccess">An optional delegate called after successful creation of the charging station.</param>
         /// <param name="OnError">An optional delegate for signaling errors.</param>
-        public VirtualChargingStation CreateNewStation(ChargingStation_Id                               ChargingStationId,
+        public VirtualChargingStation CreateNewStation(ChargingStation                                  ChargingStation,
                                                        Action<VirtualChargingStation>                   Configurator  = null,
                                                        Action<VirtualChargingStation>                   OnSuccess     = null,
                                                        Action<VirtualChargingPool, ChargingStation_Id>  OnError       = null)
@@ -192,21 +192,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (ChargingStationId == null)
-                throw new ArgumentNullException(nameof(ChargingStationId), "The given charging station identification must not be null!");
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
 
-            if (_Stations.Any(station => station.Id == ChargingStationId))
+            if (_Stations.Any(station => station.Id == ChargingStation.Id))
             {
                 if (OnError == null)
-                    throw new ChargingStationAlreadyExistsInPool(ChargingStationId, this.Id);
+                    throw new ChargingStationAlreadyExistsInPool(ChargingStation.Id, this.Id);
                 else
-                    OnError.FailSafeInvoke(this, ChargingStationId);
+                    OnError.FailSafeInvoke(this, ChargingStation.Id);
             }
 
             #endregion
 
             var Now              = DateTime.Now;
-            var _VirtualStation  = new VirtualChargingStation(ChargingStationId, this);
+            var _VirtualStation  = new VirtualChargingStation(ChargingStation, this);
 
             Configurator.FailSafeInvoke(_VirtualStation);
 
@@ -233,7 +233,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
-
 
         #endregion
 
