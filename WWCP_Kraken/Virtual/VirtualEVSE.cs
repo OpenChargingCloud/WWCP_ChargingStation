@@ -1200,13 +1200,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 if (ChargingSession.Id == SessionId)
                 {
 
+                    var Now = DateTime.Now;
+
                     var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:              _ChargingSession.Id,
                                                                      ChargingReservation:    _ChargingSession.Reservation,
                                                                      EVSE:                   _ChargingSession.EVSE,
                                                                      ProviderId:             _ChargingSession.ProviderId,
                                                                      ChargingProductId:      _ChargingSession.ChargingProductId,
-                                                                     SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, DateTime.Now),
-                                                                     ChargingTime:           new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, DateTime.Now)
+                                                                     SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
+                                                                     EnergyMeterValues:      new List<Timestamped<Double>>() {
+                                                                                                 new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,       0),
+                                                                                                 new Timestamped<Double>(_ChargingSession.SessionTime.Value.EndTime.Value, 100)
+                                                                                             }
                                                                     );
 
                     // Will do: Status = EVSEStatusType.Available
