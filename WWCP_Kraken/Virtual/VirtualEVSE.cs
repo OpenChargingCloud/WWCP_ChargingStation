@@ -1209,8 +1209,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                      ChargingProductId:      _ChargingSession.ChargingProductId,
                                                                      SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
                                                                      EnergyMeterValues:      new List<Timestamped<Double>>() {
-                                                                                                 new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,       0),
-                                                                                                 new Timestamped<Double>(_ChargingSession.SessionTime.Value.EndTime.Value, 100)
+                                                                                                 new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
+                                                                                                 new Timestamped<Double>(Now,                                          100)
                                                                                              }
                                                                     );
 
