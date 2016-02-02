@@ -239,7 +239,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 result.Result == RemoteStopEVSEResultType.Success)
             {
 
-                _ChargingSessions.Remove(result.SessionId);
+                if (_ChargingSessions.ContainsKey(result.SessionId))
+                    _ChargingSessions.Remove(result.SessionId);
 
             }
 
