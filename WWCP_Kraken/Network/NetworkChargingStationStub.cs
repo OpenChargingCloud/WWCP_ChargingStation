@@ -327,7 +327,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever a reserve EVSE command was received.
         /// </summary>
-        public event OnReserveEVSEDelegate   OnReserveEVSE;
+        public event OnEVSEReserveDelegate   OnReserveEVSE;
 
         /// <summary>
         /// An event fired whenever a reserve EVSE command completed.
