@@ -1779,6 +1779,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
+
+        public void RemoveChargingStations(DateTime                      Timestamp,
+                                           IEnumerable<ChargingStation>  ChargingStations)
+        {
+
+            foreach (var ChargingStation in ChargingStations)
+                Console.WriteLine(DateTime.Now + " LocalEMobilityService says: " + ChargingStation.Id + " was removed!");
+
+        }
+
         #endregion
 
         #region Outgoing to the roaming network
