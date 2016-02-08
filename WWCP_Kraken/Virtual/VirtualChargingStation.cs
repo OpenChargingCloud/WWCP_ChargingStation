@@ -53,7 +53,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The maximum time span for a reservation.
         /// </summary>
-        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan MaxReservationDuration    = TimeSpan.FromMinutes(15);
+
+        /// <summary>
+        /// The default time span between self checks.
+        /// </summary>
+        public static readonly TimeSpan DefaultSelfCheckTimeSpan  = TimeSpan.FromSeconds(3);
+
+        private Timer _SelfCheckTimer;
 
         #endregion
 
@@ -122,19 +129,36 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region SelfCheckTimeSpan
+
+        private readonly TimeSpan _SelfCheckTimeSpan;
+
+        /// <summary>
+        /// The time span between self checks.
+        /// </summary>
+        public TimeSpan SelfCheckTimeSpan
+        {
+            get
+            {
+                return _SelfCheckTimeSpan;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Links
 
         #region ChargingPool
 
-        private readonly VirtualChargingPool _ChargingPool;
+        private readonly VirtualChargingPool _VirtualChargingPool;
 
         public VirtualChargingPool ChargingPool
         {
             get
             {
-                return _ChargingPool;
+                return _VirtualChargingPool;
             }
         }
 
@@ -150,15 +174,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Constructor(s)
 
-        #region VirtualChargingStation(ChargingStation, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+        #region VirtualChargingStation(ChargingStation, SelfCheckTimeSpan = null, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
 
         /// <summary>
         /// Create a virtual charging station.
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
+        /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
         public VirtualChargingStation(ChargingStation  ChargingStation,
+                                      TimeSpan?        SelfCheckTimeSpan       = null,
                                       UInt16           MaxStatusListSize       = DefaultMaxStatusListSize,
                                       UInt16           MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
         {
@@ -170,28 +196,35 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id            = ChargingStation.Id;
-            this._ChargingPool  = ChargingPool;
-            this._Status        = ChargingStationStatusType.Available;
-            this._EVSEs         = new HashSet<VirtualEVSE>();
+            this._Id                 = ChargingStation.Id;
+            this._Status             = ChargingStationStatusType.Available;
+            this._EVSEs              = new HashSet<VirtualEVSE>();
+
+            this._SelfCheckTimeSpan  = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
+            this._SelfCheckTimer     = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
         #endregion
 
-        #region VirtualChargingStation(ChargingStation, ChargingPool, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+        #region VirtualChargingStation(ChargingStation, VirtualChargingPool, SelfCheckTimeSpan = null, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
 
         /// <summary>
         /// Create a virtual charging station.
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
-        /// <param name="ChargingPool">The parent charging pool.</param>
+        /// <param name="VirtualChargingPool">The parent virtual charging pool.</param>
+        /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
         public VirtualChargingStation(ChargingStation      ChargingStation,
-                                      VirtualChargingPool  ChargingPool,
+                                      VirtualChargingPool  VirtualChargingPool,
+                                      TimeSpan?            SelfCheckTimeSpan       = null,
                                       UInt16               MaxStatusListSize       = DefaultMaxStatusListSize,
                                       UInt16               MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+
+            : this(ChargingStation, SelfCheckTimeSpan, MaxStatusListSize, MaxAdminStatusListSize)
+
         {
 
             #region Initial checks
@@ -199,19 +232,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (ChargingStation == null)
                 throw new ArgumentNullException(nameof(ChargingStation),  "The given charging station must not be null!");
 
-            if (ChargingPool    == null)
+            if (VirtualChargingPool    == null)
                 throw new ArgumentNullException(nameof(ChargingStation),  "The given charging pool must not be null!");
 
             #endregion
 
-            this._Id            = ChargingStation.Id;
-            this._ChargingPool  = ChargingPool;
-            this._Status        = ChargingStationStatusType.Available;
-            this._EVSEs         = new HashSet<VirtualEVSE>();
+            this._VirtualChargingPool  = VirtualChargingPool;
 
         }
 
         #endregion
+
+        #endregion
+
+
+        #region (private) SelfCheck(Context)
+
+        private void SelfCheck(Object Context)
+        {
+
+            foreach (var _EVSE in _EVSEs)
+                _EVSE.CheckReservationTime();
+
+        }
 
         #endregion
 
@@ -282,6 +325,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 //_VirtualEVSE.OnNewReservation         += SendNewReservation;
                 //_VirtualEVSE.OnNewChargingSession     += SendNewChargingSession;
                 //_VirtualEVSE.OnNewChargeDetailRecord  += SendNewChargeDetailRecord;
+                //_VirtualEVSE.OnReservationCancelled   += SendOnReservationCancelled;
 
                 OnSuccess.FailSafeInvoke(_VirtualEVSE);
 
@@ -641,15 +685,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region OnReservationCancelled
-
-        /// <summary>
-        /// An event fired whenever a charging reservation was deleted.
-        /// </summary>
-        public event OnReservationCancelledDelegate OnReservationCancelled;
-
-        #endregion
-
         #region CancelReservation(ReservationId)
 
         /// <summary>
@@ -673,6 +708,31 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                  evse.Reservation.Id == ReservationId).
                                 MapFirst(evse => evse.CancelReservation(ReservationId, ReservationCancellation),
                                          Task.FromResult(false));
+
+        }
+
+        #endregion
+
+        #region OnReservationCancelled
+
+        /// <summary>
+        /// An event fired whenever a charging reservation was deleted.
+        /// </summary>
+        public event OnReservationCancelledDelegate OnReservationCancelled;
+
+        #endregion
+
+        #region SendOnReservationCancelled(...)
+
+        private void SendOnReservationCancelled(DateTime                         Timestamp,
+                                                Object                           Sender,
+                                                ChargingReservation              Reservation,
+                                                ChargingReservationCancellation  ReservationCancellation)
+        {
+
+            var OnReservationCancelledLocal = OnReservationCancelled;
+            if (OnReservationCancelledLocal != null)
+                OnReservationCancelledLocal(Timestamp, Sender, Reservation, ReservationCancellation);
 
         }
 

@@ -913,12 +913,34 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region (internal) CheckReservationTime()
+
+        /// <summary>
+        /// Check if the reservation is expired.
+        /// </summary>
+        internal async Task CheckReservationTime()
+        {
+
+            if (_Reservation != null &&
+                _Reservation.IsExpired)
+            {
+
+                await CancelReservation(_Reservation.Id,
+                                        ChargingReservationCancellation.Expired);
+
+            }
+
+        }
+
+        #endregion
+
         #region CancelReservation(ReservationId)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
+        /// <param name="ReservationCancellation">A reason for this cancellation.</param>
         /// <returns>True when successful, false otherwise</returns>
         public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
                                                      ChargingReservationCancellation  ReservationCancellation)
@@ -1220,6 +1242,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
                     if (OnNewChargeDetailRecordLocal != null)
                         OnNewChargeDetailRecordLocal(DateTime.Now, this, _ChargeDetailRecord);
+
+                    Reservation = null;
 
                     return RemoteStopEVSEResult.Success(_ChargeDetailRecord, null, ReservationHandling);
 

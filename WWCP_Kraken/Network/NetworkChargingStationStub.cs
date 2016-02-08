@@ -29,6 +29,7 @@ using org.GraphDefined.Vanaheimr.Illias.Votes;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
+using System.Net.Security;
 
 #endregion
 
@@ -169,15 +170,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region UseTLS
+        #region RemoteCertificateValidator
 
-        private readonly Boolean _UseTLS;
+        protected readonly RemoteCertificateValidationCallback _RemoteCertificateValidator;
 
-        public Boolean UseTLS
+        /// <summary>
+        /// A delegate to verify the remote TLS certificate.
+        /// </summary>
+        public RemoteCertificateValidationCallback RemoteCertificateValidator
         {
             get
             {
-                return _UseTLS;
+                return _RemoteCertificateValidator;
             }
         }
 
@@ -361,6 +365,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// An event fired whenever a remote stop EVSE command completed.
         /// </summary>
         public event OnRemoteEVSEStoppedDelegate  OnRemoteEVSEStopped;
+        public event OnReservationCancelledDelegate OnReservationCancelled;
 
         #endregion
 
@@ -449,31 +454,31 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
-        public NetworkChargingStationStub(ChargingStation  ChargingStation,
-                                          IPTransport      IPTransport   = IPTransport.IPv4only,
-                                          DNSClient        DNSClient     = null,
-                                          String           Hostname      = null,
-                                          IPPort           TCPPort       = null,
-                                          String           Service       = null,
-                                          Boolean          UseTLS        = false,
-                                          String           VirtualHost   = null,
-                                          String           URIPrefix     = null,
-                                          TimeSpan?        QueryTimeout  = null)
+        public NetworkChargingStationStub(ChargingStation                      ChargingStation,
+                                          IPTransport                          IPTransport                 = IPTransport.IPv4only,
+                                          DNSClient                            DNSClient                   = null,
+                                          String                               Hostname                    = null,
+                                          IPPort                               TCPPort                     = null,
+                                          String                               Service                     = null,
+                                          RemoteCertificateValidationCallback  RemoteCertificateValidator  = null,
+                                          String                               VirtualHost                 = null,
+                                          String                               URIPrefix                   = null,
+                                          TimeSpan?                            QueryTimeout                = null)
 
             : this(ChargingStation)
 
         {
 
-            this._IPTransport   = IPTransport;
-            this._DNSClient     = DNSClient != null              ? DNSClient          : new DNSClient(SearchForIPv4DNSServers: true,
-                                                                                                      SearchForIPv6DNSServers: false);
-            this._Hostname      = Hostname;
-            this._TCPPort       = TCPPort;
-            this._Service       = Service;
-            this._UseTLS        = UseTLS;
-            this._VirtualHost   = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
-            this._URIPrefix     = URIPrefix;
-            this._QueryTimeout  = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
+            this._IPTransport                 = IPTransport;
+            this._DNSClient                   = DNSClient != null              ? DNSClient          : new DNSClient(SearchForIPv4DNSServers: true,
+                                                                                                                    SearchForIPv6DNSServers: false);
+            this._Hostname                    = Hostname;
+            this._TCPPort                     = TCPPort;
+            this._Service                     = Service;
+            this._RemoteCertificateValidator  = RemoteCertificateValidator;
+            this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
+            this._URIPrefix                   = URIPrefix;
+            this._QueryTimeout                = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
 
         }
 
@@ -562,6 +567,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+
+        public IEnumerable<ChargingReservation> ChargingReservations
+        {
+            get
+            {
+                return new ChargingReservation[0];
+            }
+        }
 
         #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
@@ -858,6 +871,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 return null;
             }
         }
+
+        
 
         IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
         {

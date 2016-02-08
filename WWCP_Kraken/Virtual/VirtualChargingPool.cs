@@ -238,6 +238,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
 
 
+        public IEnumerable<ChargingReservation> ChargingReservations
+        {
+            get
+            {
+                return new ChargingReservation[0];
+            }
+        }
+
         public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, EVSP_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMA_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
