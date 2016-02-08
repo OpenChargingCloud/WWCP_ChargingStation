@@ -44,6 +44,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Data
 
+        /// <summary>
+        /// The default max size of the status history.
+        /// </summary>
+        public const UInt16 DefaultMaxStatusListSize        = 50;
+
+        /// <summary>
+        /// The default max size of the admin status history.
+        /// </summary>
+        public const UInt16 DefaultMaxAdminStatusListSize   = 50;
+
         public static readonly TimeSpan  DefaultQueryTimeout  = TimeSpan.FromSeconds(180);
 
         #endregion
@@ -232,13 +242,92 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Status
 
-        private ChargingStationStatusType _Status;
+        /// <summary>
+        /// The current charging station status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingStationStatusType> Status
+        {
 
-        public ChargingStationStatusType Status
+            get
+            {
+                return _StatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_StatusSchedule.CurrentValue != value.Value)
+                    SetStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region StatusSchedule
+
+        private StatusSchedule<ChargingStationStatusType> _StatusSchedule;
+
+        /// <summary>
+        /// The charging station status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingStationStatusType>> StatusSchedule
         {
             get
             {
-                return _Status;
+                return _StatusSchedule;
+            }
+        }
+
+        #endregion
+
+
+        #region AdminStatus
+
+        /// <summary>
+        /// The current charging station admin status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingStationAdminStatusType> AdminStatus
+        {
+
+            get
+            {
+                return _AdminStatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_AdminStatusSchedule.CurrentValue != value.Value)
+                    SetAdminStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region AdminStatusSchedule
+
+        private StatusSchedule<ChargingStationAdminStatusType> _AdminStatusSchedule;
+
+        /// <summary>
+        /// The charging station admin status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingStationAdminStatusType>> AdminStatusSchedule
+        {
+            get
+            {
+                return _AdminStatusSchedule;
             }
         }
 
@@ -317,12 +406,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the dynamic status of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEStatusChangedDelegate       OnRemoteEVSEStatusChanged;
+        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
 
         /// <summary>
         /// An event fired whenever the admin status of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEAdminStatusChangedDelegate  OnRemoteEVSEAdminStatusChanged;
+        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
 
         #endregion
 
@@ -406,6 +495,25 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+
+        #region OnStatusChanged
+
+        /// <summary>
+        /// An event fired whenever the dynamic status of the EVSE changed.
+        /// </summary>
+        public event OnChargingStationStatusChangedDelegate OnStatusChanged;
+
+        #endregion
+
+        #region OnAdminStatusChanged
+
+        /// <summary>
+        /// An event fired whenever the admin status of the EVSE changed.
+        /// </summary>
+        public event OnChargingStationAdminStatusChangedDelegate OnAdminStatusChanged;
+
+        #endregion
+
         #endregion
 
         #region Constructor(s)
@@ -416,7 +524,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// A charging station.
         /// </summary>
         /// <param name="ChargingStation">A local charging station.</param>
-        public NetworkChargingStationStub(ChargingStation  ChargingStation)
+        public NetworkChargingStationStub(ChargingStation  ChargingStation,
+                                          UInt16           MaxStatusListSize       = DefaultMaxStatusListSize,
+                                          UInt16           MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
         {
 
             #region Initial checks
@@ -426,10 +536,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id               = ChargingStation.Id;
-            this._ChargingStation  = ChargingStation;
-            this._Status           = ChargingStationStatusType.Available;
-            this._EVSEs            = new HashSet<NetworkEVSEStub>();
+            this._Id                    = ChargingStation.Id;
+            this._ChargingStation       = ChargingStation;
+            this._EVSEs                 = new HashSet<NetworkEVSEStub>();
+
+            this._StatusSchedule        = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
+            this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
+
+            this._AdminStatusSchedule   = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
+            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
+
 
             #region Init events
 
@@ -455,6 +571,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
         public NetworkChargingStationStub(ChargingStation                      ChargingStation,
+                                          UInt16                               MaxStatusListSize           = DefaultMaxStatusListSize,
+                                          UInt16                               MaxAdminStatusListSize      = DefaultMaxAdminStatusListSize,
                                           IPTransport                          IPTransport                 = IPTransport.IPv4only,
                                           DNSClient                            DNSClient                   = null,
                                           String                               Hostname                    = null,
@@ -465,7 +583,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           String                               URIPrefix                   = null,
                                           TimeSpan?                            QueryTimeout                = null)
 
-            : this(ChargingStation)
+            : this(ChargingStation, MaxStatusListSize, MaxAdminStatusListSize)
 
         {
 
@@ -479,6 +597,141 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
             this._URIPrefix                   = URIPrefix;
             this._QueryTimeout                = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
+
+        }
+
+        #endregion
+
+        #endregion
+
+
+        #region (Admin-)Status management
+
+        #region SetStatus(NewStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewStatus">A new timestamped status.</param>
+        public void SetStatus(Timestamped<ChargingStationStatusType>  NewStatus)
+        {
+            _StatusSchedule.Insert(NewStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(Timestamp, NewStatus)
+
+        /// <summary>
+        /// Set the status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="NewStatus">A new status.</param>
+        public void SetStatus(DateTime                   Timestamp,
+                              ChargingStationStatusType  NewStatus)
+        {
+            _StatusSchedule.Insert(Timestamp, NewStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped status.
+        /// </summary>
+        /// <param name="NewStatusList">A list of new timestamped status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetStatus(IEnumerable<Timestamped<ChargingStationStatusType>>  NewStatusList,
+                              ChangeMethods                                        ChangeMethod = ChangeMethods.Replace)
+        {
+            _StatusSchedule.Insert(NewStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region SetAdminStatus(NewAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusType>  NewAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(Timestamp, NewAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="NewAdminStatus">A new admin status.</param>
+        public void SetAdminStatus(DateTime                        Timestamp,
+                                   ChargingStationAdminStatusType  NewAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(Timestamp, NewAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped admin status.
+        /// </summary>
+        /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetAdminStatus(IEnumerable<Timestamped<ChargingStationAdminStatusType>>  NewAdminStatusList,
+                                   ChangeMethods                                             ChangeMethod = ChangeMethods.Replace)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region (internal) UpdateStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal void UpdateStatus(DateTime                                Timestamp,
+                                   Timestamped<ChargingStationStatusType>  OldStatus,
+                                   Timestamped<ChargingStationStatusType>  NewStatus)
+        {
+
+            var OnStatusChangedLocal = OnStatusChanged;
+            if (OnStatusChangedLocal != null)
+                OnStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateAdminStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE admin status.</param>
+        /// <param name="NewStatus">The new EVSE admin status.</param>
+        internal void UpdateAdminStatus(DateTime                                     Timestamp,
+                                        Timestamped<ChargingStationAdminStatusType>  OldStatus,
+                                        Timestamped<ChargingStationAdminStatusType>  NewStatus)
+        {
+
+            var OnAdminStatusChangedLocal = OnAdminStatusChanged;
+            if (OnAdminStatusChangedLocal != null)
+                OnAdminStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
 
         }
 
@@ -555,10 +808,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
 
 
-        public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime                 Timestamp,
-                                                                         CancellationToken        CancellationToken,
-                                                                         EventTracking_Id         EventTrackingId,
-                                                                         TimeSpan?                QueryTimeout = null)
+        public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime           Timestamp,
+                                                                         CancellationToken  CancellationToken,
+                                                                         EventTracking_Id   EventTrackingId,
+                                                                         TimeSpan?          QueryTimeout = null)
         {
 
             return new EVSEStatus[] {

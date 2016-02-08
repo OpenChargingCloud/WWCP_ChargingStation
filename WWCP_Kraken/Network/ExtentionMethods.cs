@@ -43,8 +43,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OnError">An optional delegate for reporting an error.</param>
         public static ChargingStation CreateNewRemoteStation(this ChargingPool                         ChargingPool,
                                                              ChargingStation_Id                        ChargingStationId                  = null,
+                                                             UInt16                                    MaxStatusListSize                  = NetworkChargingStationStub.DefaultMaxStatusListSize,
+                                                             UInt16                                    MaxAdminStatusListSize             = NetworkChargingStationStub.DefaultMaxAdminStatusListSize,
                                                              Action<ChargingStation>                   ChargingStationConfigurator        = null,
-                                                             Action<NetworkChargingStationStub>            RemoteChargingStationConfigurator  = null,
+                                                             Action<NetworkChargingStationStub>        RemoteChargingStationConfigurator  = null,
                                                              Action<ChargingStation>                   OnSuccess                          = null,
                                                              Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
         {
@@ -62,7 +64,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                  OnError,
                                                  newstation => {
 
-                                                     var remotestation = new NetworkChargingStationStub(newstation);
+                                                     var remotestation = new NetworkChargingStationStub(newstation, MaxStatusListSize, MaxAdminStatusListSize);
 
                                                      if (RemoteChargingStationConfigurator != null)
                                                          RemoteChargingStationConfigurator(remotestation);

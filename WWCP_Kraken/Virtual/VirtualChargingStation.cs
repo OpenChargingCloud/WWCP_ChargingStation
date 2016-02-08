@@ -115,19 +115,100 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+
         #region Status
 
-        private ChargingStationStatusType _Status;
+        /// <summary>
+        /// The current charging station status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingStationStatusType> Status
+        {
 
-        public ChargingStationStatusType Status
+            get
+            {
+                return _StatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_StatusSchedule.CurrentValue != value.Value)
+                    SetStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region StatusSchedule
+
+        private StatusSchedule<ChargingStationStatusType> _StatusSchedule;
+
+        /// <summary>
+        /// The charging station status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingStationStatusType>> StatusSchedule
         {
             get
             {
-                return _Status;
+                return _StatusSchedule;
             }
         }
 
         #endregion
+
+
+        #region AdminStatus
+
+        /// <summary>
+        /// The current charging station admin status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingStationAdminStatusType> AdminStatus
+        {
+
+            get
+            {
+                return _AdminStatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_AdminStatusSchedule.CurrentValue != value.Value)
+                    SetAdminStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region AdminStatusSchedule
+
+        private StatusSchedule<ChargingStationAdminStatusType> _AdminStatusSchedule;
+
+        /// <summary>
+        /// The charging station admin status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingStationAdminStatusType>> AdminStatusSchedule
+        {
+            get
+            {
+                return _AdminStatusSchedule;
+            }
+        }
+
+        #endregion
+
 
         #region SelfCheckTimeSpan
 
@@ -168,7 +249,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
+        #region OnStatusChanged
 
+        /// <summary>
+        /// An event fired whenever the dynamic status of the EVSE changed.
+        /// </summary>
+        public event OnChargingStationStatusChangedDelegate OnStatusChanged;
+
+        #endregion
+
+        #region OnAdminStatusChanged
+
+        /// <summary>
+        /// An event fired whenever the admin status of the EVSE changed.
+        /// </summary>
+        public event OnChargingStationAdminStatusChangedDelegate OnAdminStatusChanged;
+
+        #endregion
 
         #endregion
 
@@ -196,12 +293,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id                 = ChargingStation.Id;
-            this._Status             = ChargingStationStatusType.Available;
-            this._EVSEs              = new HashSet<VirtualEVSE>();
+            this._Id                    = ChargingStation.Id;
+            this._EVSEs                 = new HashSet<VirtualEVSE>();
 
-            this._SelfCheckTimeSpan  = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
-            this._SelfCheckTimer     = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
+            this._StatusSchedule        = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
+            this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
+
+            this._AdminStatusSchedule   = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
+            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
+
+            this._SelfCheckTimeSpan     = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
+            this._SelfCheckTimer        = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
@@ -245,6 +347,140 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+
+        #region (Admin-)Status management
+
+        #region SetStatus(NewStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewStatus">A new timestamped status.</param>
+        public void SetStatus(Timestamped<ChargingStationStatusType>  NewStatus)
+        {
+            _StatusSchedule.Insert(NewStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(Timestamp, NewStatus)
+
+        /// <summary>
+        /// Set the status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="NewStatus">A new status.</param>
+        public void SetStatus(DateTime                   Timestamp,
+                              ChargingStationStatusType  NewStatus)
+        {
+            _StatusSchedule.Insert(Timestamp, NewStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped status.
+        /// </summary>
+        /// <param name="NewStatusList">A list of new timestamped status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetStatus(IEnumerable<Timestamped<ChargingStationStatusType>>  NewStatusList,
+                              ChangeMethods                                        ChangeMethod = ChangeMethods.Replace)
+        {
+            _StatusSchedule.Insert(NewStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region SetAdminStatus(NewAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusType>  NewAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(Timestamp, NewAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="NewAdminStatus">A new admin status.</param>
+        public void SetAdminStatus(DateTime                        Timestamp,
+                                   ChargingStationAdminStatusType  NewAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(Timestamp, NewAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped admin status.
+        /// </summary>
+        /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetAdminStatus(IEnumerable<Timestamped<ChargingStationAdminStatusType>>  NewAdminStatusList,
+                                   ChangeMethods                                             ChangeMethod = ChangeMethods.Replace)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region (internal) UpdateStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal void UpdateStatus(DateTime                                Timestamp,
+                                   Timestamped<ChargingStationStatusType>  OldStatus,
+                                   Timestamped<ChargingStationStatusType>  NewStatus)
+        {
+
+            var OnStatusChangedLocal = OnStatusChanged;
+            if (OnStatusChangedLocal != null)
+                OnStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateAdminStatus(Timestamp, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE admin status.</param>
+        /// <param name="NewStatus">The new EVSE admin status.</param>
+        internal void UpdateAdminStatus(DateTime                                     Timestamp,
+                                        Timestamped<ChargingStationAdminStatusType>  OldStatus,
+                                        Timestamped<ChargingStationAdminStatusType>  NewStatus)
+        {
+
+            var OnAdminStatusChangedLocal = OnAdminStatusChanged;
+            if (OnAdminStatusChangedLocal != null)
+                OnAdminStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+
+        }
+
+        #endregion
+
+        #endregion
 
         #region (private) SelfCheck(Context)
 
@@ -354,12 +590,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the dynamic status of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEStatusChangedDelegate       OnRemoteEVSEStatusChanged;
+        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
 
         /// <summary>
         /// An event fired whenever the admin status of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEAdminStatusChangedDelegate  OnRemoteEVSEAdminStatusChanged;
+        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
 
         #endregion
 
@@ -403,9 +639,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                        Timestamped<EVSEStatusType>  NewStatus)
         {
 
-            var OnRemoteEVSEStatusChangedLocal = OnRemoteEVSEStatusChanged;
-            if (OnRemoteEVSEStatusChangedLocal != null)
-                OnRemoteEVSEStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
+            var OnEVSEStatusChangedLocal = OnEVSEStatusChanged;
+            if (OnEVSEStatusChangedLocal != null)
+                OnEVSEStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
 
         }
 
@@ -426,9 +662,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                             Timestamped<EVSEAdminStatusType>  NewStatus)
         {
 
-            var OnRemoteEVSEAdminStatusChangedLocal = OnRemoteEVSEAdminStatusChanged;
-            if (OnRemoteEVSEAdminStatusChangedLocal != null)
-                OnRemoteEVSEAdminStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
+            var OnEVSEAdminStatusChangedLocal = OnEVSEAdminStatusChanged;
+            if (OnEVSEAdminStatusChangedLocal != null)
+                OnEVSEAdminStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
 
         }
 
@@ -574,6 +810,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
+
+            #endregion
+
+            #region Check admin status
+
+            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational)
+                return ReservationResult.OutOfService;
 
             #endregion
 

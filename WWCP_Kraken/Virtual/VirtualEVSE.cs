@@ -481,7 +481,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the dynamic status of the EVSE changed.
         /// </summary>
-        public event OnStatusChangedDelegate OnStatusChanged;
+        public event OnEVSEStatusChangedDelegate OnStatusChanged;
 
         #endregion
 
@@ -490,7 +490,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the admin status of the EVSE changed.
         /// </summary>
-        public event OnAdminStatusChangedDelegate OnAdminStatusChanged;
+        public event OnEVSEAdminStatusChangedDelegate OnAdminStatusChanged;
 
         #endregion
 
@@ -839,6 +839,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
+            #region Check admin status
+
+            if (AdminStatus.Value != EVSEAdminStatusType.Operational)
+                return ReservationResult.OutOfService;
+
+            #endregion
+
             #region Check if this is a reservation update...
 
             if (_Reservation != null)
@@ -1080,6 +1087,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+            #region Check admin status
+
+            if (AdminStatus.Value != EVSEAdminStatusType.Operational)
+                return RemoteStartEVSEResult.OutOfService;
+
+            #endregion
+
             // SessionId_AlreadyInUse,
             // EVSE_NotReachable,
             // Start_Timeout
@@ -1195,6 +1209,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        TimeSpan?            QueryTimeout  = null)
 
         {
+
+            #region Check admin status
+
+            if (AdminStatus.Value != EVSEAdminStatusType.Operational)
+                return RemoteStopEVSEResult.OutOfService(SessionId);
+
+            #endregion
+
 
             #region Available
 

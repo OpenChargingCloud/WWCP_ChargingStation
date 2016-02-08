@@ -469,7 +469,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the dynamic status of the EVSE changed.
         /// </summary>
-        public event OnStatusChangedDelegate OnStatusChanged;
+        public event OnEVSEStatusChangedDelegate OnStatusChanged;
 
         #endregion
 
@@ -478,7 +478,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever the admin status of the EVSE changed.
         /// </summary>
-        public event OnAdminStatusChangedDelegate OnAdminStatusChanged;
+        public event OnEVSEAdminStatusChangedDelegate OnAdminStatusChanged;
 
         #endregion
 
