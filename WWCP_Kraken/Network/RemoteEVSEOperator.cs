@@ -201,9 +201,41 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+        public async Task<RemoteStartChargingStationResult>
+
+            RemoteStart(DateTime                Timestamp,
+                        CancellationToken       CancellationToken,
+                        EventTracking_Id        EventTrackingId,
+                        ChargingStation_Id      ChargingStationId,
+                        ChargingProduct_Id      ChargingProductId,
+                        ChargingReservation_Id  ReservationId,
+                        ChargingSession_Id      SessionId,
+                        EVSP_Id                 ProviderId,
+                        eMA_Id                  eMAId,
+                        TimeSpan?               QueryTimeout  = null)
+
+        {
+
+            throw new NotImplementedException();
+
+        }
+
         #endregion
 
         #region RemoteStop(...)
+
+        public async Task<RemoteStopResult> RemoteStop(DateTime             Timestamp,
+                                                       CancellationToken    CancellationToken,
+                                                       EventTracking_Id     EventTrackingId,
+                                                       ChargingSession_Id   SessionId,
+                                                       ReservationHandling  ReservationHandling,
+                                                       EVSP_Id              ProviderId    = null,
+                                                       TimeSpan?            QueryTimeout  = null)
+        {
+
+            throw new NotImplementedException();
+
+        }
 
         public async Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
                                                            CancellationToken    CancellationToken,
@@ -245,6 +277,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
 
             return result;
+
+        }
+
+        public async Task<RemoteStopChargingStationResult> RemoteStop(DateTime             Timestamp,
+                                                                      CancellationToken    CancellationToken,
+                                                                      EventTracking_Id     EventTrackingId,
+                                                                      ChargingStation_Id   ChargingStationId,
+                                                                      ChargingSession_Id   SessionId,
+                                                                      ReservationHandling  ReservationHandling,
+                                                                      EVSP_Id              ProviderId    = null,
+                                                                      TimeSpan?            QueryTimeout  = null)
+        {
+
+            throw new NotImplementedException();
 
         }
 
