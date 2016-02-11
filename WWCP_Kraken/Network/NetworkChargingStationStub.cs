@@ -454,7 +454,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// An event fired whenever a remote stop EVSE command completed.
         /// </summary>
         public event OnRemoteEVSEStoppedDelegate  OnRemoteEVSEStopped;
-        public event OnReservationCancelledDelegate OnReservationCancelled;
 
         #endregion
 
@@ -855,6 +854,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              TimeSpan?                Duration,
                                                              ChargingReservation_Id   ReservationId      = null,
                                                              EVSP_Id                  ProviderId         = null,
+                                                             eMA_Id                   eMAId              = null,
                                                              ChargingProduct_Id       ChargingProductId  = null,
                                                              IEnumerable<Auth_Token>  AuthTokens         = null,
                                                              IEnumerable<eMA_Id>      eMAIds             = null,
@@ -921,15 +921,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region CancelReservation(ReservationId)
+        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
+
+        #region CancelReservation(ReservationId, Reason)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
-                                                     ChargingReservationCancellation  ReservationCancellation)
+        public async Task<Boolean> CancelReservation(ChargingReservation_Id                 ReservationId,
+                                                     ChargingReservationCancellationReason  Reason)
         {
 
             #region Initial checks
@@ -942,7 +944,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(ReservationId, ReservationCancellation),
+                                MapFirst(evse => evse.CancelReservation(ReservationId, Reason),
                                          Task.FromResult(false));
 
         }

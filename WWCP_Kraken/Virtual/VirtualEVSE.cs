@@ -803,7 +803,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever a charging reservation was deleted.
         /// </summary>
-        public event OnReservationCancelledDelegate OnReservationCancelled;
+        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
 
         #endregion
 
@@ -831,6 +831,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      TimeSpan?                Duration           = null,
                                                      ChargingReservation_Id   ReservationId      = null,
                                                      EVSP_Id                  ProviderId         = null,
+                                                     eMA_Id                   eMAId              = null,
                                                      ChargingProduct_Id       ChargingProductId  = null,
                                                      IEnumerable<Auth_Token>  AuthTokens         = null,
                                                      IEnumerable<eMA_Id>      eMAIds             = null,
@@ -933,7 +934,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             {
 
                 await CancelReservation(_Reservation.Id,
-                                        ChargingReservationCancellation.Expired);
+                                        ChargingReservationCancellationReason.Expired);
 
             }
 
@@ -941,16 +942,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region CancelReservation(ReservationId)
+        #region CancelReservation(ReservationId, Reason)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
-        /// <param name="ReservationCancellation">A reason for this cancellation.</param>
+        /// <param name="Reason">A reason for this cancellation.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
-                                                     ChargingReservationCancellation  ReservationCancellation)
+        public async Task<Boolean> CancelReservation(ChargingReservation_Id                 ReservationId,
+                                                     ChargingReservationCancellationReason  Reason)
         {
 
             #region Initial checks
@@ -973,7 +974,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var OnReservationCancelledLocal = OnReservationCancelled;
             if (OnReservationCancelledLocal != null)
-                OnReservationCancelledLocal(DateTime.Now, this, OldReservation, ReservationCancellation);
+                OnReservationCancelledLocal(DateTime.Now,
+                                            this,
+                                            EventTracking_Id.New,
+                                            OldReservation,
+                                            Reason);
 
             SetStatus(EVSEStatusType.Available);
 

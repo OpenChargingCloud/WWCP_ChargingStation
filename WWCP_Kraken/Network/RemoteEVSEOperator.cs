@@ -134,6 +134,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
                     EVSP_Id                  ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
                     IEnumerable<eMA_Id>      eMAIds             = null,

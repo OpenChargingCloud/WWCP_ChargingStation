@@ -794,6 +794,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      TimeSpan?                Duration,
                                                      ChargingReservation_Id   ReservationId      = null,
                                                      EVSP_Id                  ProviderId         = null,
+                                                     eMA_Id                   eMAId              = null,
                                                      ChargingProduct_Id       ChargingProductId  = null,
                                                      IEnumerable<Auth_Token>  AuthTokens         = null,
                                                      IEnumerable<eMA_Id>      eMAIds             = null,
@@ -834,6 +835,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                     Duration,
                                                     ReservationId,
                                                     ProviderId,
+                                                    eMAId,
                                                     ChargingProductId,
                                                     AuthTokens,
                                                     eMAIds,
@@ -936,7 +938,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
         public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
-                                                     ChargingReservationCancellation  ReservationCancellation)
+                                                     ChargingReservationCancellationReason  ReservationCancellation)
         {
 
             #region Initial checks
@@ -961,21 +963,26 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever a charging reservation was deleted.
         /// </summary>
-        public event OnReservationCancelledDelegate OnReservationCancelled;
+        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
 
         #endregion
 
-        #region SendOnReservationCancelled(...)
+        #region (internal) SendOnReservationCancelled(...)
 
-        private void SendOnReservationCancelled(DateTime                         Timestamp,
-                                                Object                           Sender,
-                                                ChargingReservation              Reservation,
-                                                ChargingReservationCancellation  ReservationCancellation)
+        internal void SendOnReservationCancelled(DateTime                               Timestamp,
+                                                 Object                                 Sender,
+                                                 EventTracking_Id                       EventTrackingId,
+                                                 ChargingReservation                    Reservation,
+                                                 ChargingReservationCancellationReason  Reason)
         {
 
             var OnReservationCancelledLocal = OnReservationCancelled;
             if (OnReservationCancelledLocal != null)
-                OnReservationCancelledLocal(Timestamp, Sender, Reservation, ReservationCancellation);
+                OnReservationCancelledLocal(Timestamp,
+                                            Sender,
+                                            EventTrackingId,
+                                            Reservation,
+                                            Reason);
 
         }
 
