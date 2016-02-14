@@ -476,25 +476,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
-        #region OnStatusChanged
-
-        /// <summary>
-        /// An event fired whenever the dynamic status of the EVSE changed.
-        /// </summary>
-        public event OnEVSEStatusChangedDelegate OnStatusChanged;
-
-        #endregion
-
-        #region OnAdminStatusChanged
-
-        /// <summary>
-        /// An event fired whenever the admin status of the EVSE changed.
-        /// </summary>
-        public event OnEVSEAdminStatusChangedDelegate OnAdminStatusChanged;
-
-        #endregion
-
-
         #region SocketOutletAddition
 
         internal readonly IVotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean> SocketOutletAddition;
@@ -604,6 +585,54 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
         }
+
+        event OnRemoteEVSEStatusChangedDelegate IRemoteEVSE.OnStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        event OnRemoteEVSEAdminStatusChangedDelegate IRemoteEVSE.OnAdminStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        #endregion
+
+
+        #region Data/(Admin-)Status management
+
+        #region OnData/(Admin)StatusChanged
+
+        /// <summary>
+        /// An event fired whenever the static data of the EVSE changed.
+        /// </summary>
+        public event OnRemoteEVSEDataChangedDelegate         OnDataChanged;
+
+        /// <summary>
+        /// An event fired whenever the dynamic status of the EVSE changed.
+        /// </summary>
+        public event OnRemoteEVSEStatusChangedDelegate       OnStatusChanged;
+
+        /// <summary>
+        /// An event fired whenever the admin status of the EVSE changed.
+        /// </summary>
+        public event OnRemoteEVSEAdminStatusChangedDelegate  OnAdminStatusChanged;
 
         #endregion
 
@@ -738,7 +767,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-
+        #endregion
 
         #region Reservations...
 
@@ -1039,16 +1068,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region OnNewChargingSession
+        #region OnNewChargingSession/-ChargeDetailRecord
 
         /// <summary>
         /// An event fired whenever a new charging session was created.
         /// </summary>
-        public event OnNewChargingSessionDelegate  OnNewChargingSession;
-
-        #endregion
-
-        #region OnNewChargeDetailRecord
+        public event OnNewChargingSessionDelegate     OnNewChargingSession;
 
         /// <summary>
         /// An event fired whenever a new charge detail record was created.
@@ -1257,7 +1282,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                      ProviderId:             _ChargingSession.ProviderId,
                                                                      ChargingProductId:      _ChargingSession.ChargingProductId,
                                                                      SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
-                                                                     EnergyMeterValues:      new List<Timestamped<Double>>() {
+                                                                     EnergyMeteringValues:      new List<Timestamped<Double>>() {
                                                                                                  new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
                                                                                                  new Timestamped<Double>(Now,                                          100)
                                                                                              }
@@ -1309,7 +1334,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
         #endregion
-
 
 
         #region IEnumerable<SocketOutlet> Members

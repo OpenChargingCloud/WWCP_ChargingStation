@@ -247,28 +247,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region Events
-
-        #region OnStatusChanged
-
-        /// <summary>
-        /// An event fired whenever the dynamic status of the EVSE changed.
-        /// </summary>
-        public event OnChargingStationStatusChangedDelegate OnStatusChanged;
-
-        #endregion
-
-        #region OnAdminStatusChanged
-
-        /// <summary>
-        /// An event fired whenever the admin status of the EVSE changed.
-        /// </summary>
-        public event OnChargingStationAdminStatusChangedDelegate OnAdminStatusChanged;
-
-        #endregion
-
-        #endregion
-
         #region Constructor(s)
 
         #region VirtualChargingStation(ChargingStation, SelfCheckTimeSpan = null, MaxStatusListSize = DefaultMaxStatusListSize, MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
@@ -343,12 +321,84 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+        event OnRemoteEVSEStatusChangedDelegate IRemoteChargingStation.OnEVSEStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        event OnRemoteEVSEAdminStatusChangedDelegate IRemoteChargingStation.OnEVSEAdminStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        event OnRemoteChargingStationStatusChangedDelegate IRemoteChargingStation.OnStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        event OnRemoteChargingStationAdminStatusChangedDelegate IRemoteChargingStation.OnAdminStatusChanged
+        {
+            add
+            {
+                throw new NotImplementedException();
+            }
+
+            remove
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         #endregion
 
         #endregion
 
 
         #region (Admin-)Status management
+
+        #region OnData/(Admin)StatusChanged
+
+        /// <summary>
+        /// An event fired whenever the static data of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingStationDataChangedDelegate         OnDataChanged;
+
+        /// <summary>
+        /// An event fired whenever the dynamic status of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingStationStatusChangedDelegate       OnStatusChanged;
+
+        /// <summary>
+        /// An event fired whenever the admin status of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingStationAdminStatusChangedDelegate  OnAdminStatusChanged;
+
+        #endregion
+
 
         #region SetStatus(NewStatus)
 
@@ -576,26 +626,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region OnRemoteEVSEDataChanged
+        #region OnRemoteEVSEData/(Admin)StatusChanged
 
         /// <summary>
         /// An event fired whenever the static data of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEDataChangedDelegate OnRemoteEVSEDataChanged;
-
-        #endregion
-
-        #region OnRemoteEVSE(Admin)StatusChanged
+        public event OnRemoteEVSEDataChangedDelegate         OnEVSEDataChanged;
 
         /// <summary>
         /// An event fired whenever the dynamic status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
+        public event OnRemoteEVSEStatusChangedDelegate       OnEVSEStatusChanged;
 
         /// <summary>
         /// An event fired whenever the admin status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
+        public event OnRemoteEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
 
         #endregion
 
@@ -616,9 +662,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Object       NewValue)
         {
 
-            var OnRemoteEVSEDataChangedLocal = OnRemoteEVSEDataChanged;
-            if (OnRemoteEVSEDataChangedLocal != null)
-                OnRemoteEVSEDataChangedLocal(Timestamp, RemoteEVSE, PropertyName, OldValue, NewValue);
+            var OnEVSEDataChangedLocal = OnEVSEDataChanged;
+            if (OnEVSEDataChangedLocal != null)
+                OnEVSEDataChangedLocal(Timestamp, RemoteEVSE, PropertyName, OldValue, NewValue);
 
         }
 

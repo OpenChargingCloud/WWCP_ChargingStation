@@ -372,6 +372,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
+        public event OnReservationCancelledInternalDelegate            OnReservationCancelled;
+
 
         // EVSE events
 
@@ -392,26 +394,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region OnEVSEDataChanged
+        #region OnEVSEData/(Admin)StatusChanged
 
         /// <summary>
         /// An event fired whenever the static data of any subordinated EVSE changed.
         /// </summary>
-        public event OnRemoteEVSEDataChangedDelegate OnRemoteEVSEDataChanged;
-
-        #endregion
-
-        #region OnEVSE(Admin)StatusChanged
+        public event OnRemoteEVSEDataChangedDelegate         OnEVSEDataChanged;
 
         /// <summary>
         /// An event fired whenever the dynamic status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEStatusChangedDelegate       OnEVSEStatusChanged;
+        public event OnRemoteEVSEStatusChangedDelegate       OnEVSEStatusChanged;
 
         /// <summary>
         /// An event fired whenever the admin status of any subordinated EVSE changed.
         /// </summary>
-        public event OnEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
+        public event OnRemoteEVSEAdminStatusChangedDelegate  OnEVSEAdminStatusChanged;
 
         #endregion
 
@@ -495,21 +493,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region OnStatusChanged
+        #region OnData/(Admin)StatusChanged
 
         /// <summary>
-        /// An event fired whenever the dynamic status of the EVSE changed.
+        /// An event fired whenever the static data of the charging station changed.
         /// </summary>
-        public event OnChargingStationStatusChangedDelegate OnStatusChanged;
-
-        #endregion
-
-        #region OnAdminStatusChanged
+        public event OnRemoteChargingStationDataChangedDelegate         OnChargingStationDataChanged;
 
         /// <summary>
-        /// An event fired whenever the admin status of the EVSE changed.
+        /// An event fired whenever the dynamic status of the charging station changed.
         /// </summary>
-        public event OnChargingStationAdminStatusChangedDelegate OnAdminStatusChanged;
+        public event OnRemoteChargingStationStatusChangedDelegate       OnStatusChanged;
+
+        /// <summary>
+        /// An event fired whenever the admin status of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingStationAdminStatusChangedDelegate  OnAdminStatusChanged;
+        public event OnRemoteChargingStationDataChangedDelegate OnDataChanged;
 
         #endregion
 
@@ -921,7 +921,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
+
 
         #region CancelReservation(ReservationId, Reason)
 
