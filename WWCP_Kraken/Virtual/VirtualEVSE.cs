@@ -586,32 +586,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
-        event OnRemoteEVSEStatusChangedDelegate IRemoteEVSE.OnStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        event OnRemoteEVSEAdminStatusChangedDelegate IRemoteEVSE.OnAdminStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         #endregion
 
 

@@ -43,22 +43,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The default max size of the status history.
         /// </summary>
-        public const UInt16 DefaultMaxStatusListSize        = 50;
+        public const UInt16 DefaultMaxStatusListSize = 50;
 
         /// <summary>
         /// The default max size of the admin status history.
         /// </summary>
-        public const UInt16 DefaultMaxAdminStatusListSize   = 50;
+        public const UInt16 DefaultMaxAdminStatusListSize = 50;
 
         /// <summary>
         /// The maximum time span for a reservation.
         /// </summary>
-        public static readonly TimeSpan MaxReservationDuration    = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
 
         /// <summary>
         /// The default time span between self checks.
         /// </summary>
-        public static readonly TimeSpan DefaultSelfCheckTimeSpan  = TimeSpan.FromSeconds(3);
+        public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(3);
 
         private Timer _SelfCheckTimer;
 
@@ -258,30 +258,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
-        public VirtualChargingStation(ChargingStation  ChargingStation,
-                                      TimeSpan?        SelfCheckTimeSpan       = null,
-                                      UInt16           MaxStatusListSize       = DefaultMaxStatusListSize,
-                                      UInt16           MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+        public VirtualChargingStation(ChargingStation ChargingStation,
+                                      TimeSpan? SelfCheckTimeSpan = null,
+                                      UInt16 MaxStatusListSize = DefaultMaxStatusListSize,
+                                      UInt16 MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
         {
 
             #region Initial checks
 
             if (ChargingStation == null)
-                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging station must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
 
             #endregion
 
-            this._Id                    = ChargingStation.Id;
-            this._EVSEs                 = new HashSet<VirtualEVSE>();
+            this._Id = ChargingStation.Id;
+            this._EVSEs = new HashSet<VirtualEVSE>();
 
-            this._StatusSchedule        = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
+            this._StatusSchedule = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
             this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
 
-            this._AdminStatusSchedule   = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
+            this._AdminStatusSchedule = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
             this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
 
-            this._SelfCheckTimeSpan     = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
-            this._SelfCheckTimer        = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
+            this._SelfCheckTimeSpan = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
+            this._SelfCheckTimer = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
@@ -297,11 +297,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
-        public VirtualChargingStation(ChargingStation      ChargingStation,
-                                      VirtualChargingPool  VirtualChargingPool,
-                                      TimeSpan?            SelfCheckTimeSpan       = null,
-                                      UInt16               MaxStatusListSize       = DefaultMaxStatusListSize,
-                                      UInt16               MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+        public VirtualChargingStation(ChargingStation ChargingStation,
+                                      VirtualChargingPool VirtualChargingPool,
+                                      TimeSpan? SelfCheckTimeSpan = null,
+                                      UInt16 MaxStatusListSize = DefaultMaxStatusListSize,
+                                      UInt16 MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
 
             : this(ChargingStation, SelfCheckTimeSpan, MaxStatusListSize, MaxAdminStatusListSize)
 
@@ -310,67 +310,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (ChargingStation == null)
-                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging station must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
 
-            if (VirtualChargingPool    == null)
-                throw new ArgumentNullException(nameof(ChargingStation),  "The given charging pool must not be null!");
+            if (VirtualChargingPool == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging pool must not be null!");
 
             #endregion
 
-            this._VirtualChargingPool  = VirtualChargingPool;
+            this._VirtualChargingPool = VirtualChargingPool;
 
-        }
-
-        event OnRemoteEVSEStatusChangedDelegate IRemoteChargingStation.OnEVSEStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        event OnRemoteEVSEAdminStatusChangedDelegate IRemoteChargingStation.OnEVSEAdminStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        event OnRemoteChargingStationStatusChangedDelegate IRemoteChargingStation.OnStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        event OnRemoteChargingStationAdminStatusChangedDelegate IRemoteChargingStation.OnAdminStatusChanged
-        {
-            add
-            {
-                throw new NotImplementedException();
-            }
-
-            remove
-            {
-                throw new NotImplementedException();
-            }
         }
 
         #endregion
