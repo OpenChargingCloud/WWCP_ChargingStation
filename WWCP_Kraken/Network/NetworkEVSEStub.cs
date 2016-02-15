@@ -953,13 +953,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
             set
             {
 
+                // Skip, if the charging session is already known... 
                 if (_ChargingSession != value)
-                    SetProperty(ref _ChargingSession, value);
+                {
 
-                if (_ChargingSession != null)
-                    SetStatus(EVSEStatusType.Charging);
-                else
-                    SetStatus(EVSEStatusType.Available);
+                    _ChargingSession = value;
+
+                    if (_ChargingSession != null)
+                    {
+
+                        SetStatus(EVSEStatusType.Charging);
+
+                        var OnNewChargingSessionLocal = OnNewChargingSession;
+                        if (OnNewChargingSessionLocal != null)
+                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
+
+                    }
+
+                    else
+                        SetStatus(EVSEStatusType.Available);
+
+                }
 
             }
 
