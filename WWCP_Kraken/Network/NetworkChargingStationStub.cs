@@ -372,7 +372,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
-        public event OnReservationCancelledInternalDelegate            OnReservationCancelled;
+        #region OnNewReservation
+
+        /// <summary>
+        /// An event fired whenever a new charging reservation was created.
+        /// </summary>
+        public event OnNewReservationDelegate OnNewReservation;
+
+        #endregion
+
+        #region OnNewChargingSession/-ChargeDetailRecord
+
+        /// <summary>
+        /// An event fired whenever a new charging session was created.
+        /// </summary>
+        public event OnNewChargingSessionDelegate OnNewChargingSession;
+
+        /// <summary>
+        /// An event fired whenever a new charge detail record was created.
+        /// </summary>
+        public event OnNewChargeDetailRecordDelegate OnNewChargeDetailRecord;
+
+        #endregion
+
+        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
 
 
         // EVSE events
@@ -1127,11 +1150,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
         }
 
-        
 
         IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
         {
             return this.CreateNewEVSE(EVSEId);
+        }
+
+
+        protected internal void SendNewReservation(ChargingReservation Reservation)
+        {
+
+            var OnNewReservationLocal = OnNewReservation;
+            if (OnNewReservationLocal != null)
+                OnNewReservationLocal(DateTime.Now, this, Reservation);
+
+        }
+
+
+        protected internal void SendNewChargingSession(ChargingSession ChargingSession)
+        {
+
+            var OnNewChargingSessionLocal = OnNewChargingSession;
+            if (OnNewChargingSessionLocal != null)
+                OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
+
         }
 
     }

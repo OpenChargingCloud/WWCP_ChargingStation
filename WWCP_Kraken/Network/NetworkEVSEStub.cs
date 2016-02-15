@@ -752,15 +752,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
             set
             {
 
-                if (_Reservation == value)
-                    return;
+                // Skip, if the reservation is already known... 
+                if (_Reservation != value)
+                {
 
-                _Reservation = value;
+                    _Reservation = value;
 
-                if (_Reservation != null)
-                    SetStatus(EVSEStatusType.Reserved);
-                else
-                    SetStatus(EVSEStatusType.Available);
+                    if (_Reservation != null)
+                    {
+
+                        SetStatus(EVSEStatusType.Reserved);
+
+                        var OnNewReservationLocal = OnNewReservation;
+                        if (OnNewReservationLocal != null)
+                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
+
+                    }
+
+                    else
+                        SetStatus(EVSEStatusType.Available);
+
+                }
 
             }
 

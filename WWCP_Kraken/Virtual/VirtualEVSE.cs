@@ -899,6 +899,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 case EVSEStatusType.Available:
 
                     // Will do: Status = EVSEStatusType.Reserved
+                    // Will do: Send OnNewReservation event!
                     this.Reservation = new ChargingReservation(Timestamp,
                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
