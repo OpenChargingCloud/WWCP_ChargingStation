@@ -1112,12 +1112,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 ChargingSession  = new ChargingSession(SessionId) {
                                                           ProviderId         = ProviderId,
                                                           eMAId              = eMAId,
-                                                          ChargingProductId  = ChargingProductId
+                                                          ChargingProductId  = ChargingProductId,
+                                                          EVSEId             = Id
                                                       };
 
-                var OnNewChargingSessionLocal = OnNewChargingSession;
-                if (OnNewChargingSessionLocal != null)
-                    OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
+                //var OnNewChargingSessionLocal = OnNewChargingSession;
+                //if (OnNewChargingSessionLocal != null)
+                //    OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
 
                 return RemoteStartEVSEResult.Success(ChargingSession);
 
@@ -1139,6 +1140,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                               Reservation        = Reservation,
                                                               ProviderId         = ProviderId,
                                                               eMAId              = eMAId,
+                                                              EVSEId             = Id,
                                                               ChargingProductId  = ChargingProductId
                                                           };
 
