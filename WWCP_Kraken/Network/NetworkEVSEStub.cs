@@ -884,6 +884,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region (internal) CheckReservationTime()
+
+        /// <summary>
+        /// Check if the reservation is expired.
+        /// </summary>
+        internal async Task CheckReservationTime()
+        {
+
+            if (_Reservation != null &&
+                _Reservation.IsExpired)
+            {
+
+                await CancelReservation(_Reservation.Id,
+                                        ChargingReservationCancellationReason.Expired);
+
+            }
+
+        }
+
+        #endregion
+
+
         #region CancelReservation(ReservationId, Reason)
 
         /// <summary>
@@ -910,7 +932,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            var OldReservation = _Reservation;
+            var OldReservationId = _Reservation.Id;
 
             _Reservation = null;
 
@@ -919,7 +941,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 OnReservationCancelledLocal(DateTime.Now,
                                             this,
                                             EventTracking_Id.New,
-                                            OldReservation,
+                                            OldReservationId,
                                             Reason);
 
             SetStatus(EVSEStatusType.Available);

@@ -56,6 +56,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         public static readonly TimeSpan  DefaultQueryTimeout  = TimeSpan.FromSeconds(180);
 
+
+        /// <summary>
+        /// The default time span between self checks.
+        /// </summary>
+        public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(3);
+
+        private Timer _SelfCheckTimer;
+
         #endregion
 
         #region Properties
@@ -333,6 +341,24 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+
+        #region SelfCheckTimeSpan
+
+        private readonly TimeSpan _SelfCheckTimeSpan;
+
+        /// <summary>
+        /// The time span between self checks.
+        /// </summary>
+        public TimeSpan SelfCheckTimeSpan
+        {
+            get
+            {
+                return _SelfCheckTimeSpan;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Links
@@ -593,6 +619,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
         public NetworkChargingStationStub(ChargingStation                      ChargingStation,
+                                          TimeSpan?                            SelfCheckTimeSpan           = null,
                                           UInt16                               MaxStatusListSize           = DefaultMaxStatusListSize,
                                           UInt16                               MaxAdminStatusListSize      = DefaultMaxAdminStatusListSize,
                                           IPTransport                          IPTransport                 = IPTransport.IPv4only,
@@ -619,6 +646,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
             this._URIPrefix                   = URIPrefix;
             this._QueryTimeout                = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
+
+            this._SelfCheckTimeSpan           = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
+            this._SelfCheckTimer              = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
@@ -758,6 +788,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
+
+        #endregion
+
+        #region (private) SelfCheck(Context)
+
+        private void SelfCheck(Object Context)
+        {
+
+            foreach (var _EVSE in _EVSEs)
+                _EVSE.CheckReservationTime();
+
+        }
 
         #endregion
 

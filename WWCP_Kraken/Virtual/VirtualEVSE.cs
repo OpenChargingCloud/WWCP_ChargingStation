@@ -972,7 +972,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            var OldReservation = _Reservation;
+            var OldReservationId = _Reservation.Id;
 
             _Reservation = null;
 
@@ -981,7 +981,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 OnReservationCancelledLocal(DateTime.Now,
                                             this,
                                             EventTracking_Id.New,
-                                            OldReservation,
+                                            OldReservationId,
                                             Reason);
 
             SetStatus(EVSEStatusType.Available);
@@ -1254,7 +1254,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     var Now = DateTime.Now;
 
                     var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:              _ChargingSession.Id,
-                                                                     ChargingReservation:    _ChargingSession.Reservation,
+                                                                     Reservation:            _ChargingSession.Reservation,
                                                                      EVSE:                   _ChargingSession.EVSE,
                                                                      ProviderId:             _ChargingSession.ProviderId,
                                                                      ChargingProductId:      _ChargingSession.ChargingProductId,

@@ -258,10 +258,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
-        public VirtualChargingStation(ChargingStation ChargingStation,
-                                      TimeSpan? SelfCheckTimeSpan = null,
-                                      UInt16 MaxStatusListSize = DefaultMaxStatusListSize,
-                                      UInt16 MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+        public VirtualChargingStation(ChargingStation  ChargingStation,
+                                      TimeSpan?        SelfCheckTimeSpan       = null,
+                                      UInt16           MaxStatusListSize       = DefaultMaxStatusListSize,
+                                      UInt16           MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
         {
 
             #region Initial checks
@@ -281,7 +281,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
 
             this._SelfCheckTimeSpan = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
-            this._SelfCheckTimer = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
+            this._SelfCheckTimer    = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
@@ -966,7 +966,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         internal void SendOnReservationCancelled(DateTime                               Timestamp,
                                                  Object                                 Sender,
                                                  EventTracking_Id                       EventTrackingId,
-                                                 ChargingReservation                    Reservation,
+                                                 ChargingReservation_Id                 ReservationId,
                                                  ChargingReservationCancellationReason  Reason)
         {
 
@@ -975,7 +975,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 OnReservationCancelledLocal(Timestamp,
                                             Sender,
                                             EventTrackingId,
-                                            Reservation,
+                                            ReservationId,
                                             Reason);
 
         }
