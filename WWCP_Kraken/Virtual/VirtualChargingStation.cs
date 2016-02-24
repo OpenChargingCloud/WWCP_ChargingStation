@@ -931,8 +931,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> CancelReservation(ChargingReservation_Id           ReservationId,
-                                                     ChargingReservationCancellationReason  ReservationCancellation)
+        public async Task<Boolean> CancelReservation(DateTime                               Timestamp,
+                                                     CancellationToken                      CancellationToken,
+                                                     EventTracking_Id                       EventTrackingId,
+                                                     ChargingReservation_Id                 ReservationId,
+                                                     ChargingReservationCancellationReason  Reason,
+                                                     TimeSpan?                              QueryTimeout  = null)
         {
 
             #region Initial checks
@@ -945,7 +949,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(ReservationId, ReservationCancellation),
+                                MapFirst(evse => evse.CancelReservation(ReservationId, Reason),
                                          Task.FromResult(false));
 
         }

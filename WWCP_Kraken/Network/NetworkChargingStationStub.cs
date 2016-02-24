@@ -995,8 +995,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> CancelReservation(ChargingReservation_Id                 ReservationId,
-                                                     ChargingReservationCancellationReason  Reason)
+        public virtual async Task<Boolean> CancelReservation(DateTime                               Timestamp,
+                                                             CancellationToken                      CancellationToken,
+                                                             EventTracking_Id                       EventTrackingId,
+                                                             ChargingReservation_Id                 ReservationId,
+                                                             ChargingReservationCancellationReason  Reason,
+                                                             TimeSpan?                              QueryTimeout  = null)
         {
 
             #region Initial checks
