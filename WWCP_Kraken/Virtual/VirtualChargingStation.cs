@@ -762,7 +762,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
+        #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, eMAId = null,...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
@@ -774,6 +774,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -794,13 +795,39 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      TimeSpan?                QueryTimeout       = null)
         {
 
-            return ReservationResult.OutOfService;
+            // ReserveNow!
+            // Later this could also be a delayed reservation!
+
+            var _EVSE = _EVSEs.Where(evse => evse.Status == EVSEStatusType.Available).FirstOrDefault();
+
+            if (_EVSEs != null)
+            {
+
+                return await _EVSE.Reserve(Timestamp,
+                                           CancellationToken,
+                                           EventTrackingId,
+                                           ChargingReservationLevel.ChargingStation,
+                                           StartTime,
+                                           Duration,
+                                           ReservationId,
+                                           ProviderId,
+                                           eMAId,
+                                           ChargingProductId,
+                                           AuthTokens,
+                                           eMAIds,
+                                           PINs,
+                                           QueryTimeout);
+
+            }
+
+            else
+                return ReservationResult.NoEVSEsAvailable;
 
         }
 
         #endregion
 
-        #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, ...)
+        #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, eMAId = null,...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
@@ -885,7 +912,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
-
 
 
         #region (internal) SendNewReservation(Timestamp, Sender, Reservation)
