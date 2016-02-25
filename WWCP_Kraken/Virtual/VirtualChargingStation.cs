@@ -762,7 +762,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-                #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
+        #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
@@ -927,19 +927,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region CancelReservation(ReservationId)
+        #region CancelReservation(...ReservationId, Reason, ...)
 
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
-        /// <returns>True when successful, false otherwise</returns>
-        public async Task<Boolean> CancelReservation(DateTime                               Timestamp,
-                                                     CancellationToken                      CancellationToken,
-                                                     EventTracking_Id                       EventTrackingId,
-                                                     ChargingReservation_Id                 ReservationId,
-                                                     ChargingReservationCancellationReason  Reason,
-                                                     TimeSpan?                              QueryTimeout  = null)
+        /// <param name="Reason">A reason for this cancellation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        public async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
+                                                                     CancellationToken                      CancellationToken,
+                                                                     EventTracking_Id                       EventTrackingId,
+                                                                     ChargingReservation_Id                 ReservationId,
+                                                                     ChargingReservationCancellationReason  Reason,
+                                                                     TimeSpan?                              QueryTimeout  = null)
         {
 
             #region Initial checks
@@ -952,8 +956,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(ReservationId, Reason),
-                                         Task.FromResult(false));
+                                MapFirst(evse => evse.CancelReservation(Timestamp,
+                                                                        CancellationToken,
+                                                                        EventTrackingId,
+                                                                        ReservationId,
+                                                                        Reason,
+                                                                        QueryTimeout),
+                                         Task.FromResult(CancelReservationResult.Error("The charging reservation could not be cancelled!")));
 
         }
 
@@ -1150,7 +1159,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        #region RemoteStop(...SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session.
@@ -1161,6 +1170,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopResult>
 
@@ -1170,6 +1180,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {
@@ -1180,7 +1191,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...EVSEId, SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        #region RemoteStop(...EVSEId, SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -1192,6 +1203,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopEVSEResult>
 
@@ -1202,6 +1214,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {
@@ -1234,6 +1247,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                        SessionId,
                                                        ReservationHandling,
                                                        ProviderId,
+                                                       eMAId,
                                                        QueryTimeout);
 
             }
@@ -1248,7 +1262,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...ChargingStationId, SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        #region RemoteStop(...ChargingStationId, SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given charging station.
@@ -1260,6 +1274,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopChargingStationResult>
 
@@ -1270,6 +1285,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {

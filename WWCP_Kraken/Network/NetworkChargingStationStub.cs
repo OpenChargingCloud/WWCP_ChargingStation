@@ -804,6 +804,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        IEnumerable<EVSE> IRemoteChargingStation.EVSEs
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         #region CreateNewEVSE(EVSEId, Configurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
@@ -870,6 +878,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
+        {
+            return this.CreateNewEVSE(EVSEId);
+        }
+
 
 
         public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime           Timestamp,
@@ -884,6 +897,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+        #region Reservations
 
         public IEnumerable<ChargingReservation> ChargingReservations
         {
@@ -989,6 +1003,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        protected internal void SendNewReservation(ChargingReservation Reservation)
+        {
+
+            var OnNewReservationLocal = OnNewReservation;
+            if (OnNewReservationLocal != null)
+                OnNewReservationLocal(DateTime.Now, this, Reservation);
+
+        }
 
 
         #region CancelReservation(ReservationId, Reason)
@@ -996,14 +1018,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
-        /// <returns>True when successful, false otherwise</returns>
-        public virtual async Task<Boolean> CancelReservation(DateTime                               Timestamp,
-                                                             CancellationToken                      CancellationToken,
-                                                             EventTracking_Id                       EventTrackingId,
-                                                             ChargingReservation_Id                 ReservationId,
-                                                             ChargingReservationCancellationReason  Reason,
-                                                             TimeSpan?                              QueryTimeout  = null)
+        /// <param name="Reason">A reason for this cancellation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        public virtual async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
+                                                                             CancellationToken                      CancellationToken,
+                                                                             EventTracking_Id                       EventTrackingId,
+                                                                             ChargingReservation_Id                 ReservationId,
+                                                                             ChargingReservationCancellationReason  Reason,
+                                                                             TimeSpan?                              QueryTimeout  = null)
         {
 
             #region Initial checks
@@ -1016,13 +1042,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(ReservationId, Reason),
-                                         Task.FromResult(false));
+                                MapFirst(evse => evse.CancelReservation(Timestamp,
+                                                                        CancellationToken,
+                                                                        EventTrackingId,
+                                                                        ReservationId,
+                                                                        Reason,
+                                                                        QueryTimeout),
+                                         Task.FromResult(CancelReservationResult.Error("The charging reservation could not be cancelled!")));
 
         }
 
         #endregion
 
+        #endregion
+
+        #region RemoteStart/-Stop
 
         #region RemoteStart(...EVSEId, ChargingProductId = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
@@ -1095,7 +1129,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region RemoteStop(...SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        protected internal void SendNewChargingSession(ChargingSession ChargingSession)
+        {
+
+            var OnNewChargingSessionLocal = OnNewChargingSession;
+            if (OnNewChargingSessionLocal != null)
+                OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
+
+        }
+
+
+        #region RemoteStop(...SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session.
@@ -1106,6 +1150,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopResult>
 
@@ -1115,6 +1160,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {
@@ -1125,7 +1171,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...EVSEId, SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        #region RemoteStop(...EVSEId, SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -1137,6 +1183,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public virtual async Task<RemoteStopEVSEResult>
 
@@ -1147,6 +1194,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {
@@ -1157,7 +1205,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...ChargingStationId, SessionId, ReservationHandling, ProviderId = null, QueryTimeout = null)
+        #region RemoteStop(...ChargingStationId, SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given charging station.
@@ -1169,6 +1217,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
+        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
         /// <param name="QueryTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopChargingStationResult>
 
@@ -1179,6 +1228,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
                        EVSP_Id              ProviderId    = null,
+                       eMA_Id               eMAId         = null,
                        TimeSpan?            QueryTimeout  = null)
 
         {
@@ -1189,41 +1239,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #endregion
 
-
-        IEnumerable<EVSE> IRemoteChargingStation.EVSEs
-        {
-            get
-            {
-                return null;
-            }
-        }
-
-
-        IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
-        {
-            return this.CreateNewEVSE(EVSEId);
-        }
-
-
-        protected internal void SendNewReservation(ChargingReservation Reservation)
-        {
-
-            var OnNewReservationLocal = OnNewReservation;
-            if (OnNewReservationLocal != null)
-                OnNewReservationLocal(DateTime.Now, this, Reservation);
-
-        }
-
-
-        protected internal void SendNewChargingSession(ChargingSession ChargingSession)
-        {
-
-            var OnNewChargingSessionLocal = OnNewChargingSession;
-            if (OnNewChargingSessionLocal != null)
-                OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
-
-        }
 
     }
 

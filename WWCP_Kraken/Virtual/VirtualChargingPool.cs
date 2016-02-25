@@ -261,10 +261,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
             throw new NotImplementedException();
         }
 
-        public Task<bool> CancelReservation(ChargingReservation_Id ReservationId)
+        #region CancelReservation(...ReservationId, Reason, ...)
+
+        /// <summary>
+        /// Try to remove the given charging reservation.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
+        /// <param name="ReservationId">The unique charging reservation identification.</param>
+        /// <param name="Reason">A reason for this cancellation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        public async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
+                                                                     CancellationToken                      CancellationToken,
+                                                                     EventTracking_Id                       EventTrackingId,
+                                                                     ChargingReservation_Id                 ReservationId,
+                                                                     ChargingReservationCancellationReason  Reason,
+                                                                     TimeSpan?                              QueryTimeout  = null)
         {
             throw new NotImplementedException();
         }
+
+        #endregion
 
         public Task<RemoteStartChargingStationResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, EVSP_Id ProviderId, eMA_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
