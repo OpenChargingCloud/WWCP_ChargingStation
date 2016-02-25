@@ -60,6 +60,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(3);
 
+        private static readonly Object SelfCheckLock = new Object();
         private Timer _SelfCheckTimer;
 
         #endregion
@@ -485,8 +486,32 @@ namespace org.GraphDefined.WWCP.ChargingStations
         private void SelfCheck(Object Context)
         {
 
-            foreach (var _EVSE in _EVSEs)
-                _EVSE.CheckReservationTime();
+            if (Monitor.TryEnter(SelfCheckLock))
+            {
+
+                try
+                {
+
+                    foreach (var _EVSE in _EVSEs)
+                        _EVSE.CheckReservationTime().Wait();
+
+                }
+                catch (Exception e)
+                {
+
+                    while (e.InnerException != null)
+                        e = e.InnerException;
+
+                    DebugX.LogT("VirtualChargingStation SelfCheck() '" + Id + "' led to an exception: " + e.Message + Environment.NewLine + e.StackTrace);
+
+                }
+
+                finally
+                {
+                    Monitor.Exit(SelfCheckLock);
+                }
+
+            }
 
         }
 

@@ -1050,6 +1050,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                             OldReservationId,
                                             Reason);
 
+            // Will send events!
             SetStatus(EVSEStatusType.Available);
 
             return CancelReservationResult.Success(ReservationId);
