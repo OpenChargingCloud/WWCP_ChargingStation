@@ -870,7 +870,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 OldReservation.StartTime,
                                                                 Duration. HasValue  ? Duration. Value : MaxReservationDuration,
                                                                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
-                                                                ChargingReservationLevel.EVSE,
+                                                                ReservationLevel,
                                                                 ProviderId,
                                                                 eMAId,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
