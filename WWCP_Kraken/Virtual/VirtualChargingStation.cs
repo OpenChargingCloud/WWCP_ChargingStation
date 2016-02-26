@@ -63,6 +63,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         private static readonly Object SelfCheckLock = new Object();
         private Timer _SelfCheckTimer;
 
+
+        public const String DefaultWhiteListName = "default";
+
         #endregion
 
         #region Properties
@@ -211,6 +214,41 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        #region WhiteLists
+
+        private readonly Dictionary<String, HashSet<AuthInfo>> _WhiteLists;
+
+        /// <summary>
+        /// The authentication white lists.
+        /// </summary>
+        [InternalUseOnly]
+        public Dictionary<String, HashSet<AuthInfo>> WhiteLists
+        {
+            get
+            {
+                return _WhiteLists;
+            }
+        }
+
+        #endregion
+
+        #region DefaultWhiteList
+
+        /// <summary>
+        /// The authentication white lists.
+        /// </summary>
+        [InternalUseOnly]
+        public HashSet<AuthInfo> DefaultWhiteList
+        {
+            get
+            {
+                return _WhiteLists[DefaultWhiteListName];
+            }
+        }
+
+        #endregion
+
+
         #region SelfCheckTimeSpan
 
         private readonly TimeSpan _SelfCheckTimeSpan;
@@ -272,17 +310,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id = ChargingStation.Id;
-            this._EVSEs = new HashSet<VirtualEVSE>();
+            this._Id                   = ChargingStation.Id;
+            this._EVSEs                = new HashSet<VirtualEVSE>();
 
-            this._StatusSchedule = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
+            this._StatusSchedule       = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
             this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
 
-            this._AdminStatusSchedule = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
+            this._AdminStatusSchedule  = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
             this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
 
-            this._SelfCheckTimeSpan = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
-            this._SelfCheckTimer    = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
+            this._WhiteLists           = new Dictionary<String, HashSet<AuthInfo>>();
+            _WhiteLists.Add("default", new HashSet<AuthInfo>());
+
+            this._SelfCheckTimeSpan    = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
+            this._SelfCheckTimer       = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
         }
 
@@ -298,11 +339,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SelfCheckTimeSpan">The time span between self checks.</param>
         /// <param name="MaxStatusListSize">The maximum size of the charging station status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
-        public VirtualChargingStation(ChargingStation ChargingStation,
-                                      VirtualChargingPool VirtualChargingPool,
-                                      TimeSpan? SelfCheckTimeSpan = null,
-                                      UInt16 MaxStatusListSize = DefaultMaxStatusListSize,
-                                      UInt16 MaxAdminStatusListSize = DefaultMaxAdminStatusListSize)
+        public VirtualChargingStation(ChargingStation      ChargingStation,
+                                      VirtualChargingPool  VirtualChargingPool,
+                                      TimeSpan?            SelfCheckTimeSpan       = null,
+                                      UInt16               MaxStatusListSize       = DefaultMaxStatusListSize,
+                                      UInt16               MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
 
             : this(ChargingStation, SelfCheckTimeSpan, MaxStatusListSize, MaxAdminStatusListSize)
 
@@ -1364,7 +1405,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region WhiteLists
 
+        #region GetWhiteList(Name)
+
+        public HashSet<AuthInfo> GetWhiteList(String Name)
+        {
+
+            return _WhiteLists[Name];
+
+        }
+
+        #endregion
+
+        #endregion
 
 
         //-- Client-side methods -----------------------------------------
