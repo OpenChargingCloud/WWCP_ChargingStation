@@ -810,6 +810,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -860,8 +861,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     this._Reservation = new ChargingReservation(Timestamp,
                                                                 StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                                ProviderId,
+                                                                (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                 ChargingReservationLevel.EVSE,
+                                                                ProviderId,
+                                                                eMAId,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,

@@ -823,9 +823,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             // ReserveNow!
             // Later this could also be a delayed reservation!
 
-            var _EVSE = _EVSEs.Where(evse => evse.Status == EVSEStatusType.Available).FirstOrDefault();
+            var _EVSE = _EVSEs.Where(evse => evse.Status.Value == EVSEStatusType.Available).FirstOrDefault();
 
-            if (_EVSEs != null)
+            if (_EVSE != null)
             {
 
                 return await _EVSE.Reserve(Timestamp,

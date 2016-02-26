@@ -60,7 +60,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The maximum time span for a reservation.
         /// </summary>
-        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
+        public  static readonly TimeSpan MaxReservationDuration  = TimeSpan.FromMinutes(15);
+
+        private static readonly Random   _random                 = new Random(DateTime.Now.Millisecond);
 
         #endregion
 
@@ -862,11 +864,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 if (_Reservation.Id == ReservationId)
                 {
 
+                    var OldReservation = _Reservation; // Store already consumed reservation time!
+
                     this._Reservation = new ChargingReservation(Timestamp,
-                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
-                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                                ProviderId,
+                                                                OldReservation.StartTime,
+                                                                Duration. HasValue  ? Duration. Value : MaxReservationDuration,
+                                                                (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                 ChargingReservationLevel.EVSE,
+                                                                ProviderId,
+                                                                eMAId,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,
@@ -906,8 +912,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     this.Reservation = new ChargingReservation(Timestamp,
                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                               ProviderId,
+                                                               (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                ReservationLevel,
+                                                               ProviderId,
+                                                               eMAId,
                                                                null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                null, //ChargingStation.ChargingPool.Id,
                                                                ChargingStation.Id,
@@ -915,7 +923,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                ChargingProductId,
                                                                AuthTokens,
                                                                eMAIds,
-                                                               PINs);
+
+                                                               // ToDo: Make this behaviour optional!
+                                                               new UInt32[] { (UInt32) (_random.Next(1000000) + 100000) });
 
                     return ReservationResult.Success(_Reservation);
 
