@@ -18,11 +18,9 @@
 #region Usings
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Illias.Votes;
@@ -60,7 +58,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The maximum time span for a reservation.
         /// </summary>
-        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
+        public static readonly TimeSpan MaxReservationDuration      = TimeSpan.FromMinutes(15);
+
+
+        public static readonly TimeSpan ReservationSelfCancelAfter  = TimeSpan.FromSeconds(10);
 
         #endregion
 
@@ -896,7 +897,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation != null &&
-                _Reservation.IsExpired)
+                _Reservation.IsExpired(ReservationSelfCancelAfter))
             {
 
                 await CancelReservation(DateTime.Now,

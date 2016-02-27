@@ -18,11 +18,9 @@
 #region Usings
 
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Illias.Votes;
@@ -535,7 +533,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (ChargingStation == null)
-                throw new ArgumentNullException("ChargingStation", "The charging station must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStation), "The charging station must not be null!");
 
             #endregion
 
@@ -549,10 +547,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
 
             this._StatusSchedule        = new StatusSchedule<EVSEStatusType>(MaxStatusListSize);
-            this._StatusSchedule.Insert(EVSEStatusType.Unspecified);
+            this._StatusSchedule.     Insert(EVSEStatusType.Available);
 
             this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.Unspecified);
+            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.Operational);
 
             #endregion
 
@@ -1000,7 +998,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation != null &&
-                _Reservation.IsExpired)
+                _Reservation.IsExpired())
             {
 
                 await CancelReservation(DateTime.Now,
@@ -1172,33 +1170,31 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Check admin status
 
-            if (AdminStatus.Value != EVSEAdminStatusType.Operational)
+            if (AdminStatus.Value != EVSEAdminStatusType.Operational &&
+                AdminStatus.Value != EVSEAdminStatusType.InternalUse)
                 return RemoteStartEVSEResult.OutOfService;
 
             #endregion
 
-            // SessionId_AlreadyInUse,
-            // EVSE_NotReachable,
-            // Start_Timeout
 
             #region Available
 
-            if (Status.Value == EVSEStatusType.Available)
+            if (Status.Value == EVSEStatusType.Available ||
+                Status.Value == EVSEStatusType.AVAILABLE_DOOR_NOT_CLOSED)
             {
 
-                // Will do: Status = EVSEStatusType.Charging;
-                ChargingSession  = new ChargingSession(SessionId) {
-                                                          ProviderId         = ProviderId,
-                                                          eMAId              = eMAId,
-                                                          ChargingProductId  = ChargingProductId,
-                                                          EVSEId             = Id
-                                                      };
+                // Will also set the status -> EVSEStatusType.Charging;
+                ChargingSession = new ChargingSession(SessionId) {
+                                                         EventTrackingId    = EventTrackingId,
+                                                         Reservation        = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
+                                                         ReservationId      = ReservationId,
+                                                         EVSEId             = Id,
+                                                         ChargingProductId  = ChargingProductId,
+                                                         ProviderId         = ProviderId,
+                                                         eMAIdStart         = eMAId
+                                                     };
 
-                //var OnNewChargingSessionLocal = OnNewChargingSession;
-                //if (OnNewChargingSessionLocal != null)
-                //    OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
-
-                return RemoteStartEVSEResult.Success(ChargingSession);
+                return RemoteStartEVSEResult.Success(_ChargingSession);
 
             }
 
@@ -1213,20 +1209,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     Reservation.Id == ReservationId)
                 {
 
-                    // Will do: Status = EVSEStatusType.Charging;
+                    // Will also set the status -> EVSEStatusType.Charging;
                     ChargingSession = new ChargingSession(SessionId) {
-                                                              Reservation        = Reservation,
-                                                              ProviderId         = ProviderId,
-                                                              eMAId              = eMAId,
-                                                              EVSEId             = Id,
-                                                              ChargingProductId  = ChargingProductId
-                                                          };
+                                                             EventTrackingId    = EventTrackingId,
+                                                             Reservation        = Reservation,
+                                                             ProviderId         = ProviderId,
+                                                             eMAIdStart         = eMAId,
+                                                             EVSEId             = Id,
+                                                             ChargingProductId  = ChargingProductId
+                                                         };
 
-                    var OnNewChargingSessionLocal = OnNewChargingSession;
-                    if (OnNewChargingSessionLocal != null)
-                        OnNewChargingSessionLocal(DateTime.Now, this, ChargingSession);
-
-                    return RemoteStartEVSEResult.Success(ChargingSession);
+                    return RemoteStartEVSEResult.Success(_ChargingSession);
 
                 }
 
@@ -1265,7 +1258,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
             else
-                return RemoteStartEVSEResult.Error();
+                return RemoteStartEVSEResult.Error("Could not start charging!");
 
         }
 
@@ -1299,7 +1292,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Check admin status
 
-            if (AdminStatus.Value != EVSEAdminStatusType.Operational)
+            if (AdminStatus.Value != EVSEAdminStatusType.Operational &&
+                AdminStatus.Value != EVSEAdminStatusType.InternalUse)
                 return RemoteStopEVSEResult.OutOfService(SessionId);
 
             #endregion
@@ -1336,23 +1330,39 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:              _ChargingSession.Id,
                                                                      Reservation:            _ChargingSession.Reservation,
                                                                      EVSE:                   _ChargingSession.EVSE,
+                                                                     ChargingStation:        _ChargingSession.EVSE.ChargingStation,
+                                                                     ChargingPool:           _ChargingSession.EVSE.ChargingStation.ChargingPool,
+                                                                     EVSEOperator:           _ChargingSession.EVSE.Operator,
                                                                      ProviderId:             _ChargingSession.ProviderId,
                                                                      ChargingProductId:      _ChargingSession.ChargingProductId,
                                                                      SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
-                                                                     EnergyMeteringValues:      new List<Timestamped<Double>>() {
+
+                                                                     IdentificationStart:    _ChargingSession.eMAIdStart != null
+                                                                                                 ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart)
+                                                                                                 : _ChargingSession.AuthTokenStart != null
+                                                                                                     ? AuthInfo.FromAuthToken(_ChargingSession.AuthTokenStart)
+                                                                                                     : null,
+
+                                                                     IdentificationStop:     eMAId != null ? AuthInfo.FromRemoteIdentification(eMAId) : null,
+
+                                                                     EnergyMeteringValues:   new List<Timestamped<Double>>() {
                                                                                                  new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
                                                                                                  new Timestamped<Double>(Now,                                          100)
                                                                                              }
+
                                                                     );
 
                     // Will do: Status = EVSEStatusType.Available
                     ChargingSession = null;
 
+                    // Will do: Status = EVSEStatusType.Available
+                    Reservation     = null;
+
+
                     var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
                     if (OnNewChargeDetailRecordLocal != null)
                         OnNewChargeDetailRecordLocal(DateTime.Now, this, _ChargeDetailRecord);
 
-                    Reservation = null;
 
                     return RemoteStopEVSEResult.Success(_ChargeDetailRecord, null, ReservationHandling);
 

@@ -24,7 +24,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 using org.GraphDefined.Vanaheimr.Illias;
-using org.GraphDefined.Vanaheimr.Illias.Votes;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 
 #endregion
@@ -270,10 +269,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Links
 
+        #region ChargingStation
+
+        private readonly ChargingStation _ChargingStation;
+
+        /// <summary>
+        /// The linked charging station.
+        /// </summary>
+        public ChargingStation ChargingStation
+        {
+            get
+            {
+                return _ChargingStation;
+            }
+        }
+
+        #endregion
+
         #region ChargingPool
 
         private readonly VirtualChargingPool _VirtualChargingPool;
 
+        /// <summary>
+        /// The optional linked charging pool.
+        /// </summary>
         public VirtualChargingPool ChargingPool
         {
             get
@@ -310,6 +329,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+            this._ChargingStation      = ChargingStation;
             this._Id                   = ChargingStation.Id;
             this._EVSEs                = new HashSet<VirtualEVSE>();
 

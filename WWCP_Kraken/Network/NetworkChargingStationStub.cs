@@ -20,16 +20,15 @@
 using System;
 using System.Linq;
 using System.Threading;
+using System.Net.Security;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Illias.Votes;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
-using System.Net.Security;
 
 #endregion
 
@@ -60,7 +59,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The default time span between self checks.
         /// </summary>
-        public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(3);
+        public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(5);
 
         private Timer _SelfCheckTimer;
 
@@ -342,6 +341,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds { get; set; }
+        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds { get; set; }
+
         #region SelfCheckTimeSpan
 
         private readonly TimeSpan _SelfCheckTimeSpan;
@@ -365,7 +367,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region ChargingStation
 
-        private readonly ChargingStation _ChargingStation;
+        protected readonly ChargingStation _ChargingStation;
 
         public ChargingStation ChargingStation
         {
@@ -379,7 +381,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region EVSEs
 
-        private readonly HashSet<NetworkEVSEStub> _EVSEs;
+        protected readonly HashSet<NetworkEVSEStub> _EVSEs;
 
         /// <summary>
         /// All registered EVSEs.
@@ -797,7 +799,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             foreach (var _EVSE in _EVSEs)
-                _EVSE.CheckReservationTime();
+                _EVSE.CheckReservationTime().Wait();
 
         }
 
