@@ -998,6 +998,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation != null &&
+                Status.Value == EVSEStatusType.Reserved &&
                 _Reservation.IsExpired())
             {
 
@@ -1204,32 +1205,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusType.Reserved:
 
-                    #region Matching reservation identification...
+                    #region Not matching reservation identifications...
 
-                    if (Reservation    != null &&
-                        Reservation.Id == ReservationId)
-                    {
+                    if (Reservation != null && ReservationId == null)
+                        return RemoteStartEVSEResult.Reserved("Missing reservation identification!");
 
-                        // Will also set the status -> EVSEStatusType.Charging;
-                        ChargingSession = new ChargingSession(SessionId) {
-                                                                 EventTrackingId    = EventTrackingId,
-                                                                 Reservation        = Reservation,
-                                                                 ProviderId         = ProviderId,
-                                                                 eMAIdStart         = eMAId,
-                                                                 EVSEId             = Id,
-                                                                 ChargingProductId  = ChargingProductId
-                                                             };
-
-                        return RemoteStartEVSEResult.Success(_ChargingSession);
-
-                    }
+                    if (Reservation != null && ReservationId != Reservation.Id)
+                        return RemoteStartEVSEResult.Reserved("Invalid reservation identification!");
 
                     #endregion
 
-                    #region ...or unknowen reservation identification!
+                    #region ...or a matching reservation identification!
 
-                    else
-                        return RemoteStartEVSEResult.Reserved;
+                    // Will also set the status -> EVSEStatusType.Charging;
+                    ChargingSession = new ChargingSession(SessionId) {
+                                                             EventTrackingId    = EventTrackingId,
+                                                             Reservation        = Reservation,
+                                                             ProviderId         = ProviderId,
+                                                             eMAIdStart         = eMAId,
+                                                             EVSEId             = Id,
+                                                             ChargingProductId  = ChargingProductId
+                                                         };
+
+                    return RemoteStartEVSEResult.Success(_ChargingSession);
 
                     #endregion
 
@@ -1356,8 +1354,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         // Will do: Status = EVSEStatusType.Available
                         ChargingSession = null;
 
-                        // Will do: Status = EVSEStatusType.Available
-                        Reservation     = null;
+                        if (!ReservationHandling.IsKeepAlive)
+                            // Will do: Status = EVSEStatusType.Available
+                            Reservation     = null;
+
+                        else
+                        {
+                            //ToDo: Reservation will live on!
+                        }
 
 
                         var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
