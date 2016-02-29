@@ -536,10 +536,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
 
             this._StatusSchedule        = new StatusSchedule<EVSEStatusType>(MaxStatusListSize);
-            this._StatusSchedule.Insert(EVSEStatusType.Unspecified);
+            this._StatusSchedule.Insert(EVSEStatusType.OutOfService);
 
             this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.Unspecified);
+            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.OutOfService);
 
             #endregion
 

@@ -591,10 +591,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._EVSEs                 = new HashSet<NetworkEVSEStub>();
 
             this._StatusSchedule        = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
-            this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
+            this._StatusSchedule.Insert(ChargingStationStatusType.OutOfService);
 
             this._AdminStatusSchedule   = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
+            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.OutOfService);
 
 
             #region Init events

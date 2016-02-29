@@ -334,10 +334,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._EVSEs                = new HashSet<VirtualEVSE>();
 
             this._StatusSchedule       = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
-            this._StatusSchedule.Insert(ChargingStationStatusType.Unspecified);
+            this._StatusSchedule.Insert(ChargingStationStatusType.OutOfService);
 
             this._AdminStatusSchedule  = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.Unspecified);
+            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.OutOfService);
 
             this._WhiteLists           = new Dictionary<String, HashSet<AuthInfo>>();
             _WhiteLists.Add("default", new HashSet<AuthInfo>());
@@ -1239,21 +1239,39 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            var _VirtualEVSE = GetEVSEbyId(EVSEId);
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            {
 
-            if (_VirtualEVSE == null)
-                result = RemoteStartEVSEResult.UnknownEVSE;
+                var _VirtualEVSE = GetEVSEbyId(EVSEId);
+
+                if (_VirtualEVSE == null)
+                    result = RemoteStartEVSEResult.UnknownEVSE;
 
 
-            return await _VirtualEVSE.RemoteStart(Timestamp,
-                                                  CancellationToken,
-                                                  EventTrackingId,
-                                                  ChargingProductId,
-                                                  ReservationId,
-                                                  SessionId,
-                                                  ProviderId,
-                                                  eMAId,
-                                                  QueryTimeout);
+                return await _VirtualEVSE.RemoteStart(Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      ChargingProductId,
+                                                      ReservationId,
+                                                      SessionId,
+                                                      ProviderId,
+                                                      eMAId,
+                                                      QueryTimeout);
+
+            }
+            else
+            {
+
+                switch (AdminStatus.Value)
+                {
+
+                    default:
+                        return RemoteStartEVSEResult.OutOfService;
+
+                }
+
+            }
 
         }
 
