@@ -18,6 +18,7 @@
 #region Usings
 
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -764,71 +765,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reservations...
 
-        #region Reservation
-
-        private ChargingReservation _Reservation;
-
-        /// <summary>
-        /// The charging reservation, if available.
-        /// </summary>
-        [InternalUseOnly]
-        public ChargingReservation Reservation
-        {
-
-            get
-            {
-                return _Reservation;
-            }
-
-            set
-            {
-
-                // Skip, if the reservation is already known... 
-                if (_Reservation != value)
-                {
-
-                    _Reservation = value;
-
-                    if (_Reservation != null)
-                    {
-
-                        SetStatus(EVSEStatusType.Reserved);
-
-                        var OnNewReservationLocal = OnNewReservation;
-                        if (OnNewReservationLocal != null)
-                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
-
-                    }
-
-                    else
-                        SetStatus(EVSEStatusType.Available);
-
-                }
-
-            }
-
-        }
-
-        #endregion
-
-        #region OnNewReservation
-
-        /// <summary>
-        /// An event fired whenever a new charging reservation was created.
-        /// </summary>
-        public event OnNewReservationDelegate OnNewReservation;
-
-        #endregion
-
-        #region OnReservationCancelled
-
-        /// <summary>
-        /// An event fired whenever a charging reservation was deleted.
-        /// </summary>
-        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
-
-        #endregion
-
         #region (internal) Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
         /// <summary>
@@ -1020,12 +956,83 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region (internal) CheckReservationTime()
+        #region Reservation
+
+        private ChargingReservation _Reservation;
+
+        /// <summary>
+        /// The charging reservation, if available.
+        /// </summary>
+        [InternalUseOnly]
+        public ChargingReservation Reservation
+        {
+
+            get
+            {
+                return _Reservation;
+            }
+
+            set
+            {
+
+                // Skip, if the reservation is already known... 
+                if (_Reservation != value)
+                {
+
+                    if (value != null)
+                    {
+
+                        _Reservation = value;
+
+                        SetStatus(EVSEStatusType.Reserved);
+
+                        var OnNewReservationLocal = OnNewReservation;
+                        if (OnNewReservationLocal != null)
+                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
+
+                    }
+
+                    else
+                    {
+
+                        SetStatus(EVSEStatusType.Available);
+
+                        var OnReservationCancelledLocal = OnReservationCancelled;
+                        if (OnReservationCancelledLocal != null)
+                            OnReservationCancelled(DateTime.Now,
+                                                   this,
+                                                   EventTracking_Id.New,
+                                                   _Reservation.Id,
+                                                   ChargingReservationCancellationReason.EndOfProcess);
+
+                        _Reservation = null;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        #endregion
+
+        #region OnNewReservation
+
+        /// <summary>
+        /// An event fired whenever a new charging reservation was created.
+        /// </summary>
+        public event OnNewReservationDelegate OnNewReservation;
+
+        #endregion
+
+
+        #region (internal) CheckIfReservationIsExpired()
 
         /// <summary>
         /// Check if the reservation is expired.
         /// </summary>
-        internal async Task CheckReservationTime()
+        internal async Task CheckIfReservationIsExpired()
         {
 
             if (_Reservation != null &&
@@ -1033,13 +1040,67 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 _Reservation.IsExpired())
             {
 
-                await CancelReservation(DateTime.Now,
-                                        new CancellationTokenSource().Token,
-                                        EventTracking_Id.New,
-                                        _Reservation.Id,
-                                        ChargingReservationCancellationReason.Expired);
+                await __CancelReservation(DateTime.Now,
+                                          new CancellationTokenSource().Token,
+                                          EventTracking_Id.New,
+                                          _Reservation.Id,
+                                          ChargingReservationCancellationReason.Expired);
 
             }
+
+        }
+
+        #endregion
+
+        #region (private) __CancelReservation(...ReservationId, Reason, ...)
+
+        /// <summary>
+        /// Try to remove the given charging reservation.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp of this request.</param>
+        /// <param name="CancellationToken">A token to cancel this request.</param>
+        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
+        /// <param name="ReservationId">The unique charging reservation identification.</param>
+        /// <param name="Reason">A reason for this cancellation.</param>
+        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        private async Task<CancelReservationResult> __CancelReservation(DateTime                               Timestamp,
+                                                                        CancellationToken                      CancellationToken,
+                                                                        EventTracking_Id                       EventTrackingId,
+                                                                        ChargingReservation_Id                 ReservationId,
+                                                                        ChargingReservationCancellationReason  Reason,
+                                                                        TimeSpan?                              QueryTimeout  = null)
+        {
+
+            #region Initial checks
+
+            if (_Reservation == null)
+                return CancelReservationResult.Success(null);
+
+            if (ReservationId == null)
+                throw new ArgumentNullException(nameof(ReservationId), "The given charging reservation identification must not be null!");
+
+            if (_Reservation.Id != ReservationId)
+                return CancelReservationResult.UnknownReservationId(ReservationId);
+
+            #endregion
+
+
+            var OldReservationId = _Reservation.Id;
+
+            _Reservation = null;
+
+            var OnReservationCancelledLocal = OnReservationCancelled;
+            if (OnReservationCancelledLocal != null)
+                OnReservationCancelledLocal(DateTime.Now,
+                                            this,
+                                            EventTracking_Id.New,
+                                            OldReservationId,
+                                            Reason);
+
+            // Will send events!
+            SetStatus(EVSEStatusType.Available);
+
+            return CancelReservationResult.Success(ReservationId);
 
         }
 
@@ -1082,22 +1143,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 AdminStatus.Value == EVSEAdminStatusType.InternalUse)
             {
 
-                var OldReservationId = _Reservation.Id;
-
-                _Reservation = null;
-
-                var OnReservationCancelledLocal = OnReservationCancelled;
-                if (OnReservationCancelledLocal != null)
-                    OnReservationCancelledLocal(DateTime.Now,
-                                                this,
-                                                EventTracking_Id.New,
-                                                OldReservationId,
-                                                Reason);
-
-                // Will send events!
-                SetStatus(EVSEStatusType.Available);
-
-                return CancelReservationResult.Success(ReservationId);
+                return await __CancelReservation(Timestamp,
+                                                 CancellationToken,
+                                                 EventTrackingId,
+                                                 ReservationId,
+                                                 Reason);
 
             }
             else
@@ -1117,71 +1167,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region OnReservationCancelled
+
+        /// <summary>
+        /// An event fired whenever a charging reservation was deleted.
+        /// </summary>
+        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
+
+        #endregion
+
         #endregion
 
         #region RemoteStart/-Stop and Sessions...
-
-        #region ChargingSession
-
-        private ChargingSession _ChargingSession;
-
-        /// <summary>
-        /// The current charging session, if available.
-        /// </summary>
-        [InternalUseOnly]
-        public ChargingSession ChargingSession
-        {
-
-            get
-            {
-                return _ChargingSession;
-            }
-
-            set
-            {
-
-                // Skip, if the charging session is already known... 
-                if (_ChargingSession != value)
-                {
-
-                    _ChargingSession = value;
-
-                    if (_ChargingSession != null)
-                    {
-
-                        SetStatus(EVSEStatusType.Charging);
-
-                        var OnNewChargingSessionLocal = OnNewChargingSession;
-                        if (OnNewChargingSessionLocal != null)
-                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
-
-                    }
-
-                    else
-                        SetStatus(EVSEStatusType.Available);
-
-                }
-
-            }
-
-        }
-
-        #endregion
-
-        #region OnNewChargingSession/-ChargeDetailRecord
-
-        /// <summary>
-        /// An event fired whenever a new charging session was created.
-        /// </summary>
-        public event OnNewChargingSessionDelegate     OnNewChargingSession;
-
-        /// <summary>
-        /// An event fired whenever a new charge detail record was created.
-        /// </summary>
-        public event OnNewChargeDetailRecordDelegate  OnNewChargeDetailRecord;
-
-        #endregion
-
 
         #region RemoteStart(...ChargingProductId = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
@@ -1262,6 +1259,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         #region ...or a matching reservation identification!
 
+                        // Check if this remote start is allowed!
+                        if (!Reservation.eMAIds.Contains(eMAId))
+                            return RemoteStartEVSEResult.InvalidCredentials;
+
+
+                        Reservation.AddToTotalReservationTime(Reservation.TimeLeft);
+
                         // Will also set the status -> EVSEStatusType.Charging;
                         ChargingSession = new ChargingSession(SessionId) {
                                                                  EventTrackingId    = EventTrackingId,
@@ -1271,6 +1275,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  EVSEId             = Id,
                                                                  ChargingProductId  = ChargingProductId
                                                              };
+
+
+                        Reservation.ChargingSession = ChargingSession;
+
 
                         return RemoteStartEVSEResult.Success(_ChargingSession);
 
@@ -1318,6 +1326,62 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
 
         }
+
+        #endregion
+
+        #region ChargingSession
+
+        private ChargingSession _ChargingSession;
+
+        /// <summary>
+        /// The current charging session, if available.
+        /// </summary>
+        [InternalUseOnly]
+        public ChargingSession ChargingSession
+        {
+
+            get
+            {
+                return _ChargingSession;
+            }
+
+            set
+            {
+
+                // Skip, if the charging session is already known... 
+                if (_ChargingSession != value)
+                {
+
+                    _ChargingSession = value;
+
+                    if (_ChargingSession != null)
+                    {
+
+                        SetStatus(EVSEStatusType.Charging);
+
+                        var OnNewChargingSessionLocal = OnNewChargingSession;
+                        if (OnNewChargingSessionLocal != null)
+                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
+
+                    }
+
+                    else
+                        SetStatus(EVSEStatusType.Available);
+
+                }
+
+            }
+
+        }
+
+        #endregion
+
+        #region OnNewChargingSession
+
+        /// <summary>
+        /// An event fired whenever a new charging session was created.
+        /// </summary>
+        public event OnNewChargingSessionDelegate OnNewChargingSession;
 
         #endregion
 
@@ -1409,8 +1473,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             ChargingSession = null;
 
                             if (!ReservationHandling.IsKeepAlive)
+                            {
+
                                 // Will do: Status = EVSEStatusType.Available
-                                Reservation     = null;
+                                Reservation = null;
+
+
+
+                            }
 
                             else
                             {
@@ -1471,6 +1541,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
 
         }
+
+        #endregion
+
+        #region OnNewChargeDetailRecord
+
+        /// <summary>
+        /// An event fired whenever a new charge detail record was created.
+        /// </summary>
+        public event OnNewChargeDetailRecordDelegate OnNewChargeDetailRecord;
 
         #endregion
 

@@ -554,7 +554,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 {
 
                     foreach (var _EVSE in _EVSEs)
-                        _EVSE.CheckReservationTime().Wait();
+                        _EVSE.CheckIfReservationIsExpired().Wait();
 
                 }
                 catch (Exception e)
@@ -869,25 +869,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reservations...
 
-        #region ChargingReservations
-
-        /// <summary>
-        /// All current charging reservations.
-        /// </summary>
-        public IEnumerable<ChargingReservation> ChargingReservations
-        {
-            get
-            {
-
-                return _EVSEs.
-                           Select(evse        => evse.Reservation).
-                           Where (reservation => reservation != null);
-
-            }
-        }
-
-        #endregion
-
         #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, eMAId = null,...)
 
         /// <summary>
@@ -921,38 +902,48 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      TimeSpan?                QueryTimeout       = null)
         {
 
-            #region Check admin status
-
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return ReservationResult.OutOfService;
-
-            #endregion
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            {
 
 
-            // ReserveNow!
-            // Later this could also be a delayed reservation!
+                // ReserveNow!
+                // Later this could also be a delayed reservation!
 
-            var _EVSE = _EVSEs.Where(evse => evse.Status.Value == EVSEStatusType.Available).FirstOrDefault();
+                var _EVSE = _EVSEs.Where(evse => evse.Status.Value == EVSEStatusType.Available).FirstOrDefault();
 
-            if (_EVSE == null)
-                return ReservationResult.NoEVSEsAvailable;
+                if (_EVSE == null)
+                    return ReservationResult.NoEVSEsAvailable;
 
 
-            return await _EVSE.Reserve(Timestamp,
-                                       CancellationToken,
-                                       EventTrackingId,
-                                       ChargingReservationLevel.ChargingStation,
-                                       StartTime,
-                                       Duration,
-                                       ReservationId,
-                                       ProviderId,
-                                       eMAId,
-                                       ChargingProductId,
-                                       AuthTokens,
-                                       eMAIds,
-                                       PINs,
-                                       QueryTimeout);
+                return await _EVSE.Reserve(Timestamp,
+                                           CancellationToken,
+                                           EventTrackingId,
+                                           ChargingReservationLevel.ChargingStation,
+                                           StartTime,
+                                           Duration,
+                                           ReservationId,
+                                           ProviderId,
+                                           eMAId,
+                                           ChargingProductId,
+                                           AuthTokens,
+                                           eMAIds,
+                                           PINs,
+                                           QueryTimeout);
+
+            }
+            else
+            {
+
+                switch (AdminStatus.Value)
+                {
+
+                    default:
+                        return ReservationResult.OutOfService;
+
+                }
+
+            }
 
         }
 
@@ -971,6 +962,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -1004,48 +996,73 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return ReservationResult.OutOfService;
-
-            #endregion
-
-
-            var _VirtualEVSE = _EVSEs.Where(evse => evse.Id == EVSEId).
-                                      FirstOrDefault();
-
-            if (_VirtualEVSE != null)
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
 
-                result = await _VirtualEVSE.Reserve(Timestamp,
-                                                    CancellationToken,
-                                                    EventTrackingId,
-                                                    StartTime,
-                                                    Duration,
-                                                    ReservationId,
-                                                    ProviderId,
-                                                    eMAId,
-                                                    ChargingProductId,
-                                                    AuthTokens,
-                                                    eMAIds,
-                                                    PINs,
-                                                    QueryTimeout);
+                var _VirtualEVSE = _EVSEs.Where(evse => evse.Id == EVSEId).
+                                          FirstOrDefault();
+
+                if (_VirtualEVSE != null)
+                {
+
+                    result = await _VirtualEVSE.Reserve(Timestamp,
+                                                        CancellationToken,
+                                                        EventTrackingId,
+                                                        StartTime,
+                                                        Duration,
+                                                        ReservationId,
+                                                        ProviderId,
+                                                        eMAId,
+                                                        ChargingProductId,
+                                                        AuthTokens,
+                                                        eMAIds,
+                                                        PINs,
+                                                        QueryTimeout);
+
+                }
+
+                else
+                    result = ReservationResult.UnknownEVSE;
+
+
+                return result;
 
             }
-
             else
-                result = ReservationResult.UnknownEVSE;
+            {
 
+                switch (AdminStatus.Value)
+                {
 
-            return result;
+                    default:
+                        return ReservationResult.OutOfService;
+
+                }
+
+            }
 
         }
 
         #endregion
 
-        #region OnNewReservation
+        #region ChargingReservations / OnNewReservation
+
+        /// <summary>
+        /// All current charging reservations.
+        /// </summary>
+        public IEnumerable<ChargingReservation> ChargingReservations
+        {
+            get
+            {
+
+                return _EVSEs.
+                           Select(evse => evse.Reservation).
+                           Where(reservation => reservation != null);
+
+            }
+        }
 
         /// <summary>
         /// An event fired whenever a new charging reservation was created.
@@ -1170,25 +1187,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region RemoteStart/-Stop and Sessions
 
-        #region ChargingSessions
-
-        /// <summary>
-        /// All current charging sessions.
-        /// </summary>
-        public IEnumerable<ChargingSession> ChargingSessions
-        {
-            get
-            {
-
-                return _EVSEs.
-                           Select(evse    => evse.ChargingSession).
-                           Where (session => session != null);
-
-            }
-        }
-
-        #endregion
-
         #region RemoteStart(...EVSEId, ChargingProductId = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
@@ -1230,18 +1228,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
-
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return RemoteStartEVSEResult.OutOfService;
-
-            #endregion
-
 
             if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
                 AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
+
+                #region Check if the eMAId is on the white list
+
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return RemoteStartEVSEResult.InvalidCredentials;
+
+                #endregion
 
                 var _VirtualEVSE = GetEVSEbyId(EVSEId);
 
@@ -1312,81 +1309,114 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return RemoteStartChargingStationResult.OutOfService;
-
-            #endregion
-
-
-            var _VirtualEVSE = _EVSEs.Where(evse => evse.Status.Value == EVSEStatusType.Available).
-                                      FirstOrDefault();
-
-            if (_VirtualEVSE == null)
-                return RemoteStartChargingStationResult.NoEVSEsAvailable;
-
-
-            var result = await _VirtualEVSE.RemoteStart(Timestamp,
-                                                        CancellationToken,
-                                                        EventTrackingId,
-                                                        ChargingProductId,
-                                                        ReservationId,
-                                                        SessionId,
-                                                        ProviderId,
-                                                        eMAId,
-                                                        QueryTimeout);
-
-
-            switch (result.Result)
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
 
-                case RemoteStartEVSEResultType.Error:
-                    return RemoteStartChargingStationResult.Error(result.Message);
+                #region Check if the eMAId is on the white list
 
-                case RemoteStartEVSEResultType.InternalUse:
-                    return RemoteStartChargingStationResult.InternalUse;
-
-                case RemoteStartEVSEResultType.InvalidCredentials:
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
                     return RemoteStartChargingStationResult.InvalidCredentials;
 
-                case RemoteStartEVSEResultType.InvalidSessionId:
-                    return RemoteStartChargingStationResult.InvalidSessionId;
+                #endregion
 
-                case RemoteStartEVSEResultType.Offline:
-                    return RemoteStartChargingStationResult.Offline;
+                var _VirtualEVSE = _EVSEs.Where(evse => evse.Status.Value == EVSEStatusType.Available).
+                                      FirstOrDefault();
 
-                case RemoteStartEVSEResultType.OutOfService:
-                    return RemoteStartChargingStationResult.OutOfService;
+                if (_VirtualEVSE == null)
+                    return RemoteStartChargingStationResult.NoEVSEsAvailable;
 
-                case RemoteStartEVSEResultType.Reserved:
-                    return RemoteStartChargingStationResult.Reserved;
 
-                case RemoteStartEVSEResultType.Success:
-                    if (result.Session != null)
-                        return RemoteStartChargingStationResult.Success(result.Session);
-                    else
-                        return RemoteStartChargingStationResult.Success();
+                var result = await _VirtualEVSE.RemoteStart(Timestamp,
+                                                            CancellationToken,
+                                                            EventTrackingId,
+                                                            ChargingProductId,
+                                                            ReservationId,
+                                                            SessionId,
+                                                            ProviderId,
+                                                            eMAId,
+                                                            QueryTimeout);
 
-                case RemoteStartEVSEResultType.Timeout:
-                    return RemoteStartChargingStationResult.Timeout;
 
-                case RemoteStartEVSEResultType.UnknownEVSEOperator:
-                    return RemoteStartChargingStationResult.UnknownOperator;
+                switch (result.Result)
+                {
 
-                case RemoteStartEVSEResultType.Unspecified:
-                    return RemoteStartChargingStationResult.Unspecified;
+                    case RemoteStartEVSEResultType.Error:
+                        return RemoteStartChargingStationResult.Error(result.Message);
+
+                    case RemoteStartEVSEResultType.InternalUse:
+                        return RemoteStartChargingStationResult.InternalUse;
+
+                    case RemoteStartEVSEResultType.InvalidCredentials:
+                        return RemoteStartChargingStationResult.InvalidCredentials;
+
+                    case RemoteStartEVSEResultType.InvalidSessionId:
+                        return RemoteStartChargingStationResult.InvalidSessionId;
+
+                    case RemoteStartEVSEResultType.Offline:
+                        return RemoteStartChargingStationResult.Offline;
+
+                    case RemoteStartEVSEResultType.OutOfService:
+                        return RemoteStartChargingStationResult.OutOfService;
+
+                    case RemoteStartEVSEResultType.Reserved:
+                        return RemoteStartChargingStationResult.Reserved;
+
+                    case RemoteStartEVSEResultType.Success:
+                        if (result.Session != null)
+                            return RemoteStartChargingStationResult.Success(result.Session);
+                        else
+                            return RemoteStartChargingStationResult.Success();
+
+                    case RemoteStartEVSEResultType.Timeout:
+                        return RemoteStartChargingStationResult.Timeout;
+
+                    case RemoteStartEVSEResultType.UnknownEVSEOperator:
+                        return RemoteStartChargingStationResult.UnknownOperator;
+
+                    case RemoteStartEVSEResultType.Unspecified:
+                        return RemoteStartChargingStationResult.Unspecified;
+
+                }
+
+                return RemoteStartChargingStationResult.Error("Could not start charging!");
 
             }
+            else
+            {
 
-            return RemoteStartChargingStationResult.Error("Could not start charging!");
+                switch (AdminStatus.Value)
+                {
+
+                    default:
+                        return RemoteStartChargingStationResult.OutOfService;
+
+                }
+
+            }
 
         }
 
         #endregion
 
-        #region OnNewChargingSession
+        #region ChargingSessions / OnNewChargingSession
+
+        /// <summary>
+        /// All current charging sessions.
+        /// </summary>
+        public IEnumerable<ChargingSession> ChargingSessions
+        {
+            get
+            {
+
+                return _EVSEs.
+                           Select(evse => evse.ChargingSession).
+                           Where(session => session != null);
+
+            }
+        }
+
 
         /// <summary>
         /// An event fired whenever a new charging session was created.
@@ -1444,68 +1474,85 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return RemoteStopResult.OutOfService(SessionId);
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            {
 
-            #endregion
+                #region Check if the eMAId is on the white list
 
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return RemoteStopResult.InvalidCredentials(SessionId);
 
-            var _VirtualEVSE = _EVSEs.Where(evse => evse.ChargingSession    != null &&
+                #endregion
+
+                var _VirtualEVSE = _EVSEs.Where(evse => evse.ChargingSession != null &&
                                                     evse.ChargingSession.Id == SessionId).
                                       FirstOrDefault();
 
-            if (_VirtualEVSE == null)
-                return RemoteStopResult.InvalidSessionId(SessionId);
-
-
-            var result = await _VirtualEVSE.RemoteStop(Timestamp,
-                                                       CancellationToken,
-                                                       EventTrackingId,
-                                                       SessionId,
-                                                       ReservationHandling,
-                                                       ProviderId,
-                                                       eMAId,
-                                                       QueryTimeout);
-
-            switch (result.Result)
-            {
-
-                case RemoteStopEVSEResultType.Error:
-                    return RemoteStopResult.Error(SessionId, result.Message);
-
-                case RemoteStopEVSEResultType.InternalUse:
-                    return RemoteStopResult.InternalUse(SessionId);
-
-                case RemoteStopEVSEResultType.InvalidSessionId:
+                if (_VirtualEVSE == null)
                     return RemoteStopResult.InvalidSessionId(SessionId);
 
-                case RemoteStopEVSEResultType.Offline:
-                    return RemoteStopResult.Offline(SessionId);
 
-                case RemoteStopEVSEResultType.OutOfService:
-                    return RemoteStopResult.OutOfService(SessionId);
+                var result = await _VirtualEVSE.RemoteStop(Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           SessionId,
+                                                           ReservationHandling,
+                                                           ProviderId,
+                                                           eMAId,
+                                                           QueryTimeout);
 
-                case RemoteStopEVSEResultType.Success:
-                    if (result.ChargeDetailRecord != null)
-                        return RemoteStopResult.Success(result.ChargeDetailRecord, result.ReservationId, result.ReservationHandling);
-                    else
-                        return RemoteStopResult.Success(result.SessionId, result.ReservationId, result.ReservationHandling);
+                switch (result.Result)
+                {
 
-                case RemoteStopEVSEResultType.Timeout:
-                    return RemoteStopResult.Timeout(SessionId);
+                    case RemoteStopEVSEResultType.Error:
+                        return RemoteStopResult.Error(SessionId, result.Message);
 
-                case RemoteStopEVSEResultType.UnknownOperator:
-                    return RemoteStopResult.UnknownOperator(SessionId);
+                    case RemoteStopEVSEResultType.InternalUse:
+                        return RemoteStopResult.InternalUse(SessionId);
 
-                case RemoteStopEVSEResultType.Unspecified:
-                    return RemoteStopResult.Unspecified(SessionId);
+                    case RemoteStopEVSEResultType.InvalidSessionId:
+                        return RemoteStopResult.InvalidSessionId(SessionId);
+
+                    case RemoteStopEVSEResultType.Offline:
+                        return RemoteStopResult.Offline(SessionId);
+
+                    case RemoteStopEVSEResultType.OutOfService:
+                        return RemoteStopResult.OutOfService(SessionId);
+
+                    case RemoteStopEVSEResultType.Success:
+                        if (result.ChargeDetailRecord != null)
+                            return RemoteStopResult.Success(result.ChargeDetailRecord, result.ReservationId, result.ReservationHandling);
+                        else
+                            return RemoteStopResult.Success(result.SessionId, result.ReservationId, result.ReservationHandling);
+
+                    case RemoteStopEVSEResultType.Timeout:
+                        return RemoteStopResult.Timeout(SessionId);
+
+                    case RemoteStopEVSEResultType.UnknownOperator:
+                        return RemoteStopResult.UnknownOperator(SessionId);
+
+                    case RemoteStopEVSEResultType.Unspecified:
+                        return RemoteStopResult.Unspecified(SessionId);
+
+                }
+
+                return RemoteStopResult.Error(SessionId);
 
             }
+            else
+            {
 
-            return RemoteStopResult.Error(SessionId);
+                switch (AdminStatus.Value)
+                {
+
+                    default:
+                        return RemoteStopResult.OutOfService(SessionId);
+
+                }
+
+            }
 
         }
 
@@ -1554,36 +1601,53 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return RemoteStopEVSEResult.OutOfService(SessionId);
-
-            #endregion
-
-
-            var _VirtualEVSE = GetEVSEbyId(EVSEId);
-
-            if (_VirtualEVSE != null)
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
 
-                result = await _VirtualEVSE.RemoteStop(Timestamp,
-                                                       CancellationToken,
-                                                       EventTrackingId,
-                                                       SessionId,
-                                                       ReservationHandling,
-                                                       ProviderId,
-                                                       eMAId,
-                                                       QueryTimeout);
+                #region Check if the eMAId is on the white list
+
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return RemoteStopEVSEResult.InvalidCredentials(SessionId);
+
+                #endregion
+
+                var _VirtualEVSE = GetEVSEbyId(EVSEId);
+
+                if (_VirtualEVSE != null)
+                {
+
+                    result = await _VirtualEVSE.RemoteStop(Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           SessionId,
+                                                           ReservationHandling,
+                                                           ProviderId,
+                                                           eMAId,
+                                                           QueryTimeout);
+
+                }
+
+                else
+                    result = RemoteStopEVSEResult.UnknownEVSE(SessionId);
+
+
+                return result;
 
             }
-
             else
-                result = RemoteStopEVSEResult.UnknownEVSE(SessionId);
+            {
 
+                switch (AdminStatus.Value)
+                {
 
-            return result;
+                    default:
+                        return RemoteStopEVSEResult.OutOfService(SessionId);
+
+                }
+
+            }
 
         }
 
@@ -1627,68 +1691,85 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
-                return RemoteStopChargingStationResult.OutOfService(SessionId);
+            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            {
 
-            #endregion
+                #region Check if the eMAId is on the white list
 
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return RemoteStopChargingStationResult.InvalidCredentials(SessionId);
 
-            var _VirtualEVSE = _EVSEs.Where(evse => evse.ChargingSession != null &&
+                #endregion
+
+                var _VirtualEVSE = _EVSEs.Where(evse => evse.ChargingSession != null &&
                                                     evse.ChargingSession.Id == SessionId).
                                       FirstOrDefault();
 
-            if (_VirtualEVSE == null)
-                return RemoteStopChargingStationResult.InvalidSessionId(SessionId);
-
-
-            var result = await _VirtualEVSE.RemoteStop(Timestamp,
-                                                       CancellationToken,
-                                                       EventTrackingId,
-                                                       SessionId,
-                                                       ReservationHandling,
-                                                       ProviderId,
-                                                       eMAId,
-                                                       QueryTimeout);
-
-            switch (result.Result)
-            {
-
-                case RemoteStopEVSEResultType.Error:
-                    return RemoteStopChargingStationResult.Error(SessionId, result.Message);
-
-                case RemoteStopEVSEResultType.InternalUse:
-                    return RemoteStopChargingStationResult.InternalUse(SessionId);
-
-                case RemoteStopEVSEResultType.InvalidSessionId:
+                if (_VirtualEVSE == null)
                     return RemoteStopChargingStationResult.InvalidSessionId(SessionId);
 
-                case RemoteStopEVSEResultType.Offline:
-                    return RemoteStopChargingStationResult.Offline(SessionId);
 
-                case RemoteStopEVSEResultType.OutOfService:
-                    return RemoteStopChargingStationResult.OutOfService(SessionId);
+                var result = await _VirtualEVSE.RemoteStop(Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           SessionId,
+                                                           ReservationHandling,
+                                                           ProviderId,
+                                                           eMAId,
+                                                           QueryTimeout);
 
-                case RemoteStopEVSEResultType.Success:
-                    if (result.ChargeDetailRecord != null)
-                        return RemoteStopChargingStationResult.Success(result.ChargeDetailRecord, result.ReservationId, result.ReservationHandling);
-                    else
-                        return RemoteStopChargingStationResult.Success(result.SessionId, result.ReservationId, result.ReservationHandling);
+                switch (result.Result)
+                {
 
-                case RemoteStopEVSEResultType.Timeout:
-                    return RemoteStopChargingStationResult.Timeout(SessionId);
+                    case RemoteStopEVSEResultType.Error:
+                        return RemoteStopChargingStationResult.Error(SessionId, result.Message);
 
-                case RemoteStopEVSEResultType.UnknownOperator:
-                    return RemoteStopChargingStationResult.UnknownOperator(SessionId);
+                    case RemoteStopEVSEResultType.InternalUse:
+                        return RemoteStopChargingStationResult.InternalUse(SessionId);
 
-                case RemoteStopEVSEResultType.Unspecified:
-                    return RemoteStopChargingStationResult.Unspecified(SessionId);
+                    case RemoteStopEVSEResultType.InvalidSessionId:
+                        return RemoteStopChargingStationResult.InvalidSessionId(SessionId);
+
+                    case RemoteStopEVSEResultType.Offline:
+                        return RemoteStopChargingStationResult.Offline(SessionId);
+
+                    case RemoteStopEVSEResultType.OutOfService:
+                        return RemoteStopChargingStationResult.OutOfService(SessionId);
+
+                    case RemoteStopEVSEResultType.Success:
+                        if (result.ChargeDetailRecord != null)
+                            return RemoteStopChargingStationResult.Success(result.ChargeDetailRecord, result.ReservationId, result.ReservationHandling);
+                        else
+                            return RemoteStopChargingStationResult.Success(result.SessionId, result.ReservationId, result.ReservationHandling);
+
+                    case RemoteStopEVSEResultType.Timeout:
+                        return RemoteStopChargingStationResult.Timeout(SessionId);
+
+                    case RemoteStopEVSEResultType.UnknownOperator:
+                        return RemoteStopChargingStationResult.UnknownOperator(SessionId);
+
+                    case RemoteStopEVSEResultType.Unspecified:
+                        return RemoteStopChargingStationResult.Unspecified(SessionId);
+
+                }
+
+                return RemoteStopChargingStationResult.Error(SessionId);
 
             }
+            else
+            {
 
-            return RemoteStopChargingStationResult.Error(SessionId);
+                switch (AdminStatus.Value)
+                {
+
+                    default:
+                        return RemoteStopChargingStationResult.OutOfService(SessionId);
+
+                }
+
+            }
 
         }
 
