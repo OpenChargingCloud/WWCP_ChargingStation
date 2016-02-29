@@ -1001,6 +1001,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
 
+                #region Check if the eMAId is on the white list
+
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return ReservationResult.InvalidCredentials;
+
+                #endregion
+
                 var _VirtualEVSE = _EVSEs.Where(evse => evse.Id == EVSEId).
                                           FirstOrDefault();
 
