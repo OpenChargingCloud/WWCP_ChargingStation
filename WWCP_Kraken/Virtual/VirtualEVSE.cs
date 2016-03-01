@@ -1071,18 +1071,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                         TimeSpan?                              QueryTimeout  = null)
         {
 
-            #region Initial checks
-
-            if (_Reservation == null)
-                return CancelReservationResult.Success(null);
-
-            if (ReservationId == null)
-                throw new ArgumentNullException(nameof(ReservationId), "The given charging reservation identification must not be null!");
-
-            if (_Reservation.Id != ReservationId)
+            if (_Reservation == null || _Reservation.Id != ReservationId)
                 return CancelReservationResult.UnknownReservationId(ReservationId);
-
-            #endregion
 
 
             var OldReservationId = _Reservation.Id;
@@ -1127,14 +1117,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (_Reservation == null)
-                return CancelReservationResult.Success(null);
-
             if (ReservationId == null)
                 throw new ArgumentNullException(nameof(ReservationId),  "The given charging reservation identification must not be null!");
-
-            if (_Reservation.Id != ReservationId)
-                return CancelReservationResult.UnknownReservationId(ReservationId);
 
             #endregion
 

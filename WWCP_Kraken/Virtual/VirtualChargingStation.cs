@@ -388,6 +388,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
+        public ChargingStation_Id     RemoteChargingStationId  { get; set; }
+        public ChargingStation_Id     OutgoingChargingStationId  { get; set; }
+        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds         { get; set; }
+        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds         { get; set; }
+
+
         #region (Admin-)Status management
 
         #region OnData/(Admin)StatusChanged
@@ -906,6 +912,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
             {
 
+                #region Check if the eMAId is on the white list
+
+                if (!_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId)))
+                    return ReservationResult.InvalidCredentials;
+
+                #endregion
 
                 // ReserveNow!
                 // Later this could also be a delayed reservation!
@@ -1138,6 +1150,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (ReservationId == null)
                 throw new ArgumentNullException(nameof(ReservationId), "The given charging reservation identification must not be null!");
 
+            CancelReservationResult result = null;
+
             #endregion
 
             #region Check admin status
@@ -1149,15 +1163,41 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            return await _EVSEs.Where   (evse => evse.Reservation    != null &&
-                                                 evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(Timestamp,
-                                                                        CancellationToken,
-                                                                        EventTrackingId,
-                                                                        ReservationId,
-                                                                        Reason,
-                                                                        QueryTimeout),
-                                         Task.FromResult(CancelReservationResult.Error("The charging reservation could not be cancelled!")));
+            var _Reservation = ChargingReservations.Where(reservation => reservation.Id == ReservationId).FirstOrDefault();
+
+            if (_Reservation        != null &&
+                _Reservation.EVSEId != null)
+            {
+
+                result = await GetEVSEbyId(_Reservation.EVSEId).
+                                   CancelReservation(Timestamp,
+                                                     CancellationToken,
+                                                     EventTrackingId,
+                                                     ReservationId,
+                                                     Reason,
+                                                     QueryTimeout);
+
+                if (result.Result != CancelReservationResultType.UnknownReservationId)
+                    return result;
+
+            }
+
+            foreach (var _EVSE in _EVSEs)
+            {
+
+                result = await _EVSE.CancelReservation(Timestamp,
+                                                       CancellationToken,
+                                                       EventTrackingId,
+                                                       ReservationId,
+                                                       Reason,
+                                                       QueryTimeout);
+
+                if (result.Result != CancelReservationResultType.UnknownReservationId)
+                    return result;
+
+            }
+
+            return CancelReservationResult.UnknownReservationId(ReservationId);
 
         }
 

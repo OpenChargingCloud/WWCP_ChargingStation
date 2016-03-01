@@ -341,8 +341,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds { get; set; }
-        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds { get; set; }
+        public ChargingStation_Id     RemoteChargingStationId  { get; set; }
+        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds       { get; set; }
+        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds       { get; set; }
 
         #region SelfCheckTimeSpan
 
