@@ -225,6 +225,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                              QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
                                              CancellationToken);
 
+            if (response == null)
+                return new EVSEStatus[0];
 
             // HTTP/1.1 200 OK
             // Date: Tue, 01 Mar 2016 20:39:24 GMT
@@ -1430,6 +1432,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                              QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
                                              CancellationToken);
 
+            if (response == null)
+                return new AuthInfo[0];
 
             // HTTP / 1.1 200 OK
             // Date: Wed, 10 Feb 2016 16:10:01 GMT
