@@ -52,7 +52,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (ChargingPool == null)
-                throw new ArgumentNullException("ChargingPool", "The given charging pool must not be null!");
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
 
             #endregion
 

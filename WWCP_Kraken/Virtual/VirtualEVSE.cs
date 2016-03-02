@@ -1462,8 +1462,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                 // Will do: Status = EVSEStatusType.Available
                                 Reservation = null;
 
-
-
                             }
 
                             else

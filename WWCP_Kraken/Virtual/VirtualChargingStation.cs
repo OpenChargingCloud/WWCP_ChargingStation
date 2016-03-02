@@ -388,10 +388,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        public ChargingStation_Id     RemoteChargingStationId  { get; set; }
-        public ChargingStation_Id     OutgoingChargingStationId  { get; set; }
-        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds         { get; set; }
-        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds         { get; set; }
+        public String                 RemoteEVSEIdPrefix         { get; set; }
+
+        public void AddMapping(EVSE_Id LocalEVSEId,
+                               EVSE_Id RemoteEVSEId)
+        {
+        }
 
 
         #region (Admin-)Status management

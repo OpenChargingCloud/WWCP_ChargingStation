@@ -52,6 +52,8 @@
     <Compile Include="Network\NetworkEVSEStub.cs" />
     <Compile Include="Network\RemoteEVSEOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxy\ExtentionMethods.cs" />
+    <Compile Include="Proxy\ProxyChargingStation.cs" />
     <Compile Include="Virtual\ExtentionMethods.cs" />
     <Compile Include="Virtual\VirtualChargingPool.cs" />
     <Compile Include="Virtual\VirtualChargingStation.cs" />

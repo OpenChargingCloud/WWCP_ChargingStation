@@ -341,9 +341,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        public ChargingStation_Id     RemoteChargingStationId  { get; set; }
-        public Func<EVSE_Id, EVSE_Id> MapIncomingEVSEIds       { get; set; }
-        public Func<EVSE_Id, EVSE_Id> MapOutgoingEVSEIds       { get; set; }
+        public String RemoteEVSEIdPrefix  { get; set; }
+
 
         #region SelfCheckTimeSpan
 
@@ -359,6 +358,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 return _SelfCheckTimeSpan;
             }
         }
+
+        #endregion
+
+
+        #region EVSEIdMapping
+
+        private readonly Dictionary<EVSE_Id, EVSE_Id> MapOutgoing;
+        private readonly Dictionary<EVSE_Id, EVSE_Id> MapIncoming;
 
         #endregion
 
@@ -653,6 +660,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._SelfCheckTimeSpan           = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
             this._SelfCheckTimer              = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
 
+            this.MapOutgoing                  = new Dictionary<EVSE_Id, EVSE_Id>();
+            this.MapIncoming                  = new Dictionary<EVSE_Id, EVSE_Id>();
+
         }
 
         #endregion
@@ -805,6 +815,40 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
+
+
+        public void AddMapping(EVSE_Id LocalEVSEId,
+                               EVSE_Id RemoteEVSEId)
+        {
+
+            MapOutgoing.Add(LocalEVSEId,  RemoteEVSEId);
+            MapIncoming.Add(RemoteEVSEId, LocalEVSEId);
+
+        }
+
+        public EVSE_Id MapOutgoingId(EVSE_Id EVSEIdOut)
+        {
+
+            EVSE_Id EVSEIdIn = null;
+
+            if (MapOutgoing.TryGetValue(EVSEIdOut, out EVSEIdIn))
+                return EVSEIdIn;
+
+            return EVSEIdOut;
+
+        }
+
+        public EVSE_Id MapIncomingId(EVSE_Id EVSEIdIn)
+        {
+
+            EVSE_Id EVSEIdOut = null;
+
+            if (MapIncoming.TryGetValue(EVSEIdIn, out EVSEIdOut))
+                return EVSEIdOut;
+
+            return EVSEIdIn;
+
+        }
 
 
         IEnumerable<EVSE> IRemoteChargingStation.EVSEs
