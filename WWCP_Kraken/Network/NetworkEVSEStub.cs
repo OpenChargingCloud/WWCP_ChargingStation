@@ -573,6 +573,24 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+
+            this.OnStatusChanged += (Timestamp, IRemoteEVSE, OldStatus, NewStatus) => {
+
+                if (OldStatus.Value == EVSEStatusType.Reserved &&
+                    NewStatus.Value != EVSEStatusType.Reserved &&
+                    _Reservation != null)
+                {
+
+                    CancelReservation(DateTime.Now,
+                                      new CancellationTokenSource().Token,
+                                      EventTracking_Id.New,
+                                      _Reservation.Id,
+                                      ChargingReservationCancellationReason.Aborted).Wait();
+
+                }
+
+            };
+
         }
 
         #endregion
@@ -770,8 +788,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     }
 
-                    else
-                        SetStatus(EVSEStatusType.Available);
+                    // Let the remote charging station set the new status!
+                    //else
+                    //    SetStatus(EVSEStatusType.Available);
 
                 }
 
@@ -897,7 +916,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation != null &&
+
+                // The remote charging station might already have sent another status!
+                //Status.Value == EVSEStatusType.Reserved &&
+
                 _Reservation.IsExpired(ReservationSelfCancelAfter))
+
             {
 
                 await CancelReservation(DateTime.Now,
@@ -958,7 +982,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                             OldReservationId,
                                             Reason);
 
-            SetStatus(EVSEStatusType.Available);
+            //SetStatus(EVSEStatusType.Available);
 
             return CancelReservationResult.Success(ReservationId);
 
@@ -1110,21 +1134,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStopEVSEResult result = null;
 
-            var result2 = await _ChargingStation.
-                                    RemoteStop(Timestamp,
-                                               CancellationToken,
-                                               EventTrackingId,
-                                               SessionId,
-                                               ReservationHandling,
-                                               ProviderId,
-                                               eMAId,
-                                               QueryTimeout);
+            var response = await _ChargingStation.
+                                     RemoteStop(Timestamp,
+                                                CancellationToken,
+                                                EventTrackingId,
+                                                SessionId,
+                                                ReservationHandling,
+                                                ProviderId,
+                                                eMAId,
+                                                QueryTimeout);
 
-            switch (result2.Result)
+            switch (response.Result)
             {
 
                 case RemoteStopResultType.Error:
-                    result = RemoteStopEVSEResult.Error(SessionId, result2.ErrorMessage);
+                    result = RemoteStopEVSEResult.Error(SessionId, response.ErrorMessage);
                     break;
 
 

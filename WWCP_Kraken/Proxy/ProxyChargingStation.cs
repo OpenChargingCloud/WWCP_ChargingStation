@@ -544,13 +544,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 logfile.WriteLine("--------------------------------------------------------------------------------");
             }
 
-            JObject JSON       = null;
-            String  ErrorCode  = null;
+            JObject JSON         = null;
+            String  Description  = "";
 
             if (response.ContentLength > 0)
             {
-                JSON       = JObject.Parse(response.HTTPBody.ToUTF8String());
-                ErrorCode  = JSON["errorCode"] != null ? JSON["errorCode"].Value<String>() : null;
+                JSON         = JObject.Parse(response.HTTPBody.ToUTF8String());
+                Description  = JSON["description"] != null ? JSON["description"].Value<String>() : "";
             }
 
             #region OK
@@ -571,9 +571,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             //     "errorCode":     "SUCCESS"
             // }
 
-            if (response.HTTPStatusCode == HTTPStatusCode.OK &&
-                (ErrorCode              == "SUCCESS" ||
-                 ErrorCode              == "SUCCESS_UPDATED"))
+            if (response.HTTPStatusCode == HTTPStatusCode.OK ||
+                response.HTTPStatusCode == HTTPStatusCode.Created)
             {
 
                 var NewReservation = new ChargingReservation(
@@ -604,49 +603,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Conflict
+            #region Unauthorized
 
-            if (response.HTTPStatusCode == HTTPStatusCode.Conflict)
+            else if (response.HTTPStatusCode == HTTPStatusCode.Unauthorized)
             {
 
-                switch (ErrorCode)
+                switch (Description)
                 {
 
-                    #region AlreadyReserved
+                    case "Unauthorized remote start or invalid credentials!":
+                        return ReservationResult.InvalidCredentials;
 
-                    // HTTP/1.1 409 Conflict
-                    // Date: Thu, 11 Feb 2016 22:07:33 GMT
-                    // Server: Apache/2.2.16 (Debian)
-                    // Content-Length: 69
-                    // Content-Type: application/json
-                    // 
-                    // {
-                    //     "StartTime":  null,
-                    //     "Duration":   0,
-                    //     "errorCode":  "RESERVATION_EVSE_IN_USE"
-                    // }
-                    case "RESERVATION_EVSE_IN_USE":
-                        return ReservationResult.AlreadyInUse;
-
-                    #endregion
-
-                    #region Offline
-
-                    // HTTP/1.1 409 Conflict
-                    // Date: Tue, 16 Feb 2016 14:39:09 GMT
-                    // Server: Apache/2.2.16 (Debian)
-                    // Content-Length: 68
-                    // Content-Type: application/json
-                    // 
-                    // {
-                    //     "StartTime":  null,
-                    //     "Duration":   0,
-                    //     "errorCode":  "LOCATION_NOT_REACHABLE"
-                    // }
-                    case "LOCATION_NOT_REACHABLE":
-                        return ReservationResult.Offline;
-
-                    #endregion
+                    default:
+                        return ReservationResult.CommunicationError(Description);
 
                 }
 
@@ -654,21 +623,53 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+            #region NotFound
+
             else if (response.HTTPStatusCode == HTTPStatusCode.NotFound)
             {
 
-                // HTTP/1.1 404 Not Found
-                // Date: Tue, 01 Mar 2016 00:32:18 GMT
-                // Server: Apache/2.2.16 (Debian)
-                // Transfer-Encoding: chunked
-                // Content-Type: text/plain; charset=UTF-8
+                switch (Description)
+                {
 
-                if (!RemoteWhiteList.Contains(AuthInfo.FromRemoteIdentification(eMAId)))
-                    return ReservationResult.InvalidCredentials;
+                    case "Unknown reservation identification!":
+                        return ReservationResult.UnknownChargingReservationId;
+
+                    case "Unknown EVSE!":
+                        return ReservationResult.UnknownEVSE;
+
+                }
 
             }
 
-            return ReservationResult.Error(ErrorCode);
+            #endregion
+
+            #region Conflict
+
+            if (response.HTTPStatusCode == HTTPStatusCode.Conflict)
+            {
+
+                switch (Description)
+                {
+
+                    case "The EVSE is already reserved!":
+                        return ReservationResult.AlreadyReserved;
+
+                    case "The EVSE is already in use!":
+                        return ReservationResult.AlreadyInUse;
+
+                    case "The EVSE is out of service!":
+                        return ReservationResult.OutOfService;
+
+                    case "The EVSE is offline!":
+                        return ReservationResult.Offline;
+
+                }
+
+            }
+
+            #endregion
+
+            return ReservationResult.Error(Description);
 
         }
 
@@ -972,12 +973,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 _RemoteCertificateValidator,
                                                 DNSClient).
 
-                                     Execute(client => client.DELETE(URIPrefix + "/Reservations/" + ReservationId.ToString(),
+                                     Execute(client => client.POST(URIPrefix + "/Reservations/" + ReservationId.ToString() + "/Delete",
 
                                                                      requestbuilder => {
-                                                                         requestbuilder.Host         = VirtualHost;
+                                                                         requestbuilder.Host           = VirtualHost;
+                                                                         requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                          requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
-                                                                         requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
+                                                                         requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
                                                                      }),
 
                                              QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
@@ -986,7 +988,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response == null)
             {
 
-                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_CancelReservation.log"))
+                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_CancelReservation.log"))
                 {
                     logfile.WriteLine(DateTime.Now);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -998,7 +1000,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             }
 
-            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_CancelReservation.log"))
+            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_CancelReservation.log"))
             {
                 logfile.WriteLine(DateTime.Now);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
@@ -1509,7 +1511,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response == null)
             {
 
-                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ADDToWhiteList.log"))
+                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ADDToWhiteList.log"))
                 {
                     logfile.WriteLine(DateTime.Now);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1521,7 +1523,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             }
 
-            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ADDToWhiteList.log"))
+            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ADDToWhiteList.log"))
             {
                 logfile.WriteLine(DateTime.Now);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
@@ -1719,7 +1721,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response == null)
             {
 
-                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_REMOVEFromWhiteList.log"))
+                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_REMOVEFromWhiteList.log"))
                 {
                     logfile.WriteLine(DateTime.Now);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1731,7 +1733,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             }
 
-            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_REMOVEFromWhiteList.log"))
+            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_REMOVEFromWhiteList.log"))
             {
                 logfile.WriteLine(DateTime.Now);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);

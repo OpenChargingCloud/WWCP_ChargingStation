@@ -822,7 +822,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                     OldReservation.StartTime,
                                                                     Duration. HasValue  ? Duration. Value : MaxReservationDuration,
                                                                     (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
-                                                                    OldReservation.Duration - OldReservation.TimeLeft,
+                                                                    OldReservation.ConsumedReservationTime + OldReservation.Duration - OldReservation.TimeLeft,
                                                                     ReservationLevel,
                                                                     ProviderId,
                                                                     eMAId,
