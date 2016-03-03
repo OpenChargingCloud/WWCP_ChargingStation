@@ -817,10 +817,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         var OldReservation = _Reservation; // Store already consumed reservation time!
 
-                        this._Reservation = new ChargingReservation(Timestamp,
+                        this._Reservation = new ChargingReservation(OldReservation.Id,
+                                                                    Timestamp,
                                                                     OldReservation.StartTime,
                                                                     Duration. HasValue  ? Duration. Value : MaxReservationDuration,
                                                                     (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                    OldReservation.Duration - OldReservation.TimeLeft,
                                                                     ReservationLevel,
                                                                     ProviderId,
                                                                     eMAId,
@@ -832,6 +834,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                     AuthTokens,
                                                                     eMAIds,
                                                                     PINs);
+
+                        var OnNewReservationLocal = OnNewReservation;
+                        if (OnNewReservationLocal != null)
+                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
 
                         return ReservationResult.Success(_Reservation);
 
@@ -1248,7 +1254,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             return RemoteStartEVSEResult.InvalidCredentials;
 
 
-                        Reservation.AddToTotalReservationTime(Reservation.TimeLeft);
+                        Reservation.AddToConsumedReservationTime(Reservation.Duration - Reservation.TimeLeft);
 
                         // Will also set the status -> EVSEStatusType.Charging;
                         ChargingSession = new ChargingSession(SessionId) {

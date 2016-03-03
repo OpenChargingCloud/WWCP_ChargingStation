@@ -389,6 +389,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                        jsonarray["StartTime"].Value<DateTime>(),
                                        TimeSpan.FromSeconds(jsonarray["Duration"].Value<Int32>()),
                                        DateTime.Now + TimeSpan.FromSeconds(jsonarray["Duration"].Value<Int32>()),
+                                       jsonarray["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(jsonarray["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                        ChargingReservationLevel.EVSE,
                                        EVSP_Id.Parse("DE*GEF"),
                                        null,
@@ -405,6 +406,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                        _JSONObject["StartTime"].Value<DateTime>(),
                                        TimeSpan.FromSeconds(_JSONObject["Duration"].Value<Int32>()),
                                        DateTime.Now + TimeSpan.FromSeconds(_JSONObject["Duration"].Value<Int32>()),
+                                       _JSONObject["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(_JSONObject["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                        ChargingReservationLevel.EVSE,
                                        EVSP_Id.Parse("DE*GEF"),
                                        null,
@@ -475,60 +477,44 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var EVSEIdLocal = EVSEId;
-
-            if (EVSEId == EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*1"))
-                EVSEIdLocal = EVSE_Id.Parse("+49*822*483*1");
-
-            else if (EVSEId == EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*2"))
-                EVSEIdLocal = EVSE_Id.Parse("+49*822*483*2");
-
-            else if (EVSEId == EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*3"))
-                EVSEIdLocal = EVSE_Id.Parse("+49*822*483*3");
-
-            else if (EVSEId == EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*4"))
-                EVSEIdLocal = EVSE_Id.Parse("+49*822*483*4");
-
-            else
-                EVSEIdLocal = EVSEId;
-
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 _RemoteCertificateValidator,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/EVSEs/" + EVSEIdLocal.ToFormat(IdFormatType.OLD).Replace("+", "") + "/Reservation",
+                                     Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation",
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host         = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
-                                                                       requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
-                                                                       requestbuilder.Content      = JSONObject.Create(
-                                                                                                         Duration.HasValue
-                                                                                                             ? new JProperty("Duration",           (Int32) Duration.Value.TotalSeconds)
-                                                                                                             : null,
-                                                                                                         ChargingProductId != null
-                                                                                                             ? new JProperty("ChargingProductId",  ChargingProductId.ToString())
-                                                                                                             : null,
-                                                                                                         ReservationId     != null
-                                                                                                             ? new JProperty("ReservationId",      ReservationId.    ToString())
-                                                                                                             : null,
-                                                                                                         ProviderId        != null
-                                                                                                             ? new JProperty("ProviderId",         ProviderId.       ToString())
-                                                                                                             : null,
-                                                                                                         eMAId             != null
-                                                                                                             ? new JProperty("eMAId",              eMAId.            ToString())
-                                                                                                             : null,
-                                                                                                         AuthTokens.NotNullAny()
-                                                                                                             ? new JProperty("AuthorizedIds",
-                                                                                                                   JSONObject.Create(
-                                                                                                                       new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),
-                                                                                                                       new JProperty("eMAIds",  new JArray(eMAIds.    SafeSelect(emaid => emaid.ToString())))
-                                                                                                                   )
-                                                                                                               )
-                                                                                                             : null
-                                                                                                     ).ToUTF8Bytes();
+                                                                       requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
+                                                                       requestbuilder.Content        = JSONObject.Create(
+                                                                                                           Duration.HasValue
+                                                                                                               ? new JProperty("Duration",           (Int32) Duration.Value.TotalSeconds)
+                                                                                                               : null,
+                                                                                                           ChargingProductId != null
+                                                                                                               ? new JProperty("ChargingProductId",  ChargingProductId.ToString())
+                                                                                                               : null,
+                                                                                                           ReservationId     != null
+                                                                                                               ? new JProperty("ReservationId",      ReservationId.    ToString())
+                                                                                                               : null,
+                                                                                                           ProviderId        != null
+                                                                                                               ? new JProperty("ProviderId",         ProviderId.       ToString())
+                                                                                                               : null,
+                                                                                                           eMAId             != null
+                                                                                                               ? new JProperty("eMAId",              eMAId.            ToString())
+                                                                                                               : null,
+                                                                                                           AuthTokens.NotNullAny()
+                                                                                                               ? new JProperty("AuthorizedIds",
+                                                                                                                     JSONObject.Create(
+                                                                                                                         new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),
+                                                                                                                         new JProperty("eMAIds",  new JArray(eMAIds.    SafeSelect(emaid => emaid.ToString())))
+                                                                                                                     )
+                                                                                                                 )
+                                                                                                               : null
+                                                                                                       ).ToUTF8Bytes();
                                                                    }),
 
                                              QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
@@ -537,7 +523,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response == null)
             {
 
-                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ReserveEVSE.log"))
+                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_ReserveEVSE.log"))
                 {
                     logfile.WriteLine(DateTime.Now);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -549,7 +535,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             }
 
-            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ReserveEVSE.log"))
+            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_ReserveEVSE.log"))
             {
                 logfile.WriteLine(DateTime.Now);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
@@ -596,6 +582,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                          JSON["StartTime"].Value<DateTime>(),
                                          TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
                                          JSON["StartTime"].Value<DateTime>() + TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
+                                         JSON["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(JSON["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                          ChargingReservationLevel.EVSE,
                                          ProviderId,
                                          eMAId,
@@ -748,34 +735,35 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + "/ChargingStations/" + ChargingStationIdLocal.ToFormat(IdFormatType.OLD).Replace("+", "") + "/Reservation",
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host         = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
-                                                                       requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
-                                                                       requestbuilder.Content      = JSONObject.Create(
-                                                                                                         Duration.HasValue
-                                                                                                             ? new JProperty("Duration",           (Int32) Duration.Value.TotalSeconds)
-                                                                                                             : null,
-                                                                                                         ChargingProductId != null
-                                                                                                             ? new JProperty("ChargingProductId",  ChargingProductId.ToString())
-                                                                                                             : null,
-                                                                                                         ReservationId     != null
-                                                                                                             ? new JProperty("ReservationId",      ReservationId.    ToString())
-                                                                                                             : null,
-                                                                                                         ProviderId        != null
-                                                                                                             ? new JProperty("ProviderId",         ProviderId.       ToString())
-                                                                                                             : null,
-                                                                                                         eMAId             != null
-                                                                                                             ? new JProperty("eMAId",              eMAId.            ToString())
-                                                                                                             : null,
-                                                                                                         AuthTokens.NotNullAny()
-                                                                                                             ? new JProperty("AuthorizedIds",
-                                                                                                                   JSONObject.Create(
-                                                                                                                       new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),
-                                                                                                                       new JProperty("eMAIds",  new JArray(eMAIds.    SafeSelect(emaid => emaid.ToString())))
-                                                                                                                   )
-                                                                                                               )
-                                                                                                             : null
-                                                                                                     ).ToUTF8Bytes();
+                                                                       requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
+                                                                       requestbuilder.Content        = JSONObject.Create(
+                                                                                                           Duration.HasValue
+                                                                                                               ? new JProperty("Duration",           (Int32) Duration.Value.TotalSeconds)
+                                                                                                               : null,
+                                                                                                           ChargingProductId != null
+                                                                                                               ? new JProperty("ChargingProductId",  ChargingProductId.ToString())
+                                                                                                               : null,
+                                                                                                           ReservationId     != null
+                                                                                                               ? new JProperty("ReservationId",      ReservationId.    ToString())
+                                                                                                               : null,
+                                                                                                           ProviderId        != null
+                                                                                                               ? new JProperty("ProviderId",         ProviderId.       ToString())
+                                                                                                               : null,
+                                                                                                           eMAId             != null
+                                                                                                               ? new JProperty("eMAId",              eMAId.            ToString())
+                                                                                                               : null,
+                                                                                                           AuthTokens.NotNullAny()
+                                                                                                               ? new JProperty("AuthorizedIds",
+                                                                                                                     JSONObject.Create(
+                                                                                                                         new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),
+                                                                                                                         new JProperty("eMAIds",  new JArray(eMAIds.    SafeSelect(emaid => emaid.ToString())))
+                                                                                                                     )
+                                                                                                                 )
+                                                                                                               : null
+                                                                                                       ).ToUTF8Bytes();
                                                                    }),
 
                                              QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
@@ -784,7 +772,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response == null)
             {
 
-                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ReserveChargingStation.log"))
+                using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ReserveChargingStation.log"))
                 {
                     logfile.WriteLine(DateTime.Now);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -796,7 +784,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             }
 
-            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString() + "_ReserveChargingStation.log"))
+            using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ReserveChargingStation.log"))
             {
                 logfile.WriteLine(DateTime.Now);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
@@ -836,33 +824,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 ErrorCode               == "SUCCESS")
             {
 
-                var EVSEIdReturn  = EVSE_Id.Parse(JSON["evseId"].Value<String>());
-                var EVSEIdLocal   = EVSEIdReturn;
-
-                if (EVSEIdReturn == EVSE_Id.Parse("+49*822*483*1"))
-                    EVSEIdLocal = EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*1");
-
-                else if (EVSEIdReturn == EVSE_Id.Parse("+49*822*483*2"))
-                    EVSEIdLocal = EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*2");
-
-                else if (EVSEIdReturn == EVSE_Id.Parse("+49*822*483*2"))
-                    EVSEIdLocal = EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*2");
-
-                else if (EVSEIdReturn == EVSE_Id.Parse("+49*822*483*2"))
-                    EVSEIdLocal = EVSE_Id.Parse("DE*822*EVSE*BOSCHEBIKE*LIVE*2");
-
-
                 var NewReservation = new ChargingReservation(
                                          ChargingReservation_Id.Parse(JSON["ReservationId"].Value<String>()),
                                          DateTime.Now,
                                          JSON["StartTime"].Value<DateTime>(),
                                          TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
                                          JSON["StartTime"].Value<DateTime>() + TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
+                                         JSON["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(JSON["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                          ChargingReservationLevel.ChargingStation,
                                          ProviderId,
                                          eMAId,
                                          this.ChargingStation.Operator.RoamingNetwork,
-                                         EVSEId:             EVSEIdLocal,
+                                         EVSEId:             MapIncomingId(EVSE_Id.Parse(JSON["EVSEId"].Value<String>())),
                                          ChargingStationId:  Id,
                                          AuthTokens:         AuthTokens,  // As it is not included in the HTTP response!
                                          eMAIds:             eMAIds,      // As it is not included in the HTTP response!
