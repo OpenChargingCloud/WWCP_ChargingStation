@@ -341,7 +341,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        public String RemoteEVSEIdPrefix  { get; set; }
+        public ChargingStation_Id RemoteChargingStationId { get; set; }
+        public String             RemoteEVSEIdPrefix      { get; set; }
 
 
         #region SelfCheckTimeSpan

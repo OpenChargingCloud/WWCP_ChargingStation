@@ -722,18 +722,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var ChargingStationIdLocal = Id;
-
-            if (Id == ChargingStation_Id.Parse("DE*822*STATION*BOSCHEBIKE*LIVE"))
-                ChargingStationIdLocal = ChargingStation_Id.Parse("+49*822*483");
-
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 _RemoteCertificateValidator,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/ChargingStations/" + ChargingStationIdLocal.ToFormat(IdFormatType.OLD).Replace("+", "") + "/Reservation",
+                                     Execute(client => client.POST(URIPrefix + "/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation",
 
                                                                    requestbuilder => {
                                                                        requestbuilder.Host           = VirtualHost;
@@ -794,35 +789,36 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 logfile.WriteLine("--------------------------------------------------------------------------------");
             }
 
-            JObject JSON       = null;
-            String  ErrorCode  = null;
+
+            JObject JSON         = null;
+            String  Description  = "";
 
             if (response.ContentLength > 0)
             {
-                JSON      = JObject.Parse(response.HTTPBody.ToUTF8String());
-                ErrorCode = JSON["errorCode"] != null ? JSON["errorCode"].Value<String>() : null;
+                JSON         = JObject.Parse(response.HTTPBody.ToUTF8String());
+                Description  = JSON["description"] != null ? JSON["description"].Value<String>() : "";
             }
 
             #region OK
 
             // HTTP/1.1 200 OK
-            // Date: Wed, 24 Feb 2016 14:40:28 GMT
-            // Server: Apache/2.2.16 (Debian)
-            // Content-Length: 190
+            // Date: Thu, 11 Feb 2016 11:52:31 GMT
+            // Server: Apache/2.2.16(Debian)
+            // Content-Length: 187
             // Content-Type: application/json
             // 
             // {
-            //     "evseId":         "49*822*483*1",
-            //     "pin":            "615849",
-            //     "ReservationId":  "54ccc5c8-8711-4f16-afba-cf6b0094580d",
-            //     "StartTime":      "2016-02-24T15:40:28+01:00",
-            //     "Duration":       120,
-            //     "State":          "CREATED",
-            //     "errorCode":      "SUCCESS"
+            //     "evseId":        "49*822*483*1",
+            //     "pin":           "538753",
+            //     "ReservationId": "33983d9f-cec3-4da7-894a-c805a55eb897",
+            //     "StartTime":     "2016-02-11T12:52:33CET",
+            //     "Duration":      900,
+            //     "State":         "CREATED",
+            //     "errorCode":     "SUCCESS"
             // }
 
-            if (response.HTTPStatusCode == HTTPStatusCode.OK &&
-                ErrorCode               == "SUCCESS")
+            if (response.HTTPStatusCode == HTTPStatusCode.OK ||
+                response.HTTPStatusCode == HTTPStatusCode.Created)
             {
 
                 var NewReservation = new ChargingReservation(
@@ -853,67 +849,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            #region Conflict
+            #region Unauthorized
 
-            else if (response.HTTPStatusCode == HTTPStatusCode.Conflict)
+            else if (response.HTTPStatusCode == HTTPStatusCode.Unauthorized)
             {
 
-                switch (ErrorCode)
+                switch (Description)
                 {
 
-                    #region UnknownChargingStation
+                    case "Unauthorized remote start or invalid credentials!":
+                        return ReservationResult.InvalidCredentials;
 
-                    // HTTP/1.1 409 Conflict
-                    // Date: Thu, 25 Feb 2016 11:12:55 GMT
-                    // Server: Apache/2.2.16 (Debian)
-                    // Content-Length: 65
-                    // Content-Type: application/json
-                    // 
-                    // {
-                    //     "StartTime":  null,
-                    //     "Duration":   0,
-                    //     "errorCode":  "LOCATION_ID_UNKNOWN"
-                    // }
-                    case "LOCATION_ID_UNKNOWN":
-                        return ReservationResult.UnknownChargingStation;
-
-                    #endregion
-
-                    #region RESERVATION_EVSE_IN_USE -> NoEVSEsAvailable
-
-                    // HTTP/1.1 409 Conflict
-                    // Date: Thu, 11 Feb 2016 22:07:33 GMT
-                    // Server: Apache/2.2.16 (Debian)
-                    // Content-Length: 69
-                    // Content-Type: application/json
-                    // 
-                    // {
-                    //     "StartTime":  null,
-                    //     "Duration":   0,
-                    //     "errorCode":  "RESERVATION_EVSE_IN_USE"
-                    // }
-                    case "RESERVATION_EVSE_IN_USE":
-                        return ReservationResult.NoEVSEsAvailable;
-
-                    #endregion
-
-                    #region Offline
-
-                    // HTTP/1.1 409 Conflict
-                    // Date: Tue, 16 Feb 2016 14:39:09 GMT
-                    // Server: Apache/2.2.16 (Debian)
-                    // Content-Length: 68
-                    // Content-Type: application/json
-                    // 
-                    // {
-                    //     "StartTime":  null,
-                    //     "Duration":   0,
-                    //     "errorCode":  "LOCATION_NOT_REACHABLE"
-                    // }
-                    case "LOCATION_NOT_REACHABLE":
-                        return ReservationResult.Offline;
-
-                    #endregion
+                    default:
+                        return ReservationResult.CommunicationError(Description);
 
                 }
 
@@ -921,21 +869,56 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+            #region NotFound
+
             else if (response.HTTPStatusCode == HTTPStatusCode.NotFound)
             {
 
-                // HTTP/1.1 404 Not Found
-                // Date: Tue, 01 Mar 2016 00:32:18 GMT
-                // Server: Apache/2.2.16 (Debian)
-                // Transfer-Encoding: chunked
-                // Content-Type: text/plain; charset=UTF-8
+                switch (Description)
+                {
 
-                if (!RemoteWhiteList.Contains(AuthInfo.FromRemoteIdentification(eMAId)))
-                    return ReservationResult.InvalidCredentials;
+                    case "Unknown reservation identification!":
+                        return ReservationResult.UnknownChargingReservationId;
+
+                    case "Unknown charging station!":
+                        return ReservationResult.UnknownChargingStation;
+
+                }
 
             }
 
-            return ReservationResult.Error(ErrorCode);
+            #endregion
+
+            #region Conflict
+
+            if (response.HTTPStatusCode == HTTPStatusCode.Conflict)
+            {
+
+                switch (Description)
+                {
+
+                    case "No EVSEs are available for reservation!":
+                        return ReservationResult.NoEVSEsAvailable;
+
+                    case "The charging station is already reserved!":
+                        return ReservationResult.AlreadyReserved;
+
+                    case "The charging station is already in use!":
+                        return ReservationResult.AlreadyInUse;
+
+                    case "The charging station is out of service!":
+                        return ReservationResult.OutOfService;
+
+                    case "The charging station is offline!":
+                        return ReservationResult.Offline;
+
+                }
+
+            }
+
+            #endregion
+
+            return ReservationResult.Error(Description);
 
         }
 
