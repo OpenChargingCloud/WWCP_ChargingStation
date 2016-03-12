@@ -297,7 +297,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     {
 
                         List.Add(new EVSEStatus(MapIncomingId(EVSE_Id.Parse(property.Key.Replace(@"""", ""))),
-                                                (EVSEStatusType) Enum.Parse(typeof(EVSEStatusType), ((property.Value as JObject).First as JProperty).Value.Value<String>(), true)));
+                                                (EVSEStatusType) Enum.Parse(typeof(EVSEStatusType), ((property.Value as JObject).First as JProperty).Value.Value<String>(), true),
+                                                DateTime.Parse(((property.Value as JObject).First as JProperty).Name)));
 
                     }
 

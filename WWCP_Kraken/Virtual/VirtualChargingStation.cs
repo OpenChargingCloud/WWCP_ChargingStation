@@ -424,25 +424,38 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Set the current status.
         /// </summary>
-        /// <param name="NewStatus">A new timestamped status.</param>
-        public void SetStatus(Timestamped<ChargingStationStatusType>  NewStatus)
+        /// <param name="NewStatus">A new status.</param>
+        public void SetStatus(ChargingStationStatusType  NewStatus)
         {
             _StatusSchedule.Insert(NewStatus);
         }
 
         #endregion
 
-        #region SetStatus(Timestamp, NewStatus)
+        #region SetStatus(NewTimestampedStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewTimestampedStatus">A new timestamped status.</param>
+        public void SetStatus(Timestamped<ChargingStationStatusType> NewTimestampedStatus)
+        {
+            _StatusSchedule.Insert(NewTimestampedStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatus, Timestamp)
 
         /// <summary>
         /// Set the status.
         /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
         /// <param name="NewStatus">A new status.</param>
-        public void SetStatus(DateTime                   Timestamp,
-                              ChargingStationStatusType  NewStatus)
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetStatus(ChargingStationStatusType  NewStatus,
+                              DateTime                   Timestamp)
         {
-            _StatusSchedule.Insert(Timestamp, NewStatus);
+            _StatusSchedule.Insert(NewStatus, Timestamp);
         }
 
         #endregion
@@ -469,24 +482,37 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusType>  NewAdminStatus)
+        public void SetAdminStatus(ChargingStationAdminStatusType  NewAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus);
         }
 
         #endregion
 
-        #region SetAdminStatus(Timestamp, NewAdminStatus)
+        #region SetAdminStatus(NewTimestampedAdminStatus)
 
         /// <summary>
         /// Set the admin status.
         /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="NewAdminStatus">A new admin status.</param>
-        public void SetAdminStatus(DateTime                        Timestamp,
-                                   ChargingStationAdminStatusType  NewAdminStatus)
+        /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusType> NewTimestampedAdminStatus)
         {
-            _AdminStatusSchedule.Insert(Timestamp, NewAdminStatus);
+            _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatus, Timestamp)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new admin status.</param>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetAdminStatus(ChargingStationAdminStatusType  NewAdminStatus,
+                                   DateTime                        Timestamp)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
         }
 
         #endregion
@@ -868,7 +894,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  TimeSpan?                QueryTimeout = null)
         {
 
-            return _EVSEs.Select(evse => new EVSEStatus(evse.Id, evse.Status.Value));
+            return _EVSEs.Select(evse => new EVSEStatus(evse.Id, evse.Status.Value, evse.Status.Timestamp));
 
         }
 

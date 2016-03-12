@@ -734,25 +734,38 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Set the current status.
         /// </summary>
-        /// <param name="NewStatus">A new timestamped status.</param>
-        public void SetStatus(Timestamped<EVSEStatusType>  NewStatus)
+        /// <param name="NewStatus">A new status.</param>
+        public void SetStatus(EVSEStatusType  NewStatus)
         {
             _StatusSchedule.Insert(NewStatus);
         }
 
         #endregion
 
-        #region SetStatus(Timestamp, NewStatus)
+        #region SetStatus(NewTimestampedStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewTimestampedStatus">A new timestamped status.</param>
+        public void SetStatus(Timestamped<EVSEStatusType> NewTimestampedStatus)
+        {
+            _StatusSchedule.Insert(NewTimestampedStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatus, Timestamp)
 
         /// <summary>
         /// Set the status.
         /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
         /// <param name="NewStatus">A new status.</param>
-        public void SetStatus(DateTime        Timestamp,
-                              EVSEStatusType  NewStatus)
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetStatus(EVSEStatusType  NewStatus,
+                              DateTime        Timestamp)
         {
-            _StatusSchedule.Insert(Timestamp, NewStatus);
+            _StatusSchedule.Insert(NewStatus, Timestamp);
         }
 
         #endregion
@@ -779,24 +792,37 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(Timestamped<EVSEAdminStatusType> NewAdminStatus)
+        public void SetAdminStatus(EVSEAdminStatusType NewAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus);
         }
 
         #endregion
 
-        #region SetAdminStatus(Timestamp, NewAdminStatus)
+        #region SetAdminStatus(NewTimestampedAdminStatus)
 
         /// <summary>
         /// Set the admin status.
         /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="NewAdminStatus">A new admin status.</param>
-        public void SetAdminStatus(DateTime             Timestamp,
-                                   EVSEAdminStatusType  NewAdminStatus)
+        /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(Timestamped<EVSEAdminStatusType> NewTimestampedAdminStatus)
         {
-            _AdminStatusSchedule.Insert(Timestamp, NewAdminStatus);
+            _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatus, Timestamp)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new admin status.</param>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetAdminStatus(EVSEAdminStatusType  NewAdminStatus,
+                                   DateTime             Timestamp)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
         }
 
         #endregion
