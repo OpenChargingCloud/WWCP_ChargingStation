@@ -1250,7 +1250,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  Reservation        = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
                                                                  ReservationId      = ReservationId,
                                                                  EVSEId             = Id,
-                                                                 ChargingProductId  = ChargingProductId,
+                                                                 ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
                                                                  ProviderId         = ProviderId,
                                                                  eMAIdStart         = eMAId
                                                              };
@@ -1289,8 +1289,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  ProviderId         = ProviderId,
                                                                  eMAIdStart         = eMAId,
                                                                  EVSEId             = Id,
-                                                                 ChargingProductId  = ChargingProductId
-                                                             };
+                                                                 ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
+                        };
 
 
                         Reservation.ChargingSession = ChargingSession;
