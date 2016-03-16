@@ -836,8 +836,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         private void SelfCheck(Object Context)
         {
 
-            foreach (var _EVSE in _EVSEs)
-                _EVSE.CheckReservationTime().Wait();
+            //foreach (var _EVSE in _EVSEs)
+            //    _EVSE.CheckReservationTime().Wait();
 
         }
 
