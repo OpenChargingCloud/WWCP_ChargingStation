@@ -17,7 +17,10 @@
 
 #region Usings
 
+using org.GraphDefined.Vanaheimr.Hermod;
+using org.GraphDefined.Vanaheimr.Hermod.DNS;
 using System;
+using System.Net.Security;
 
 #endregion
 
@@ -41,11 +44,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RemoteChargingStationConfigurator">An optional delegate to configure the new (remote) charging station.</param>
         /// <param name="OnSuccess">An optional delegate for reporting success.</param>
         /// <param name="OnError">An optional delegate for reporting an error.</param>
-        public static ChargingStation CreateNewRemoteStation(this ChargingPool                         ChargingPool,
+        public static ChargingStation CreateNewRemoteStation(//this ChargingPool                         ChargingPool,
+                                                             //ChargingStation_Id                        ChargingStationId                  = null,
+                                                             //Action<ChargingStation>                   ChargingStationConfigurator        = null,
+                                                             //UInt16                                    MaxStatusListSize                  = NetworkChargingStationStub.DefaultMaxStatusListSize,
+                                                             //UInt16                                    MaxAdminStatusListSize             = NetworkChargingStationStub.DefaultMaxAdminStatusListSize,
+                                                             //Action<NetworkChargingStationStub>        RemoteChargingStationConfigurator  = null,
+                                                             //Action<ChargingStation>                   OnSuccess                          = null,
+                                                             //Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
+                                                             this ChargingPool                         ChargingPool,
                                                              ChargingStation_Id                        ChargingStationId                  = null,
-                                                             UInt16                                    MaxStatusListSize                  = NetworkChargingStationStub.DefaultMaxStatusListSize,
-                                                             UInt16                                    MaxAdminStatusListSize             = NetworkChargingStationStub.DefaultMaxAdminStatusListSize,
                                                              Action<ChargingStation>                   ChargingStationConfigurator        = null,
+                                                             TimeSpan?                                 SelfCheckTimeSpan                  = null,
+                                                             UInt16                                    MaxStatusListSize                  = ChargingStations.NetworkChargingStationStub.DefaultMaxStatusListSize,
+                                                             UInt16                                    MaxAdminStatusListSize             = ChargingStations.NetworkChargingStationStub.DefaultMaxAdminStatusListSize,
+                                                             IPTransport                               IPTransport                        = IPTransport.IPv4only,
+                                                             DNSClient                                 DNSClient                          = null,
+                                                             String                                    Hostname                           = null,
+                                                             IPPort                                    TCPPort                            = null,
+                                                             String                                    Service                            = null,
+                                                             RemoteCertificateValidationCallback       RemoteCertificateValidator         = null,
+                                                             String                                    VirtualHost                        = null,
+                                                             String                                    URIPrefix                          = null,
+                                                             TimeSpan?                                 QueryTimeout                       = null,
                                                              Action<NetworkChargingStationStub>        RemoteChargingStationConfigurator  = null,
                                                              Action<ChargingStation>                   OnSuccess                          = null,
                                                              Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
