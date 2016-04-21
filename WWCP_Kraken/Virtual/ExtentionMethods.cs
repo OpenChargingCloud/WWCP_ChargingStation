@@ -64,8 +64,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                                                      var virtualstation = new VirtualChargingStation(newstation);
 
-                                                     if (VirtualChargingStationConfigurator != null)
-                                                         VirtualChargingStationConfigurator(virtualstation);
+                                                     VirtualChargingStationConfigurator?.Invoke(virtualstation);
 
                                                      return virtualstation;
 
