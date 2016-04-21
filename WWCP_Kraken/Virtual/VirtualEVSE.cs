@@ -1502,10 +1502,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             }
 
 
-                            var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
-                            if (OnNewChargeDetailRecordLocal != null)
-                                OnNewChargeDetailRecordLocal(DateTime.Now, this, _ChargeDetailRecord);
-
+                            OnNewChargeDetailRecord?.Invoke(DateTime.Now, this, _ChargeDetailRecord);
 
                             return RemoteStopEVSEResult.Success(_ChargeDetailRecord, null, ReservationHandling);
 
