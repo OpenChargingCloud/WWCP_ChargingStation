@@ -284,9 +284,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 #region Send OnEVSEDataPush event
 
-                var OnEVSEDataPushLocal = OnEVSEDataPush;
-                if (OnEVSEDataPushLocal != null)
-                    OnEVSEDataPushLocal(StartTime, this, this.Id.ToString(), this.RoamingNetwork.Id, ActionType, GroupedEVSEs, (UInt32) NumberOfEVSEs);
+                OnEVSEDataPush?.Invoke(StartTime,
+                                       this,
+                                       this.Id.ToString(),
+                                       this.RoamingNetwork.Id,
+                                       ActionType,
+                                       GroupedEVSEs,
+                                       (UInt32) NumberOfEVSEs);
 
                 #endregion
 
@@ -300,7 +304,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 //                                            QueryTimeout);
                 //
                 //if (result.Result == true)
-                    Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(true);
 
                 //else
                 //    Acknowledgement = new Acknowledgement(false, result.StatusCode.Description);
@@ -315,9 +319,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
             var EndTime = DateTime.Now;
 
-            var OnEVSEDataPushedLocal = OnEVSEDataPushed;
-            if (OnEVSEDataPushedLocal != null)
-                OnEVSEDataPushedLocal(EndTime, this, this.Id.ToString(), this.RoamingNetwork.Id, ActionType, GroupedEVSEs, (UInt32) NumberOfEVSEs, Acknowledgement, EndTime - StartTime);
+            OnEVSEDataPushed?.Invoke(EndTime,
+                                     this,
+                                     this.Id.ToString(),
+                                     this.RoamingNetwork.Id,
+                                     ActionType,
+                                     GroupedEVSEs,
+                                     (UInt32) NumberOfEVSEs,
+                                     Acknowledgement,
+                                     EndTime - StartTime);
 
             #endregion
 
@@ -754,9 +764,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 #region Send OnEVSEStatusPush event
 
-                var OnEVSEStatusPushLocal = OnEVSEStatusPush;
-                if (OnEVSEStatusPushLocal != null)
-                    OnEVSEStatusPushLocal(StartTime, this, this.Id.ToString(), this.RoamingNetwork.Id, ActionType, GroupedEVSEStatus, (UInt32) _NumberOfEVSEStatus);
+                OnEVSEStatusPush?.Invoke(StartTime,
+                                         this,
+                                         this.Id.ToString(),
+                                         this.RoamingNetwork.Id,
+                                         ActionType,
+                                         GroupedEVSEStatus,
+                                         (UInt32) _NumberOfEVSEStatus);
 
                 #endregion
 
@@ -770,7 +784,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 //                                                QueryTimeout);
                 //
                 //  if (result.Result == true)
-                    Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(true);
 
                 //  else
                 //      Acknowledgement = new Acknowledgement(false, result.StatusCode.Description);
@@ -779,9 +793,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 var EndTime = DateTime.Now;
 
-                var OnEVSEStatusPushedLocal = OnEVSEStatusPushed;
-                if (OnEVSEStatusPushedLocal != null)
-                    OnEVSEStatusPushedLocal(EndTime, this, this.Id.ToString(), this.RoamingNetwork.Id, ActionType, GroupedEVSEStatus, (UInt32)_NumberOfEVSEStatus, Acknowledgement, EndTime - StartTime);
+                OnEVSEStatusPushed?.Invoke(EndTime,
+                                           this,
+                                           this.Id.ToString(),
+                                           this.RoamingNetwork.Id,
+                                           ActionType,
+                                           GroupedEVSEStatus,
+                                           (UInt32) _NumberOfEVSEStatus,
+                                           Acknowledgement,
+                                           EndTime - StartTime);
 
                 #endregion
 
