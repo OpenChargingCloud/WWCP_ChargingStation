@@ -144,7 +144,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            throw new NotImplementedException();
+            return ReservationResult.UnknownEVSE;
 
         }
 
@@ -245,7 +245,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            throw new NotImplementedException();
+            return RemoteStartChargingStationResult.UnknownChargingStation;
 
         }
 
