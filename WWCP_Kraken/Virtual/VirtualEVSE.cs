@@ -901,23 +901,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         // Will do: Status = EVSEStatusType.Reserved
                         // Will do: Send OnNewReservation event!
-                        this.Reservation = new ChargingReservation(Timestamp,
-                                                                   StartTime.HasValue ? StartTime.Value : DateTime.Now,
-                                                                   Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                                   (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
-                                                                   ReservationLevel,
-                                                                   ProviderId,
-                                                                   eMAId,
-                                                                   null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
-                                                                   null, //ChargingStation.ChargingPool.Id,
-                                                                   ChargingStation.Id,
-                                                                   Id,
-                                                                   ChargingProductId,
-                                                                   AuthTokens,
-                                                                   eMAIds,
-
-                                                                   // ToDo: Make this behaviour optional!
-                                                                   new UInt32[] { (UInt32) (_random.Next(1000000) + 100000) });
+                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.New,
+                                                                   Timestamp:               Timestamp,
+                                                                   StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
+                                                                   Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
+                                                                   EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                   ConsumedReservationTime: TimeSpan.FromSeconds(0),
+                                                                   ReservationLevel:        ReservationLevel,
+                                                                   ProviderId:              ProviderId,
+                                                                   eMAId:                   eMAId,
+                                                                   RoamingNetwork:          null,
+                                                                   ChargingPoolId:          null,
+                                                                   ChargingStationId:       ChargingStation.Id,
+                                                                   EVSEId:                  Id,
+                                                                   ChargingProductId:       ChargingProductId,
+                                                                   AuthTokens:              AuthTokens,
+                                                                   eMAIds:                  eMAIds,
+                                                                   PINs:                    PINs != null ? PINs : new UInt32[] { (UInt32)(_random.Next(1000000) + 100000) });
 
                         return ReservationResult.Success(_Reservation);
 

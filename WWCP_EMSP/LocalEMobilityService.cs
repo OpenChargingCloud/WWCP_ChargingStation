@@ -1795,73 +1795,6 @@ namespace org.GraphDefined.WWCP.EMSP
         #endregion
 
 
-        #region SendChargeDetailRecord(EVSEId, SessionId, SessionStart, SessionEnd, PartnerProductId, ..., QueryTimeout = null)
-
-        /// <summary>
-        /// Create a SendChargeDetailRecord request.
-        /// </summary>
-        /// <param name="EVSEId">An EVSE identification.</param>
-        /// <param name="SessionId">The session identification from the Authorize Start request.</param>
-        /// <param name="PartnerProductId">An optional charging product identification.</param>
-        /// <param name="SessionStart">The timestamp of the session start.</param>
-        /// <param name="SessionEnd">The timestamp of the session end.</param>
-        /// <param name="ChargingStart">An optional charging start timestamp.</param>
-        /// <param name="ChargingEnd">An optional charging end timestamp.</param>
-        /// <param name="MeterValueStart">An optional initial value of the energy meter.</param>
-        /// <param name="MeterValueEnd">An optional final value of the energy meter.</param>
-        /// <param name="MeterValuesInBetween">An optional enumeration of meter values during the charging session.</param>
-        /// <param name="ConsumedEnergy">The optional amount of consumed energy.</param>
-        /// <param name="MeteringSignature">An optional signature for the metering values.</param>
-        /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<SendCDRResult>
-
-            SendChargeDetailRecord(DateTime             Timestamp,
-                                   CancellationToken    CancellationToken,
-                                   EventTracking_Id     EventTrackingId,
-                                   EVSE_Id              EVSEId,
-                                   ChargingSession_Id   SessionId,
-                                   ChargingProduct_Id   PartnerProductId,
-                                   DateTime             SessionStart,
-                                   DateTime             SessionEnd,
-                                   AuthInfo             AuthInfo, // REMOVE ME!
-                                   DateTime?            ChargingStart         = null,
-                                   DateTime?            ChargingEnd           = null,
-                                   Double?              MeterValueStart       = null,
-                                   Double?              MeterValueEnd         = null,
-                                   IEnumerable<Double>  MeterValuesInBetween  = null,
-                                   Double?              ConsumedEnergy        = null,
-                                   String               MeteringSignature     = null,
-                                   TimeSpan?            QueryTimeout          = null)
-
-        {
-
-            #region Initial checks
-
-            if (EVSEId           == null)
-                throw new ArgumentNullException(nameof(EVSEId),            "The given parameter must not be null!");
-
-            if (SessionId        == null)
-                throw new ArgumentNullException("SessionId",         "The given parameter must not be null!");
-
-            if (SessionStart     == null)
-                throw new ArgumentNullException("SessionStart",      "The given parameter must not be null!");
-
-            if (SessionEnd       == null)
-                throw new ArgumentNullException("SessionEnd",        "The given parameter must not be null!");
-
-            #endregion
-
-            SessionInfo _SessionInfo = null;
-
-            if (SessionDatabase.TryRemove(SessionId, out _SessionInfo))
-                return SendCDRResult.Forwarded(AuthorizatorId);
-
-            return SendCDRResult.InvalidSessionId(AuthorizatorId);
-
-        }
-
-        #endregion
-
         #region SendChargeDetailRecord(ChargeDetailRecord, QueryTimeout = null)
 
         public async Task<SendCDRResult> SendChargeDetailRecord(DateTime            Timestamp,
@@ -1874,7 +1807,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (ChargeDetailRecord == null)
-                throw new ArgumentNullException("ChargeDetailRecord",  "The given charge detail record must not be null!");
+                throw new ArgumentNullException(nameof(ChargeDetailRecord),  "The given charge detail record must not be null!");
 
             #endregion
 
@@ -1894,8 +1827,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                            IEnumerable<ChargingStation>  ChargingStations)
         {
 
-            foreach (var ChargingStation in ChargingStations)
-                Console.WriteLine(DateTime.Now + " LocalEMobilityService says: " + ChargingStation.Id + " was removed!");
+            foreach (var _ChargingStation in ChargingStations)
+                Console.WriteLine(DateTime.Now + " LocalEMobilityService says: " + _ChargingStation.Id + " was removed!");
 
         }
 

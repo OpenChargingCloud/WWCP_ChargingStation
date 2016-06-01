@@ -896,10 +896,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusType.Available:
 
-                    this._Reservation = new ChargingReservation(Timestamp,
+                    this._Reservation = new ChargingReservation(ReservationId,
+                                                                Timestamp,
                                                                 StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration. HasValue ? Duration. Value : MaxReservationDuration,
                                                                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                TimeSpan.FromSeconds(0),
                                                                 ChargingReservationLevel.EVSE,
                                                                 ProviderId,
                                                                 eMAId,

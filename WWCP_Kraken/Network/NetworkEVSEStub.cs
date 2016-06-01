@@ -913,21 +913,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusType.Available:
 
-                    this._Reservation = new ChargingReservation(Timestamp,
-                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
-                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                                (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
-                                                                ChargingReservationLevel.EVSE,
-                                                                ProviderId,
-                                                                eMAId,
-                                                                null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
-                                                                null, //ChargingStation.ChargingPool.Id,
-                                                                ChargingStation.Id,
-                                                                Id,
-                                                                ChargingProductId,
-                                                                AuthTokens,
-                                                                eMAIds,
-                                                                PINs);
+                    this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.New,
+                                                                Timestamp:               Timestamp,
+                                                                StartTime:               StartTime.HasValue ? StartTime.Value : DateTime.Now,
+                                                                Duration:                Duration. HasValue ? Duration. Value : MaxReservationDuration,
+                                                                EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                ConsumedReservationTime: TimeSpan.FromSeconds(0),
+                                                                ReservationLevel:        ChargingReservationLevel.EVSE,
+                                                                ProviderId:              ProviderId,
+                                                                eMAId:                   eMAId,
+                                                                RoamingNetwork:          null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
+                                                                ChargingPoolId:          null, //ChargingStation.ChargingPool.Id,
+                                                                ChargingStationId:       ChargingStation.Id,
+                                                                EVSEId:                  Id,
+                                                                ChargingProductId:       ChargingProductId,
+                                                                AuthTokens:              AuthTokens,
+                                                                eMAIds:                  eMAIds,
+                                                                PINs:                    PINs);
 
                     SetStatus(EVSEStatusType.Reserved);
 
