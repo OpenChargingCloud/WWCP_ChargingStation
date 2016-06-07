@@ -48,14 +48,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\BelectricDriveAPI\BelectricDriveAPI.csproj">
-      <Project>{6846fc90-5726-4982-9d27-3a79ebfddeff}</Project>
-      <Name>BelectricDriveAPI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\BoschEBikeAPI\BoschEBikeAPI.csproj">
-      <Project>{78eb9a61-30f4-461b-af5c-e9b736f74a2a}</Project>
-      <Name>BoschEBikeAPI</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Aegir\Aegir\Aegir.csproj">
       <Project>{4d8ffccd-738d-41aa-a527-8cfdfe0a681d}</Project>
       <Name>Aegir</Name>
@@ -63,10 +55,6 @@
     <ProjectReference Include="..\..\BouncyCastle\crypto\crypto.csproj">
       <Project>{38872a5f-e87e-4fad-b109-8eb7b2e6a4a0}</Project>
       <Name>crypto</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Hermod\Hermod\Hermod.csproj">
-      <Project>{477efd16-3627-4473-957d-44ca9a9dfb79}</Project>
-      <Name>Hermod</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Illias\Illias\Illias.csproj">
       <Project>{23d37453-2d4e-4bd8-b40f-3e731fee7712}</Project>
@@ -79,34 +67,6 @@
     <ProjectReference Include="..\..\WWCP_Core\WWCP_Core\WWCP_Core.csproj">
       <Project>{33836742-af1d-4aa4-963f-b0a8e60e6480}</Project>
       <Name>WWCP_Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_Net\WWCP_GeoJSON\WWCP_GeoJSON.csproj">
-      <Project>{5fecd89d-80c3-407a-9ccd-2b6180882f17}</Project>
-      <Name>WWCP_GeoJSON</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_Net\WWCP_JSON\WWCP_JSON.csproj">
-      <Project>{19b4c454-a831-4e70-963a-0ed50db92f89}</Project>
-      <Name>WWCP_JSON</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_Net\WWCP_Net\WWCP_Net.csproj">
-      <Project>{f2114125-84c1-4984-8706-b2d003156495}</Project>
-      <Name>WWCP_Net</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_Net\WWCP_RDF\WWCP_RDF.csproj">
-      <Project>{0fbd2942-fe7a-4d7c-a57c-59172506e2e0}</Project>
-      <Name>WWCP_RDF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_Net\WWCP_XML\WWCP_XML.csproj">
-      <Project>{98e75e5f-03b6-4003-a6c1-cb94e3888010}</Project>
-      <Name>WWCP_XML</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_OCPI\WWCP_OCPIv2_0\WWCP_OCPIv2_0.csproj">
-      <Project>{820584ca-46a2-4eb7-8b26-ef43025d042a}</Project>
-      <Name>WWCP_OCPIv2_0</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_OICP\WWCP_OICPv2_0\WWCP_OICPv2_0.csproj">
-      <Project>{4bb02c38-48c3-41cb-99f6-a1888881b942}</Project>
-      <Name>WWCP_OICPv2_0</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

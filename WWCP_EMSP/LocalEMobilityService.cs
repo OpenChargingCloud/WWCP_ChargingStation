@@ -51,12 +51,7 @@ namespace org.GraphDefined.WWCP.EMSP
         private readonly String _Id;
 
         public String Id
-        {
-            get
-            {
-                return _Id;
-            }
-        }
+            => _Id;
 
         #endregion
 
@@ -65,12 +60,7 @@ namespace org.GraphDefined.WWCP.EMSP
         private readonly RoamingNetwork _RoamingNetwork;
 
         public RoamingNetwork RoamingNetwork
-        {
-            get
-            {
-                return _RoamingNetwork;
-            }
-        }
+            => _RoamingNetwork;
 
         #endregion
 
@@ -79,12 +69,7 @@ namespace org.GraphDefined.WWCP.EMSP
         private readonly EVSP _EVSP;
 
         public EVSP EVSP
-        {
-            get
-            {
-                return _EVSP;
-            }
-        }
+            => _EVSP;
 
         #endregion
 
@@ -93,12 +78,7 @@ namespace org.GraphDefined.WWCP.EMSP
         private readonly Authorizator_Id _AuthorizatorId;
 
         public Authorizator_Id AuthorizatorId
-        {
-            get
-            {
-                return _AuthorizatorId;
-            }
-        }
+            => _AuthorizatorId;
 
         #endregion
 
@@ -106,48 +86,28 @@ namespace org.GraphDefined.WWCP.EMSP
         #region AllTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> AllTokens
-        {
-            get
-            {
-                return AuthorizationDatabase;
-            }
-        }
+            => AuthorizationDatabase;
 
         #endregion
 
         #region AuthorizedTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> AuthorizedTokens
-        {
-            get
-            {
-                return AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Authorized);
-            }
-        }
+            => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Authorized);
 
         #endregion
 
         #region NotAuthorizedTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> NotAuthorizedTokens
-        {
-            get
-            {
-                return AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.NotAuthorized);
-            }
-        }
+            => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.NotAuthorized);
 
         #endregion
 
         #region BlockedTokens
 
         public IEnumerable<KeyValuePair<Auth_Token, TokenAuthorizationResultType>> BlockedTokens
-        {
-            get
-            {
-                return AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Blocked);
-            }
-        }
+            => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Blocked);
 
         #endregion
 
@@ -193,7 +153,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             this._RoamingNetwork        = EVSP.RoamingNetwork;
             this._EVSP                  = EVSP;
-            this._AuthorizatorId        = (AuthorizatorId == null) ? Authorizator_Id.Parse("eMI3 Local E-Mobility Database") : AuthorizatorId;
+            this._AuthorizatorId        = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
 
             this.AuthorizationDatabase  = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase        = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
@@ -262,7 +222,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (GroupedEVSEs == null)
-                throw new ArgumentNullException("GroupedEVSEs", "The given lookup of EVSEs must not be null!");
+                throw new ArgumentNullException(nameof(GroupedEVSEs), "The given lookup of EVSEs must not be null!");
 
             #endregion
 
@@ -360,7 +320,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSE == null)
-                throw new ArgumentNullException("EVSE", "The given EVSE must not be null!");
+                throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
 
             #endregion
 
@@ -404,7 +364,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEs == null)
-                throw new ArgumentNullException("EVSEs", "The given enumeration of EVSEs must not be null!");
+                throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
 
             if (IncludeEVSEs == null)
                 IncludeEVSEs = EVSE => true;
@@ -459,14 +419,14 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (ChargingStation == null)
-                throw new ArgumentNullException("ChargingStation", "The given charging station must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
 
             #endregion
 
             return await PushEVSEData(ChargingStation.EVSEs,
                                       ActionType,
-                                      OperatorId   != null ? OperatorId   : ChargingStation.ChargingPool.Operator.Id,
-                                      OperatorName != null ? OperatorName : ChargingStation.ChargingPool.Operator.Name.FirstText,
+                                      OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
+                                      OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
                                       IncludeEVSEs,
                                       QueryTimeout);
 
@@ -499,7 +459,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (ChargingStations == null)
-                throw new ArgumentNullException("ChargingStations", "The given enumeration of charging stations must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
 
             #endregion
 
@@ -539,14 +499,14 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (ChargingPool == null)
-                throw new ArgumentNullException("ChargingPool", "The given charging pool must not be null!");
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
 
             #endregion
 
             return await PushEVSEData(ChargingPool.EVSEs,
                                       ActionType,
-                                      OperatorId   != null ? OperatorId   : ChargingPool.Operator.Id,
-                                      OperatorName != null ? OperatorName : ChargingPool.Operator.Name.FirstText,
+                                      OperatorId   ?? ChargingPool.Operator.Id,
+                                      OperatorName ?? ChargingPool.Operator.Name.FirstText,
                                       IncludeEVSEs,
                                       QueryTimeout);
 
@@ -579,7 +539,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (ChargingPools == null)
-                throw new ArgumentNullException("ChargingPools", "The given enumeration of charging pools must not be null!");
+                throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
 
             #endregion
 
@@ -620,7 +580,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperator == null)
-                throw new ArgumentNullException("EVSEOperator", "The given EVSE operator must not be null!");
+                throw new ArgumentNullException(nameof(EVSEOperator), "The given EVSE operator must not be null!");
 
             #endregion
 
@@ -661,7 +621,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperators == null)
-                throw new ArgumentNullException("EVSEOperators",  "The given enumeration of EVSE operators must not be null!");
+                throw new ArgumentNullException(nameof(EVSEOperators),  "The given enumeration of EVSE operators must not be null!");
 
             #endregion
 
@@ -703,7 +663,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (RoamingNetwork == null)
-                throw new ArgumentNullException("RoamingNetwork", "The given roaming network must not be null!");
+                throw new ArgumentNullException(nameof(RoamingNetwork), "The given roaming network must not be null!");
 
             #endregion
 
@@ -1020,8 +980,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                             ? ChargingStation.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
                                             : ChargingStation.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
                                         ActionType,
-                                        OperatorId   != null ? OperatorId   : ChargingStation.ChargingPool.Operator.Id,
-                                        OperatorName != null ? OperatorName : ChargingStation.ChargingPool.Operator.Name.FirstText,
+                                        OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
+                                        OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
                                         QueryTimeout);
 
         }
@@ -1102,8 +1062,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                             ? ChargingPool.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
                                             : ChargingPool.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
                                         ActionType,
-                                        OperatorId   != null ? OperatorId   : ChargingPool.Operator.Id,
-                                        OperatorName != null ? OperatorName : ChargingPool.Operator.Name.FirstText,
+                                        OperatorId   ?? ChargingPool.Operator.Id,
+                                        OperatorName ?? ChargingPool.Operator.Name.FirstText,
                                         QueryTimeout);
 
         }
@@ -1328,10 +1288,10 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId == null)
-                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId), "The given parameter must not be null!");
 
             if (AuthToken  == null)
-                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
 
             #endregion
 
@@ -1413,10 +1373,10 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId == null)
-                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId), "The given parameter must not be null!");
 
             if (AuthToken  == null)
-                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
 
             #endregion
 
@@ -1500,13 +1460,13 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId        == null)
-                throw new ArgumentNullException("OperatorId",         "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId),         "The given parameter must not be null!");
 
             if (AuthToken         == null)
-                throw new ArgumentNullException("AuthToken",          "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),          "The given parameter must not be null!");
 
             if (ChargingStationId == null)
-                throw new ArgumentNullException("ChargingStationId",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStationId),  "The given parameter must not be null!");
 
             #endregion
 
@@ -1585,13 +1545,13 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId == null)
-                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId), "The given parameter must not be null!");
 
             if (SessionId  == null)
-                throw new ArgumentNullException("SessionId",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
 
             if (AuthToken  == null)
-                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
 
             #endregion
 
@@ -1680,13 +1640,13 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId == null)
-                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId), "The given parameter must not be null!");
 
             if (SessionId  == null)
-                throw new ArgumentNullException("SessionId",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
 
             if (AuthToken  == null)
-                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
 
             if (EVSEId == null)
                 throw new ArgumentNullException(nameof(EVSEId),     "The given parameter must not be null!");
@@ -1778,13 +1738,13 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (OperatorId == null)
-                throw new ArgumentNullException("OperatorId", "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(OperatorId), "The given parameter must not be null!");
 
             if (SessionId  == null)
-                throw new ArgumentNullException("SessionId",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
 
             if (AuthToken  == null)
-                throw new ArgumentNullException("AuthToken",  "The given parameter must not be null!");
+                throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
 
             #endregion
 
