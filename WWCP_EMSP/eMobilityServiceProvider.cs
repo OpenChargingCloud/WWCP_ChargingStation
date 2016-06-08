@@ -42,6 +42,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         private readonly ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>  AuthorizationDatabase;
         private readonly ConcurrentDictionary<ChargingSession_Id, SessionInfo>                   SessionDatabase;
+        private readonly ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>            ChargeDetailRecordDatabase;
 
         #endregion
 
@@ -194,15 +195,16 @@ namespace org.GraphDefined.WWCP.EMSP
         #region Constructor(s)
 
         internal eMobilityServiceProvider(EVSP             EVSP,
-                                       Authorizator_Id  AuthorizatorId = null)
+                                          Authorizator_Id  AuthorizatorId = null)
         {
 
-            this._RoamingNetwork        = EVSP.RoamingNetwork;
-            this._EVSP                  = EVSP;
-            this._AuthorizatorId        = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+            this._RoamingNetwork             = EVSP.RoamingNetwork;
+            this._EVSP                       = EVSP;
+            this._AuthorizatorId             = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
 
-            this.AuthorizationDatabase  = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
-            this.SessionDatabase        = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
+            this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
+            this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
+            this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
 
             EVSP.EMobilityService = this;
 
@@ -243,9 +245,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region Incoming from the roaming network
 
-        #region PushEVSEData(GroupedEVSEs,     ActionType = fullLoad, OperatorId = null, OperatorName = null,                      QueryTimeout = null)
+        #region Incoming requests from the roaming network
+
+        #region Receive incoming EVSEData
+
+        private IPushData AsIPushData  => this;
+
+        #region PushEVSEData(GroupedEVSEs,     ActionType = fullLoad, OperatorId, OperatorName, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given lookup of EVSEs grouped by their EVSE operator.
@@ -255,13 +262,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(ILookup<EVSEOperator, EVSE>  GroupedEVSEs,
-                         ActionType                   ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id              OperatorId    = null,
-                         String                       OperatorName  = null,
-                         TimeSpan?                    QueryTimeout  = null)
+            IPushData.PushEVSEData(ILookup<EVSEOperator, EVSE>  GroupedEVSEs,
+                                   ActionType                   ActionType,
+                                   EVSEOperator_Id              OperatorId,
+                                   String                       OperatorName,
+                                   TimeSpan?                    QueryTimeout)
 
         {
 
@@ -343,7 +350,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region PushEVSEData(EVSE,             ActionType = fullLoad, OperatorId = null, OperatorName = null,                      QueryTimeout = null)
+        #region PushEVSEData(EVSE,             ActionType = fullLoad, OperatorId, OperatorName, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given EVSE.
@@ -353,13 +360,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(EVSE                 EVSE,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(EVSE                 EVSE,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -370,22 +377,22 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(new EVSE[] { EVSE },
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName.IsNotNullOrEmpty()
-                                          ? OperatorName
-                                          : EVSE.Operator.Name.Any()
-                                                ? EVSE.Operator.Name.FirstText
-                                                : null,
-                                      null,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(new EVSE[] { EVSE },
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName.IsNotNullOrEmpty()
+                                                               ? OperatorName
+                                                               : EVSE.Operator.Name.Any()
+                                                                     ? EVSE.Operator.Name.FirstText
+                                                                     : null,
+                                                           null,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(EVSEs,            ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(EVSEs,            ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given enumeration of EVSEs.
@@ -396,14 +403,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(IEnumerable<EVSE>    EVSEs,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(IEnumerable<EVSE>    EVSEs,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   Func<EVSE, Boolean>  IncludeEVSEs,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -427,12 +434,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
             if (_EVSEs.Any())
-                return await PushEVSEData(_EVSEs.ToLookup(evse => evse.Operator,
-                                                          evse => evse),
-                                          ActionType,
-                                          OperatorId,
-                                          OperatorName,
-                                          QueryTimeout);
+                return await AsIPushData.PushEVSEData(_EVSEs.ToLookup(evse => evse.Operator,
+                                                                               evse => evse),
+                                                               ActionType,
+                                                               OperatorId,
+                                                               OperatorName,
+                                                               QueryTimeout);
 
             return new Acknowledgement(true);
 
@@ -440,7 +447,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region PushEVSEData(ChargingStation,  ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(ChargingStation,  ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given charging station.
@@ -451,14 +458,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(ChargingStation      ChargingStation,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(ChargingStation      ChargingStation,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   Func<EVSE, Boolean>  IncludeEVSEs,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -469,18 +476,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(ChargingStation.EVSEs,
-                                      ActionType,
-                                      OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
-                                      OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(ChargingStation.EVSEs,
+                                                           ActionType,
+                                                           OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
+                                                           OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(ChargingStations, ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(ChargingStations, ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given charging stations.
@@ -491,14 +498,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(IEnumerable<ChargingStation>  ChargingStations,
-                         ActionType                    ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id               OperatorId    = null,
-                         String                        OperatorName  = null,
-                         Func<EVSE, Boolean>           IncludeEVSEs  = null,
-                         TimeSpan?                     QueryTimeout  = null)
+            IPushData.PushEVSEData(IEnumerable<ChargingStation>  ChargingStations,
+                                   ActionType                    ActionType,
+                                   EVSEOperator_Id               OperatorId,
+                                   String                        OperatorName,
+                                   Func<EVSE, Boolean>           IncludeEVSEs,
+                                   TimeSpan?                     QueryTimeout)
 
         {
 
@@ -509,18 +516,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(ChargingStations.SelectMany(station => station.EVSEs),
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(ChargingStations.SelectMany(station => station.EVSEs),
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(ChargingPool,     ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(ChargingPool,     ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given charging pool.
@@ -531,14 +538,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(ChargingPool         ChargingPool,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(ChargingPool         ChargingPool,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   Func<EVSE, Boolean>  IncludeEVSEs,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -549,18 +556,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(ChargingPool.EVSEs,
-                                      ActionType,
-                                      OperatorId   ?? ChargingPool.Operator.Id,
-                                      OperatorName ?? ChargingPool.Operator.Name.FirstText,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(ChargingPool.EVSEs,
+                                                           ActionType,
+                                                           OperatorId   ?? ChargingPool.Operator.Id,
+                                                           OperatorName ?? ChargingPool.Operator.Name.FirstText,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(ChargingPools,    ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(ChargingPools,    ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given charging pools.
@@ -571,14 +578,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(IEnumerable<ChargingPool>  ChargingPools,
-                         ActionType                 ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id            OperatorId    = null,
-                         String                     OperatorName  = null,
-                         Func<EVSE, Boolean>        IncludeEVSEs  = null,
-                         TimeSpan?                  QueryTimeout  = null)
+            IPushData.PushEVSEData(IEnumerable<ChargingPool>  ChargingPools,
+                                   ActionType                 ActionType,
+                                   EVSEOperator_Id            OperatorId,
+                                   String                     OperatorName,
+                                   Func<EVSE, Boolean>        IncludeEVSEs,
+                                   TimeSpan?                  QueryTimeout)
 
         {
 
@@ -589,19 +596,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(ChargingPools.SelectMany(pool    => pool.ChargingStations).
-                                                    SelectMany(station => station.EVSEs),
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(ChargingPools.SelectMany(pool    => pool.ChargingStations).
+                                                                         SelectMany(station => station.EVSEs),
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(EVSEOperator,     ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(EVSEOperator,     ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given EVSE operator.
@@ -612,14 +619,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(EVSEOperator         EVSEOperator,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(EVSEOperator         EVSEOperator,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   Func<EVSE, Boolean>  IncludeEVSEs,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -630,18 +637,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(new EVSEOperator[] { EVSEOperator },
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(new EVSEOperator[] { EVSEOperator },
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(EVSEOperators,    ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(EVSEOperators,    ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given EVSE operators.
@@ -653,14 +660,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         /// <returns></returns>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(IEnumerable<EVSEOperator>             EVSEOperators,
-                         ActionType                            ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id                       OperatorId    = null,
-                         String                                OperatorName  = null,
-                         Func<EVSE, Boolean>                   IncludeEVSEs  = null,
-                         TimeSpan?                             QueryTimeout  = null)
+            IPushData.PushEVSEData(IEnumerable<EVSEOperator>  EVSEOperators,
+                                   ActionType                 ActionType,
+                                   EVSEOperator_Id            OperatorId,
+                                   String                     OperatorName,
+                                   Func<EVSE, Boolean>        IncludeEVSEs,
+                                   TimeSpan?                  QueryTimeout)
 
         {
 
@@ -671,20 +678,20 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
-                                                    SelectMany(pool         => pool.ChargingStations).
-                                                    SelectMany(station      => station.EVSEs),
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
+                                                                         SelectMany(pool         => pool.ChargingStations).
+                                                                         SelectMany(station      => station.EVSEs),
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEData(RoamingNetwork,   ActionType = fullLoad, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEData(RoamingNetwork,   ActionType = fullLoad, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE data of the given roaming network.
@@ -695,14 +702,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEData(RoamingNetwork       RoamingNetwork,
-                         ActionType           ActionType    = ActionType.fullLoad,
-                         EVSEOperator_Id      OperatorId    = null,
-                         String               OperatorName  = null,
-                         Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                         TimeSpan?            QueryTimeout  = null)
+            IPushData.PushEVSEData(RoamingNetwork       RoamingNetwork,
+                                   ActionType           ActionType,
+                                   EVSEOperator_Id      OperatorId,
+                                   String               OperatorName,
+                                   Func<EVSE, Boolean>  IncludeEVSEs,
+                                   TimeSpan?            QueryTimeout)
 
         {
 
@@ -713,19 +720,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEData(RoamingNetwork.EVSEs,
-                                      ActionType,
-                                      OperatorId,
-                                      OperatorName,
-                                      IncludeEVSEs,
-                                      QueryTimeout);
+            return await AsIPushData.PushEVSEData(RoamingNetwork.EVSEs,
+                                                           ActionType,
+                                                           OperatorId,
+                                                           OperatorName,
+                                                           IncludeEVSEs,
+                                                           QueryTimeout);
 
         }
 
         #endregion
 
-        public void RemoveChargingStations(DateTime Timestamp,
-                                   IEnumerable<ChargingStation> ChargingStations)
+        public void RemoveChargingStations(DateTime                      Timestamp,
+                                           IEnumerable<ChargingStation>  ChargingStations)
         {
 
             foreach (var _ChargingStation in ChargingStations)
@@ -733,8 +740,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
         }
 
+        #endregion
 
-        #region PushEVSEStatus(GroupedEVSEStatus, ActionType = update, OperatorId = null, OperatorName = null,                      QueryTimeout = null)
+        #region Receive incoming EVSEStatus
+
+        private IPushStatus AsIPushStatus  => this;
+
+        #region PushEVSEStatus(GroupedEVSEStatus, ActionType, OperatorId, OperatorName, ...)
 
         /// <summary>
         /// Upload the EVSE status of the given lookup of EVSE status types grouped by their EVSE operator.
@@ -744,13 +756,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(ILookup<EVSEOperator_Id, EVSEStatus>  GroupedEVSEStatus,
-                           ActionType                            ActionType    = ActionType.update,
-                           EVSEOperator_Id                       OperatorId    = null,
-                           String                                OperatorName  = null,
-                           TimeSpan?                             QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(ILookup<EVSEOperator_Id, EVSEStatus>  GroupedEVSEStatus,
+                                       ActionType                            ActionType,
+                                       EVSEOperator_Id                       OperatorId,
+                                       String                                OperatorName,
+                                       TimeSpan?                             QueryTimeout)
 
         {
 
@@ -832,7 +844,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region PushEVSEStatus(EVSEStatus,        ActionType = update, OperatorId = null, OperatorName = null,                      QueryTimeout = null)
+        #region PushEVSEStatus(EVSEStatus,        ActionType, OperatorId, OperatorName, ...)
 
         /// <summary>
         /// Upload the given EVSE status.
@@ -842,13 +854,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(EVSEStatus       EVSEStatus,
-                           ActionType       ActionType    = ActionType.update,
-                           EVSEOperator_Id  OperatorId    = null,
-                           String           OperatorName  = null,
-                           TimeSpan?        QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(EVSEStatus       EVSEStatus,
+                                       ActionType       ActionType,
+                                       EVSEOperator_Id  OperatorId,
+                                       String           OperatorName,
+                                       TimeSpan?        QueryTimeout)
 
         {
 
@@ -859,17 +871,17 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(new EVSEStatus[] { EVSEStatus },
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(new EVSEStatus[] { EVSEStatus },
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(EVSEStatus,        ActionType = update, OperatorId = null, OperatorName = null,                      QueryTimeout = null)
+        #region PushEVSEStatus(EVSEStatus,        ActionType, OperatorId, OperatorName, ...)
 
         /// <summary>
         /// Upload the given enumeration of EVSE status.
@@ -879,13 +891,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(IEnumerable<EVSEStatus>  EVSEStatus,
-                           ActionType               ActionType    = ActionType.update,
-                           EVSEOperator_Id          OperatorId    = null,
-                           String                   OperatorName  = null,
-                           TimeSpan?                QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(IEnumerable<EVSEStatus>  EVSEStatus,
+                                       ActionType               ActionType,
+                                       EVSEOperator_Id          OperatorId,
+                                       String                   OperatorName,
+                                       TimeSpan?                QueryTimeout)
 
         {
 
@@ -900,12 +912,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
             if (_EVSEStatus.Any())
-                return await PushEVSEStatus(_EVSEStatus.ToLookup(evsestatus => evsestatus.Id.OperatorId,
-                                                                 evsestatus => evsestatus),
-                                            ActionType,
-                                            OperatorId,
-                                            OperatorName,
-                                            QueryTimeout);
+                return await AsIPushStatus.PushEVSEStatus(_EVSEStatus.ToLookup(evsestatus => evsestatus.Id.OperatorId,
+                                                                               evsestatus => evsestatus),
+                                                          ActionType,
+                                                          OperatorId,
+                                                          OperatorName,
+                                                          QueryTimeout);
 
             return new Acknowledgement(true);
 
@@ -913,7 +925,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region PushEVSEStatus(EVSE,              ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(EVSE,              ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload the EVSE status of the given EVSE.
@@ -924,14 +936,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(EVSE                 EVSE,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(EVSE                 EVSE,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -945,17 +957,17 @@ namespace org.GraphDefined.WWCP.EMSP
             if (IncludeEVSEs != null && !IncludeEVSEs(EVSE))
                 return new Acknowledgement(true);
 
-            return await PushEVSEStatus(EVSEStatus.Snapshot(EVSE),
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(EVSEStatus.Snapshot(EVSE),
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(EVSEs,             ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(EVSEs,             ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given enumeration of EVSEs.
@@ -966,14 +978,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(IEnumerable<EVSE>    EVSEs,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(IEnumerable<EVSE>    EVSEs,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -989,11 +1001,11 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
             if (_EVSEs.Any())
-                return await PushEVSEStatus(EVSEs.Select(evse => EVSEStatus.Snapshot(evse)),
-                                            ActionType,
-                                            OperatorId,
-                                            OperatorName,
-                                            QueryTimeout);
+                return await AsIPushStatus.PushEVSEStatus(EVSEs.Select(evse => EVSEStatus.Snapshot(evse)),
+                                                          ActionType,
+                                                          OperatorId,
+                                                          OperatorName,
+                                                          QueryTimeout);
 
             else
                 return new Acknowledgement(true);
@@ -1002,7 +1014,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region PushEVSEStatus(ChargingStation,   ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(ChargingStation,   ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given charging station.
@@ -1013,14 +1025,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(ChargingStation      ChargingStation,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(ChargingStation      ChargingStation,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -1031,19 +1043,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? ChargingStation.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
-                                            : ChargingStation.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
-                                        ActionType,
-                                        OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
-                                        OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? ChargingStation.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
+                                                          : ChargingStation.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
+                                                      ActionType,
+                                                      OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
+                                                      OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(ChargingStations,  ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(ChargingStations,  ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given enumeration of charging stations.
@@ -1054,14 +1066,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(IEnumerable<ChargingStation>  ChargingStations,
-                           ActionType                    ActionType    = ActionType.update,
-                           EVSEOperator_Id               OperatorId    = null,
-                           String                        OperatorName  = null,
-                           Func<EVSE, Boolean>           IncludeEVSEs  = null,
-                           TimeSpan?                     QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(IEnumerable<ChargingStation>  ChargingStations,
+                                       ActionType                    ActionType,
+                                       EVSEOperator_Id               OperatorId,
+                                       String                        OperatorName,
+                                       Func<EVSE, Boolean>           IncludeEVSEs,
+                                       TimeSpan?                     QueryTimeout)
 
         {
 
@@ -1072,19 +1084,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? ChargingStations.SelectMany(station => station.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse)))
-                                            : ChargingStations.SelectMany(station => station.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse))),
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? ChargingStations.SelectMany(station => station.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse)))
+                                                          : ChargingStations.SelectMany(station => station.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse))),
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(ChargingPool,      ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(ChargingPool,      ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given charging pool.
@@ -1095,14 +1107,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(ChargingPool         ChargingPool,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(ChargingPool         ChargingPool,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -1113,19 +1125,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? ChargingPool.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
-                                            : ChargingPool.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
-                                        ActionType,
-                                        OperatorId   ?? ChargingPool.Operator.Id,
-                                        OperatorName ?? ChargingPool.Operator.Name.FirstText,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? ChargingPool.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
+                                                          : ChargingPool.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
+                                                      ActionType,
+                                                      OperatorId   ?? ChargingPool.Operator.Id,
+                                                      OperatorName ?? ChargingPool.Operator.Name.FirstText,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(ChargingPools,     ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(ChargingPools,     ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given enumeration of charging pools.
@@ -1136,14 +1148,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(IEnumerable<ChargingPool>  ChargingPools,
-                           ActionType                 ActionType    = ActionType.update,
-                           EVSEOperator_Id            OperatorId    = null,
-                           String                     OperatorName  = null,
-                           Func<EVSE, Boolean>        IncludeEVSEs  = null,
-                           TimeSpan?                  QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(IEnumerable<ChargingPool>  ChargingPools,
+                                       ActionType                 ActionType,
+                                       EVSEOperator_Id            OperatorId,
+                                       String                     OperatorName,
+                                       Func<EVSE, Boolean>        IncludeEVSEs,
+                                       TimeSpan?                  QueryTimeout)
 
         {
 
@@ -1154,22 +1166,22 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? ChargingPools.SelectMany(pool    => pool.ChargingStations).
-                                                            SelectMany(station => station.EVSEs.Where (IncludeEVSEs).
-                                                                                                Select(evse => EVSEStatus.Snapshot(evse)))
-                                            : ChargingPools.SelectMany(pool    => pool.ChargingStations).
-                                                            SelectMany(station => station.EVSEs.Select(evse => EVSEStatus.Snapshot(evse))),
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? ChargingPools.SelectMany(pool    => pool.ChargingStations).
+                                                                          SelectMany(station => station.EVSEs.Where (IncludeEVSEs).
+                                                                                                              Select(evse => EVSEStatus.Snapshot(evse)))
+                                                          : ChargingPools.SelectMany(pool    => pool.ChargingStations).
+                                                                          SelectMany(station => station.EVSEs.Select(evse => EVSEStatus.Snapshot(evse))),
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(EVSEOperator,      ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(EVSEOperator,      ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given EVSE operator.
@@ -1180,14 +1192,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(EVSEOperator         EVSEOperator,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(EVSEOperator         EVSEOperator,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -1198,21 +1210,21 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? EVSEOperator.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
-                                            : EVSEOperator.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
-                                        ActionType,
-                                        EVSEOperator.Id,
-                                        OperatorName.IsNotNullOrEmpty()
-                                            ? OperatorName
-                                            : EVSEOperator.Name.FirstText,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? EVSEOperator.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
+                                                          : EVSEOperator.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
+                                                      ActionType,
+                                                      EVSEOperator.Id,
+                                                      OperatorName.IsNotNullOrEmpty()
+                                                          ? OperatorName
+                                                          : EVSEOperator.Name.FirstText,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(EVSEOperators,     ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(EVSEOperators,     ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given enumeration of EVSE operators.
@@ -1223,14 +1235,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(IEnumerable<EVSEOperator>  EVSEOperators,
-                           ActionType                 ActionType    = ActionType.update,
-                           EVSEOperator_Id            OperatorId    = null,
-                           String                     OperatorName  = null,
-                           Func<EVSE, Boolean>        IncludeEVSEs  = null,
-                           TimeSpan?                  QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(IEnumerable<EVSEOperator>  EVSEOperators,
+                                       ActionType                 ActionType,
+                                       EVSEOperator_Id            OperatorId,
+                                       String                     OperatorName,
+                                       Func<EVSE, Boolean>        IncludeEVSEs,
+                                       TimeSpan?                  QueryTimeout)
 
         {
 
@@ -1241,24 +1253,24 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
-                                                            SelectMany(pool         => pool.ChargingStations).
-                                                            SelectMany(station      => station.EVSEs.Where(IncludeEVSEs).
-                                                                                                     Select(evse => EVSEStatus.Snapshot(evse)))
-                                            : EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
-                                                            SelectMany(pool         => pool.ChargingStations).
-                                                            SelectMany(station      => station.EVSEs.Select(evse => EVSEStatus.Snapshot(evse))),
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
+                                                                          SelectMany(pool         => pool.ChargingStations).
+                                                                          SelectMany(station      => station.EVSEs.Where(IncludeEVSEs).
+                                                                                                                   Select(evse => EVSEStatus.Snapshot(evse)))
+                                                          : EVSEOperators.SelectMany(evseoperator => evseoperator.ChargingPools).
+                                                                          SelectMany(pool         => pool.ChargingStations).
+                                                                          SelectMany(station      => station.EVSEs.Select(evse => EVSEStatus.Snapshot(evse))),
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(RoamingNetwork,    ActionType = update, OperatorId = null, OperatorName = null, IncludeEVSEs = null, QueryTimeout = null)
+        #region PushEVSEStatus(RoamingNetwork,    ActionType, OperatorId, OperatorName, IncludeEVSEs, ...)
 
         /// <summary>
         /// Upload all EVSE status of the given roaming network.
@@ -1269,14 +1281,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
-        public async Task<Acknowledgement>
+        async Task<Acknowledgement>
 
-            PushEVSEStatus(RoamingNetwork       RoamingNetwork,
-                           ActionType           ActionType    = ActionType.update,
-                           EVSEOperator_Id      OperatorId    = null,
-                           String               OperatorName  = null,
-                           Func<EVSE, Boolean>  IncludeEVSEs  = null,
-                           TimeSpan?            QueryTimeout  = null)
+            IPushStatus.PushEVSEStatus(RoamingNetwork       RoamingNetwork,
+                                       ActionType           ActionType,
+                                       EVSEOperator_Id      OperatorId,
+                                       String               OperatorName,
+                                       Func<EVSE, Boolean>  IncludeEVSEs,
+                                       TimeSpan?            QueryTimeout)
 
         {
 
@@ -1287,27 +1299,29 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return await PushEVSEStatus(IncludeEVSEs != null
-                                            ? RoamingNetwork.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
-                                            : RoamingNetwork.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
-                                        ActionType,
-                                        OperatorId,
-                                        OperatorName,
-                                        QueryTimeout);
+            return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
+                                                          ? RoamingNetwork.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
+                                                          : RoamingNetwork.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
+                                                      ActionType,
+                                                      OperatorId,
+                                                      OperatorName,
+                                                      QueryTimeout);
 
         }
 
         #endregion
 
-        #region PushEVSEStatus(EVSEStatusDiff, QueryTimeout = null)
+        #region PushEVSEStatus(EVSEStatusDiff, ...)
 
         /// <summary>
         /// Send EVSE status updates.
         /// </summary>
         /// <param name="EVSEStatusDiff">An EVSE status diff.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task PushEVSEStatus(EVSEStatusDiff  EVSEStatusDiff,
-                                         TimeSpan?       QueryTimeout  = null)
+        async Task
+
+            IPushStatus.PushEVSEStatus(EVSEStatusDiff  EVSEStatusDiff,
+                                       TimeSpan?       QueryTimeout)
 
         {
 
@@ -1317,9 +1331,11 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
+        #endregion
 
+        #region Receive incoming AuthStart/-Stop
 
-        #region AuthorizeStart(OperatorId, AuthToken, ChargingProductId = null, SessionId = null, QueryTimeout = null)
+        #region AuthorizeStart(OperatorId, AuthToken, ChargingProductId, SessionId, ...)
 
         /// <summary>
         /// Create an authorize start request.
@@ -1329,14 +1345,16 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ChargingProductId">An optional charging product identification.</param>
         /// <param name="SessionId">An optional session identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStartResult> AuthorizeStart(DateTime            Timestamp,
-                                                          CancellationToken   CancellationToken,
-                                                          EventTracking_Id    EventTrackingId,
-                                                          EVSEOperator_Id     OperatorId,
-                                                          Auth_Token          AuthToken,
-                                                          ChargingProduct_Id  ChargingProductId  = null,
-                                                          ChargingSession_Id  SessionId          = null,
-                                                          TimeSpan?           QueryTimeout       = null)
+        async Task<AuthStartResult>
+
+            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
+                                            CancellationToken   CancellationToken,
+                                            EventTracking_Id    EventTrackingId,
+                                            EVSEOperator_Id     OperatorId,
+                                            Auth_Token          AuthToken,
+                                            ChargingProduct_Id  ChargingProductId,
+                                            ChargingSession_Id  SessionId,
+                                            TimeSpan?           QueryTimeout)
 
         {
 
@@ -1402,7 +1420,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStart(OperatorId, AuthToken, EVSEId, ChargingProductId = null, SessionId = null, QueryTimeout = null)
+        #region AuthorizeStart(OperatorId, AuthToken, EVSEId, ChargingProductId, SessionId, ...)
 
         /// <summary>
         /// Create an authorize start request at the given EVSE.
@@ -1413,15 +1431,17 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ChargingProductId">An optional charging product identification.</param>
         /// <param name="SessionId">An optional session identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStartEVSEResult> AuthorizeStart(DateTime            Timestamp,
-                                                              CancellationToken   CancellationToken,
-                                                              EventTracking_Id    EventTrackingId,
-                                                              EVSEOperator_Id     OperatorId,
-                                                              Auth_Token          AuthToken,
-                                                              EVSE_Id             EVSEId             = null,
-                                                              ChargingProduct_Id  ChargingProductId  = null,
-                                                              ChargingSession_Id  SessionId          = null,
-                                                              TimeSpan?           QueryTimeout       = null)
+        async Task<AuthStartEVSEResult>
+
+            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
+                                            CancellationToken   CancellationToken,
+                                            EventTracking_Id    EventTrackingId,
+                                            EVSEOperator_Id     OperatorId,
+                                            Auth_Token          AuthToken,
+                                            EVSE_Id             EVSEId,
+                                            ChargingProduct_Id  ChargingProductId,
+                                            ChargingSession_Id  SessionId,
+                                            TimeSpan?           QueryTimeout)
 
         {
 
@@ -1487,7 +1507,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStart(OperatorId, AuthToken, ChargingStationId, ChargingProductId = null, SessionId = null, QueryTimeout = null)
+        #region AuthorizeStart(OperatorId, AuthToken, ChargingStationId, ChargingProductId, SessionId, ...)
 
         /// <summary>
         /// Create an AuthorizeStart request at the given charging station.
@@ -1498,17 +1518,17 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ChargingProductId">An optional charging product identification.</param>
         /// <param name="SessionId">An optional session identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStartChargingStationResult>
+        async Task<AuthStartChargingStationResult>
 
-            AuthorizeStart(DateTime            Timestamp,
-                           CancellationToken   CancellationToken,
-                           EventTracking_Id    EventTrackingId,
-                           EVSEOperator_Id     OperatorId,
-                           Auth_Token          AuthToken,
-                           ChargingStation_Id  ChargingStationId,
-                           ChargingProduct_Id  ChargingProductId  = null,   // [maxlength: 100]
-                           ChargingSession_Id  SessionId          = null,
-                           TimeSpan?           QueryTimeout       = null)
+            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
+                                            CancellationToken   CancellationToken,
+                                            EventTracking_Id    EventTrackingId,
+                                            EVSEOperator_Id     OperatorId,
+                                            Auth_Token          AuthToken,
+                                            ChargingStation_Id  ChargingStationId,
+                                            ChargingProduct_Id  ChargingProductId,
+                                            ChargingSession_Id  SessionId,
+                                            TimeSpan?           QueryTimeout)
 
         {
 
@@ -1578,7 +1598,7 @@ namespace org.GraphDefined.WWCP.EMSP
         #endregion
 
 
-        #region AuthorizeStop(OperatorId, SessionId, AuthToken, QueryTimeout = null)
+        #region AuthorizeStop(OperatorId, SessionId, AuthToken, ...)
 
         /// <summary>
         /// Create an authorize stop request.
@@ -1587,13 +1607,15 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStopResult> AuthorizeStop(DateTime            Timestamp,
-                                                        CancellationToken   CancellationToken,
-                                                        EventTracking_Id    EventTrackingId,
-                                                        EVSEOperator_Id     OperatorId,
-                                                        ChargingSession_Id  SessionId,
-                                                        Auth_Token          AuthToken,
-                                                        TimeSpan?           QueryTimeout  = null)
+        async Task<AuthStopResult>
+
+            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
+                                           CancellationToken   CancellationToken,
+                                           EventTracking_Id    EventTrackingId,
+                                           EVSEOperator_Id     OperatorId,
+                                           ChargingSession_Id  SessionId,
+                                           Auth_Token          AuthToken,
+                                           TimeSpan?           QueryTimeout)
 
         {
 
@@ -1671,7 +1693,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStop(OperatorId, EVSEId, SessionId, AuthToken, QueryTimeout = null)
+        #region AuthorizeStop(OperatorId, EVSEId, SessionId, AuthToken, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
@@ -1681,14 +1703,16 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStopEVSEResult> AuthorizeStop(DateTime            Timestamp,
-                                                            CancellationToken   CancellationToken,
-                                                            EventTracking_Id    EventTrackingId,
-                                                            EVSEOperator_Id     OperatorId,
-                                                            EVSE_Id             EVSEId,
-                                                            ChargingSession_Id  SessionId,
-                                                            Auth_Token          AuthToken,
-                                                            TimeSpan?           QueryTimeout  = null)
+        async Task<AuthStopEVSEResult>
+
+            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
+                                           CancellationToken   CancellationToken,
+                                           EventTracking_Id    EventTrackingId,
+                                           EVSEOperator_Id     OperatorId,
+                                           EVSE_Id             EVSEId,
+                                           ChargingSession_Id  SessionId,
+                                           Auth_Token          AuthToken,
+                                           TimeSpan?           QueryTimeout)
 
         {
 
@@ -1769,7 +1793,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStop(OperatorId, ChargingStationId, SessionId, AuthToken, QueryTimeout = null)
+        #region AuthorizeStop(OperatorId, ChargingStationId, SessionId, AuthToken, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given charging station.
@@ -1779,14 +1803,16 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
-        public async Task<AuthStopChargingStationResult> AuthorizeStop(DateTime            Timestamp,
-                                                                       CancellationToken   CancellationToken,
-                                                                       EventTracking_Id    EventTrackingId,
-                                                                       EVSEOperator_Id     OperatorId,
-                                                                       ChargingStation_Id  ChargingStationId,
-                                                                       ChargingSession_Id  SessionId,
-                                                                       Auth_Token          AuthToken,
-                                                                       TimeSpan?           QueryTimeout  = null)
+        async Task<AuthStopChargingStationResult>
+
+            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
+                                           CancellationToken   CancellationToken,
+                                           EventTracking_Id    EventTrackingId,
+                                           EVSEOperator_Id     OperatorId,
+                                           ChargingStation_Id  ChargingStationId,
+                                           ChargingSession_Id  SessionId,
+                                           Auth_Token          AuthToken,
+                                           TimeSpan?           QueryTimeout)
 
         {
 
@@ -1809,14 +1835,19 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
+        #endregion
 
-        #region SendChargeDetailRecord(ChargeDetailRecord, QueryTimeout = null)
+        #region Receive incoming ChargeDetailRecords
 
-        public async Task<SendCDRResult> SendChargeDetailRecord(DateTime            Timestamp,
-                                                                CancellationToken   CancellationToken,
-                                                                EventTracking_Id    EventTrackingId,
-                                                                ChargeDetailRecord  ChargeDetailRecord,
-                                                                TimeSpan?           QueryTimeout = null)
+        #region SendChargeDetailRecord(ChargeDetailRecord, ...)
+
+        async Task<SendCDRResult>
+
+            IGeneralServices.SendChargeDetailRecord(DateTime            Timestamp,
+                                                    CancellationToken   CancellationToken,
+                                                    EventTracking_Id    EventTrackingId,
+                                                    ChargeDetailRecord  ChargeDetailRecord,
+                                                    TimeSpan?           QueryTimeout)
         {
 
             #region Initial checks
@@ -1828,10 +1859,24 @@ namespace org.GraphDefined.WWCP.EMSP
 
             SessionInfo _SessionInfo = null;
 
-            if (SessionDatabase.TryRemove(ChargeDetailRecord.SessionId, out _SessionInfo))
-                return SendCDRResult.Forwarded(AuthorizatorId);
+            //ToDo: Add events!
+
 
             Debug.WriteLine("Received a CDR: " + ChargeDetailRecord.SessionId.ToString());
+
+
+            if (ChargeDetailRecordDatabase.ContainsKey(ChargeDetailRecord.SessionId))
+                return SendCDRResult.InvalidSessionId(AuthorizatorId);
+
+
+            if (ChargeDetailRecordDatabase.TryAdd(ChargeDetailRecord.SessionId, ChargeDetailRecord))
+            {
+
+                SessionDatabase.TryRemove(ChargeDetailRecord.SessionId, out _SessionInfo);
+
+                return SendCDRResult.Forwarded(AuthorizatorId);
+
+            }
 
             //roamingprovider.OnEVSEStatusPush   += (Timestamp, Sender, SenderId, RoamingNetworkId, ActionType, GroupedEVSEs, NumberOfEVSEs) => {
             //    Console.WriteLine("[" + Timestamp + "] " + RoamingNetworkId.ToString() + ": Pushing " + NumberOfEVSEs + " EVSE status towards " + SenderId + "(" + ActionType + ")");
@@ -1866,7 +1911,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region Outgoing to the roaming network
+        #endregion
+
+        #region Outgoing requests towards the roaming network
 
         #region Reserve(...EVSEId, StartTime, Duration, ReservationId = null, ProviderId = null, ...)
 
