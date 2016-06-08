@@ -1,0 +1,12 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "es5",
+    //"module": "commonjs",
+    "module": "system",
+    "removeComments": true,
+    "sourceMap": true,
+    "watch": true,
+    "outFile": "HTTPWorker.js"
+  }
+}
