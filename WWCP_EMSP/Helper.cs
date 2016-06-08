@@ -27,9 +27,9 @@ namespace org.GraphDefined.WWCP
     public static class LocalEMobilityServiceExtentions
     {
 
-        public static LocalEMobilityService AttachLocalEMobilityService(this EVSP EVSP, Authorizator_Id AuthorizatorId)
+        public static eMobilityServiceProvider AttachLocalEMobilityService(this EVSP EVSP, Authorizator_Id AuthorizatorId)
         {
-            return new LocalEMobilityService(EVSP, AuthorizatorId);
+            return new eMobilityServiceProvider(EVSP, AuthorizatorId);
         }
 
     }
