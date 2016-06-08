@@ -17,7 +17,11 @@
 
 #region Usings
 
+using System;
+
 using org.GraphDefined.WWCP.EMSP;
+
+using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
@@ -27,9 +31,28 @@ namespace org.GraphDefined.WWCP
     public static class LocalEMobilityServiceExtentions
     {
 
-        public static eMobilityServiceProvider AttachLocalEMobilityService(this EVSP EVSP, Authorizator_Id AuthorizatorId)
+        public static eMobilityServiceProvider
+
+            CreateMobilityServiceProvider(this RoamingNetwork  RoamingNetwork_QA,
+                                          EVSP_Id              Id,
+                                          I18NString           Name,
+                                          Authorizator_Id      AuthorizatorId,
+                                          UInt32               Priority = 10)
+
         {
-            return new eMobilityServiceProvider(EVSP, AuthorizatorId);
+
+            var EMP = new eMobilityServiceProvider(RoamingNetwork_QA.CreateNewEVServiceProvider(
+                                                       Id,
+                                                       ServiceProvider => {
+                                                           ServiceProvider.Name = Name;
+                                                       }
+                                                   ),
+                                                   AuthorizatorId);
+
+            RoamingNetwork_QA.RegistereMobilityServiceProvider(Priority, EMP);
+
+            return EMP;
+
         }
 
     }
