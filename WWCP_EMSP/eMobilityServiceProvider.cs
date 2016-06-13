@@ -1847,11 +1847,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         async Task<SendCDRResult>
 
-            IGeneralServices.SendChargeDetailRecord(DateTime            Timestamp,
-                                                    CancellationToken   CancellationToken,
+            IGeneralServices.SendChargeDetailRecord(ChargeDetailRecord  ChargeDetailRecord,
+
+                                                    DateTime?           Timestamp,
+                                                    CancellationToken?  CancellationToken,
                                                     EventTracking_Id    EventTrackingId,
-                                                    ChargeDetailRecord  ChargeDetailRecord,
-                                                    TimeSpan?           QueryTimeout)
+                                                    TimeSpan?           RequestTimeout)
         {
 
             #region Initial checks
