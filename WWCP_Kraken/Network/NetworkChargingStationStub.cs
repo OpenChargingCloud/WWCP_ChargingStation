@@ -648,8 +648,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             this._IPTransport                 = IPTransport;
-            this._DNSClient                   = DNSClient != null              ? DNSClient          : new DNSClient(SearchForIPv4DNSServers: true,
-                                                                                                                    SearchForIPv6DNSServers: false);
+            this._DNSClient                   = DNSClient ?? new DNSClient(SearchForIPv4DNSServers: true,
+                                                                           SearchForIPv6DNSServers: false);
             this._Hostname                    = Hostname;
             this._TCPPort                     = TCPPort;
             this._Service                     = Service;

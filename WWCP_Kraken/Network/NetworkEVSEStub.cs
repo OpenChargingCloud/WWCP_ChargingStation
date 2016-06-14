@@ -80,11 +80,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             get
             {
-
-                return _Description != null
-                    ? _Description
-                    : _ChargingStation.Description;
-
+                return _Description ?? _ChargingStation.Description;
             }
 
             set
