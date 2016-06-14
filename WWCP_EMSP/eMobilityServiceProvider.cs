@@ -1351,14 +1351,15 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStartResult>
 
-            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
-                                            CancellationToken   CancellationToken,
-                                            EventTracking_Id    EventTrackingId,
-                                            EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             ChargingProduct_Id  ChargingProductId,
                                             ChargingSession_Id  SessionId,
-                                            TimeSpan?           QueryTimeout)
+
+                                            DateTime?           Timestamp          = null,
+                                            CancellationToken?  CancellationToken  = null,
+                                            EventTracking_Id    EventTrackingId    = null,
+                                            TimeSpan?           RequestTimeout     = null)
 
         {
 
@@ -1437,15 +1438,16 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStartEVSEResult>
 
-            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
-                                            CancellationToken   CancellationToken,
-                                            EventTracking_Id    EventTrackingId,
-                                            EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             EVSE_Id             EVSEId,
                                             ChargingProduct_Id  ChargingProductId,
                                             ChargingSession_Id  SessionId,
-                                            TimeSpan?           QueryTimeout)
+
+                                            DateTime?           Timestamp          = null,
+                                            CancellationToken?  CancellationToken  = null,
+                                            EventTracking_Id    EventTrackingId    = null,
+                                            TimeSpan?           RequestTimeout     = null)
 
         {
 
@@ -1524,15 +1526,16 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStartChargingStationResult>
 
-            IGeneralServices.AuthorizeStart(DateTime            Timestamp,
-                                            CancellationToken   CancellationToken,
-                                            EventTracking_Id    EventTrackingId,
-                                            EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             ChargingStation_Id  ChargingStationId,
                                             ChargingProduct_Id  ChargingProductId,
                                             ChargingSession_Id  SessionId,
-                                            TimeSpan?           QueryTimeout)
+
+                                            DateTime?           Timestamp          = null,
+                                            CancellationToken?  CancellationToken  = null,
+                                            EventTracking_Id    EventTrackingId    = null,
+                                            TimeSpan?           RequestTimeout     = null)
 
         {
 
@@ -1613,13 +1616,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStopResult>
 
-            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
-                                           CancellationToken   CancellationToken,
-                                           EventTracking_Id    EventTrackingId,
-                                           EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,
-                                           TimeSpan?           QueryTimeout)
+
+                                           DateTime?           Timestamp          = null,
+                                           CancellationToken?  CancellationToken  = null,
+                                           EventTracking_Id    EventTrackingId    = null,
+                                           TimeSpan?           RequestTimeout     = null)
 
         {
 
@@ -1709,14 +1713,15 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStopEVSEResult>
 
-            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
-                                           CancellationToken   CancellationToken,
-                                           EventTracking_Id    EventTrackingId,
-                                           EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
                                            EVSE_Id             EVSEId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,
-                                           TimeSpan?           QueryTimeout)
+
+                                           DateTime?           Timestamp          = null,
+                                           CancellationToken?  CancellationToken  = null,
+                                           EventTracking_Id    EventTrackingId    = null,
+                                           TimeSpan?           RequestTimeout     = null)
 
         {
 
@@ -1809,14 +1814,15 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="QueryTimeout">An optional timeout for this query.</param>
         async Task<AuthStopChargingStationResult>
 
-            IGeneralServices.AuthorizeStop(DateTime            Timestamp,
-                                           CancellationToken   CancellationToken,
-                                           EventTracking_Id    EventTrackingId,
-                                           EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
                                            ChargingStation_Id  ChargingStationId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,
-                                           TimeSpan?           QueryTimeout)
+
+                                           DateTime?           Timestamp          = null,
+                                           CancellationToken?  CancellationToken  = null,
+                                           EventTracking_Id    EventTrackingId    = null,
+                                           TimeSpan?           RequestTimeout     = null)
 
         {
 
