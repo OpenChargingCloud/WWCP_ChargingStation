@@ -508,7 +508,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                          RESERVE,
                                          URIPrefix + "/EVSEs/{EVSEId}",
                                          HTTPContentType.JSON_UTF8,
-                                         HTTPDelegate: Request => {
+                                         HTTPDelegate: async Request => {
 
                                              SendReserveEVSE(Request);
 
@@ -1164,7 +1164,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                          REMOTESTART,
                                          URIPrefix + "/EVSEs/{EVSEId}",
                                          HTTPContentType.JSON_UTF8,
-                                         HTTPDelegate: Request => {
+                                         HTTPDelegate: async Request => {
 
                                              SendRemoteStartEVSE(Request);
 
@@ -1451,7 +1451,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                          REMOTESTOP,
                                          URIPrefix + "/EVSEs/{EVSEId}",
                                          HTTPContentType.JSON_UTF8,
-                                         HTTPDelegate: Request => {
+                                         HTTPDelegate: async Request => {
 
                                              SendRemoteStopEVSE(Request);
 
