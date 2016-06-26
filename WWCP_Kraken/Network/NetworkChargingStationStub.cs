@@ -29,6 +29,7 @@ using org.GraphDefined.Vanaheimr.Illias.Votes;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
+using System.Security.Cryptography.X509Certificates;
 
 #endregion
 
@@ -187,22 +188,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteCertificateValidator
-
-        protected readonly RemoteCertificateValidationCallback _RemoteCertificateValidator;
-
         /// <summary>
         /// A delegate to verify the remote TLS certificate.
         /// </summary>
-        public RemoteCertificateValidationCallback RemoteCertificateValidator
-        {
-            get
-            {
-                return _RemoteCertificateValidator;
-            }
-        }
+        public RemoteCertificateValidationCallback RemoteCertificateValidator { get; }
 
-        #endregion
+        public X509Certificate ClientCert { get; }
 
         #region VirtualHost
 
@@ -639,6 +630,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           IPPort                               TCPPort                     = null,
                                           String                               Service                     = null,
                                           RemoteCertificateValidationCallback  RemoteCertificateValidator  = null,
+                                          X509Certificate                      ClientCert                  = null,
                                           String                               VirtualHost                 = null,
                                           String                               URIPrefix                   = null,
                                           TimeSpan?                            QueryTimeout                = null)
@@ -653,7 +645,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._Hostname                    = Hostname;
             this._TCPPort                     = TCPPort;
             this._Service                     = Service;
-            this._RemoteCertificateValidator  = RemoteCertificateValidator;
+            this.RemoteCertificateValidator   = RemoteCertificateValidator;
+            this.ClientCert                   = ClientCert;
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
             this._URIPrefix                   = URIPrefix;
             this._QueryTimeout                = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;

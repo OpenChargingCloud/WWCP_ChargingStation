@@ -125,12 +125,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// An event fired whenever new EVSE data will be send upstream.
         /// </summary>
-        public event OnEVSEDataPushDelegate OnEVSEDataPush;
+        public event OnPushEVSEDataRequestDelegate OnPushEVSEDataRequest;
 
         /// <summary>
         /// An event fired whenever new EVSE data had been sent upstream.
         /// </summary>
-        public event OnEVSEDataPushedDelegate OnEVSEDataPushed;
+        public event OnPushEVSEDataResponseDelegate OnPushEVSEDataResponse;
 
         #endregion
 
@@ -139,12 +139,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// An event fired whenever new EVSE status will be send upstream.
         /// </summary>
-        public event OnEVSEStatusPushDelegate OnEVSEStatusPush;
+        public event OnPushEVSEStatusRequestDelegate OnPushEVSEStatusRequest;
 
         /// <summary>
         /// An event fired whenever new EVSE status had been sent upstream.
         /// </summary>
-        public event OnEVSEStatusPushedDelegate OnEVSEStatusPushed;
+        public event OnPushEVSEStatusResponseDelegate OnPushEVSEStatusResponse;
 
         #endregion
 
@@ -272,7 +272,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    ActionType                   ActionType,
                                    EVSEOperator_Id              OperatorId,
                                    String                       OperatorName,
-                                   TimeSpan?                    QueryTimeout)
+
+                                   DateTime?                    Timestamp,
+                                   CancellationToken?           CancellationToken,
+                                   EventTracking_Id             EventTrackingId,
+                                   TimeSpan?                    RequestTimeout)
 
         {
 
@@ -291,7 +295,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                     Select(group => group.Count()).
                                     Sum   ();
 
-            var StartTime = DateTime.Now;
+            if (!Timestamp.HasValue)
+                Timestamp = DateTime.Now;
 
             #endregion
 
@@ -301,13 +306,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 #region Send OnEVSEDataPush event
 
-                OnEVSEDataPush?.Invoke(StartTime,
+                OnPushEVSEDataRequest?.Invoke(DateTime.Now,
+                                       Timestamp.Value,
                                        this,
                                        this.Id.ToString(),
+                                       EventTrackingId,
                                        this.RoamingNetwork.Id,
                                        ActionType,
                                        GroupedEVSEs,
-                                       (UInt32) NumberOfEVSEs);
+                                       (UInt32) NumberOfEVSEs,
+                                       RequestTimeout);
 
                 #endregion
 
@@ -334,17 +342,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnEVSEDataPushed event
 
-            var EndTime = DateTime.Now;
-
-            OnEVSEDataPushed?.Invoke(EndTime,
+            OnPushEVSEDataResponse?.Invoke(DateTime.Now,
+                                     Timestamp.Value,
                                      this,
                                      this.Id.ToString(),
+                                     EventTrackingId,
                                      this.RoamingNetwork.Id,
                                      ActionType,
                                      GroupedEVSEs,
                                      (UInt32) NumberOfEVSEs,
+                                     RequestTimeout,
                                      Acknowledgement,
-                                     EndTime - StartTime);
+                                     DateTime.Now - Timestamp.Value);
 
             #endregion
 
@@ -370,7 +379,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    ActionType           ActionType,
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -390,7 +403,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                      ? EVSE.Operator.Name.FirstText
                                                                      : null,
                                                            null,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -414,7 +431,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
                                    Func<EVSE, Boolean>  IncludeEVSEs,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -443,7 +464,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                ActionType,
                                                                OperatorId,
                                                                OperatorName,
-                                                               QueryTimeout);
+
+                                                               Timestamp,
+                                                               CancellationToken,
+                                                               EventTrackingId,
+                                                               RequestTimeout);
 
             return new Acknowledgement(true);
 
@@ -469,7 +494,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
                                    Func<EVSE, Boolean>  IncludeEVSEs,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -485,7 +514,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
                                                            OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -509,7 +542,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id               OperatorId,
                                    String                        OperatorName,
                                    Func<EVSE, Boolean>           IncludeEVSEs,
-                                   TimeSpan?                     QueryTimeout)
+
+                                   DateTime?                     Timestamp,
+                                   CancellationToken?            CancellationToken,
+                                   EventTracking_Id              EventTrackingId,
+                                   TimeSpan?                     RequestTimeout)
 
         {
 
@@ -525,7 +562,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId,
                                                            OperatorName,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -549,7 +590,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
                                    Func<EVSE, Boolean>  IncludeEVSEs,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -565,7 +610,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId   ?? ChargingPool.Operator.Id,
                                                            OperatorName ?? ChargingPool.Operator.Name.FirstText,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -589,7 +638,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id            OperatorId,
                                    String                     OperatorName,
                                    Func<EVSE, Boolean>        IncludeEVSEs,
-                                   TimeSpan?                  QueryTimeout)
+
+                                   DateTime?                  Timestamp,
+                                   CancellationToken?         CancellationToken,
+                                   EventTracking_Id           EventTrackingId,
+                                   TimeSpan?                  RequestTimeout)
 
         {
 
@@ -606,7 +659,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId,
                                                            OperatorName,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -630,7 +687,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
                                    Func<EVSE, Boolean>  IncludeEVSEs,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -646,7 +707,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId,
                                                            OperatorName,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -671,7 +736,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id            OperatorId,
                                    String                     OperatorName,
                                    Func<EVSE, Boolean>        IncludeEVSEs,
-                                   TimeSpan?                  QueryTimeout)
+
+                                   DateTime?                  Timestamp,
+                                   CancellationToken?         CancellationToken,
+                                   EventTracking_Id           EventTrackingId,
+                                   TimeSpan?                  RequestTimeout)
 
         {
 
@@ -689,7 +758,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId,
                                                            OperatorName,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -713,7 +786,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                    EVSEOperator_Id      OperatorId,
                                    String               OperatorName,
                                    Func<EVSE, Boolean>  IncludeEVSEs,
-                                   TimeSpan?            QueryTimeout)
+
+                                   DateTime?            Timestamp,
+                                   CancellationToken?   CancellationToken,
+                                   EventTracking_Id     EventTrackingId,
+                                   TimeSpan?            RequestTimeout)
 
         {
 
@@ -729,7 +806,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            OperatorId,
                                                            OperatorName,
                                                            IncludeEVSEs,
-                                                           QueryTimeout);
+
+                                                           Timestamp,
+                                                           CancellationToken,
+                                                           EventTrackingId,
+                                                           RequestTimeout);
 
         }
 
@@ -759,14 +840,22 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(ILookup<EVSEOperator_Id, EVSEStatus>  GroupedEVSEStatus,
                                        ActionType                            ActionType,
                                        EVSEOperator_Id                       OperatorId,
                                        String                                OperatorName,
-                                       TimeSpan?                             QueryTimeout)
+
+                                       DateTime?                             Timestamp,
+                                       CancellationToken?                    CancellationToken,
+                                       EventTracking_Id                      EventTrackingId,
+                                       TimeSpan?                             RequestTimeout)
 
         {
 
@@ -785,7 +874,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                           Select(group => group.Count()).
                                           Sum();
 
-            var StartTime = DateTime.Now;
+            if (!Timestamp.HasValue)
+                Timestamp = DateTime.Now;
 
             #endregion
 
@@ -795,13 +885,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 #region Send OnEVSEStatusPush event
 
-                OnEVSEStatusPush?.Invoke(StartTime,
+                OnPushEVSEStatusRequest?.Invoke(DateTime.Now,
+                                         Timestamp.Value,
                                          this,
                                          this.Id.ToString(),
+                                         EventTrackingId,
                                          this.RoamingNetwork.Id,
                                          ActionType,
                                          GroupedEVSEStatus,
-                                         (UInt32) _NumberOfEVSEStatus);
+                                         (UInt32) _NumberOfEVSEStatus,
+                                         RequestTimeout);
 
                 #endregion
 
@@ -822,17 +915,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 #region Send OnEVSEStatusPushed event
 
-                var EndTime = DateTime.Now;
-
-                OnEVSEStatusPushed?.Invoke(EndTime,
+                OnPushEVSEStatusResponse?.Invoke(DateTime.Now,
+                                           Timestamp.Value,
                                            this,
                                            this.Id.ToString(),
+                                           EventTrackingId,
                                            this.RoamingNetwork.Id,
                                            ActionType,
                                            GroupedEVSEStatus,
                                            (UInt32) _NumberOfEVSEStatus,
+                                           RequestTimeout,
                                            Acknowledgement,
-                                           EndTime - StartTime);
+                                           DateTime.Now - Timestamp.Value);
 
                 #endregion
 
@@ -857,14 +951,22 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IPushStatus.PushEVSEStatus(EVSEStatus       EVSEStatus,
-                                       ActionType       ActionType,
-                                       EVSEOperator_Id  OperatorId,
-                                       String           OperatorName,
-                                       TimeSpan?        QueryTimeout)
+            IPushStatus.PushEVSEStatus(EVSEStatus          EVSEStatus,
+                                       ActionType          ActionType,
+                                       EVSEOperator_Id     OperatorId,
+                                       String              OperatorName,
+
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -879,7 +981,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -894,14 +1000,22 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(IEnumerable<EVSEStatus>  EVSEStatus,
                                        ActionType               ActionType,
                                        EVSEOperator_Id          OperatorId,
                                        String                   OperatorName,
-                                       TimeSpan?                QueryTimeout)
+
+                                       DateTime?                Timestamp,
+                                       CancellationToken?       CancellationToken,
+                                       EventTracking_Id         EventTrackingId,
+                                       TimeSpan?                RequestTimeout)
 
         {
 
@@ -921,7 +1035,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                           ActionType,
                                                           OperatorId,
                                                           OperatorName,
-                                                          QueryTimeout);
+
+                                                          Timestamp,
+                                                          CancellationToken,
+                                                          EventTrackingId,
+                                                          RequestTimeout);
 
             return new Acknowledgement(true);
 
@@ -939,7 +1057,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(EVSE                 EVSE,
@@ -947,7 +1069,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -965,7 +1091,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -981,7 +1111,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(IEnumerable<EVSE>    EVSEs,
@@ -989,7 +1123,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -1009,7 +1147,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                           ActionType,
                                                           OperatorId,
                                                           OperatorName,
-                                                          QueryTimeout);
+
+                                                          Timestamp,
+                                                          CancellationToken,
+                                                          EventTrackingId,
+                                                          RequestTimeout);
 
             else
                 return new Acknowledgement(true);
@@ -1028,7 +1170,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(ChargingStation      ChargingStation,
@@ -1036,7 +1182,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -1053,7 +1203,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId   ?? ChargingStation.ChargingPool.Operator.Id,
                                                       OperatorName ?? ChargingStation.ChargingPool.Operator.Name.FirstText,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1069,7 +1223,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(IEnumerable<ChargingStation>  ChargingStations,
@@ -1077,7 +1235,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id               OperatorId,
                                        String                        OperatorName,
                                        Func<EVSE, Boolean>           IncludeEVSEs,
-                                       TimeSpan?                     QueryTimeout)
+
+                                       DateTime?                     Timestamp,
+                                       CancellationToken?            CancellationToken,
+                                       EventTracking_Id              EventTrackingId,
+                                       TimeSpan?                     RequestTimeout)
 
         {
 
@@ -1094,7 +1256,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1110,7 +1276,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(ChargingPool         ChargingPool,
@@ -1118,7 +1288,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -1135,7 +1309,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId   ?? ChargingPool.Operator.Id,
                                                       OperatorName ?? ChargingPool.Operator.Name.FirstText,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1151,7 +1329,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(IEnumerable<ChargingPool>  ChargingPools,
@@ -1159,7 +1341,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id            OperatorId,
                                        String                     OperatorName,
                                        Func<EVSE, Boolean>        IncludeEVSEs,
-                                       TimeSpan?                  QueryTimeout)
+
+                                       DateTime?                  Timestamp,
+                                       CancellationToken?         CancellationToken,
+                                       EventTracking_Id           EventTrackingId,
+                                       TimeSpan?                  RequestTimeout)
 
         {
 
@@ -1179,7 +1365,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1195,7 +1385,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(EVSEOperator         EVSEOperator,
@@ -1203,7 +1397,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -1222,7 +1420,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       OperatorName.IsNotNullOrEmpty()
                                                           ? OperatorName
                                                           : EVSEOperator.Name.FirstText,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1238,7 +1440,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(IEnumerable<EVSEOperator>  EVSEOperators,
@@ -1246,7 +1452,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id            OperatorId,
                                        String                     OperatorName,
                                        Func<EVSE, Boolean>        IncludeEVSEs,
-                                       TimeSpan?                  QueryTimeout)
+
+                                       DateTime?                  Timestamp,
+                                       CancellationToken?         CancellationToken,
+                                       EventTracking_Id           EventTrackingId,
+                                       TimeSpan?                  RequestTimeout)
 
         {
 
@@ -1268,7 +1478,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1284,7 +1498,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="OperatorId">An optional unique identification of the EVSE operator.</param>
         /// <param name="OperatorName">The optional name of the EVSE operator.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
-        /// <param name="QueryTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
             IPushStatus.PushEVSEStatus(RoamingNetwork       RoamingNetwork,
@@ -1292,7 +1510,11 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEOperator_Id      OperatorId,
                                        String               OperatorName,
                                        Func<EVSE, Boolean>  IncludeEVSEs,
-                                       TimeSpan?            QueryTimeout)
+
+                                       DateTime?            Timestamp,
+                                       CancellationToken?   CancellationToken,
+                                       EventTracking_Id     EventTrackingId,
+                                       TimeSpan?            RequestTimeout)
 
         {
 
@@ -1305,11 +1527,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
             return await AsIPushStatus.PushEVSEStatus(IncludeEVSEs != null
                                                           ? RoamingNetwork.EVSEs.Where(IncludeEVSEs).Select(evse => EVSEStatus.Snapshot(evse))
-                                                          : RoamingNetwork.EVSEs.                    Select(evse => EVSEStatus.Snapshot(evse)),
+                                                          : RoamingNetwork.EVSEs.Select(evse => EVSEStatus.Snapshot(evse)),
                                                       ActionType,
                                                       OperatorId,
                                                       OperatorName,
-                                                      QueryTimeout);
+
+                                                      Timestamp,
+                                                      CancellationToken,
+                                                      EventTrackingId,
+                                                      RequestTimeout);
 
         }
 
@@ -1321,11 +1547,19 @@ namespace org.GraphDefined.WWCP.EMSP
         /// Send EVSE status updates.
         /// </summary>
         /// <param name="EVSEStatusDiff">An EVSE status diff.</param>
-        /// <param name="QueryTimeout">An optional timeout for this query.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task
 
-            IPushStatus.PushEVSEStatus(EVSEStatusDiff  EVSEStatusDiff,
-                                       TimeSpan?       QueryTimeout)
+            IPushStatus.PushEVSEStatus(EVSEStatusDiff      EVSEStatusDiff,
+
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 

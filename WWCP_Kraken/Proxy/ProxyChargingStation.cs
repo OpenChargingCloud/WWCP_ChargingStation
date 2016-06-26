@@ -35,6 +35,7 @@ using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using org.GraphDefined.WWCP;
 using org.GraphDefined.WWCP.ChargingStations;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 
 #endregion
 
@@ -100,6 +101,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     IPPort                               TCPPort                     = null,
                                     String                               Service                     = null,
                                     RemoteCertificateValidationCallback  RemoteCertificateValidator  = null,
+                                    X509Certificate                      ClientCert                  = null,
                                     String                               VirtualHost                 = DefaultVirtualHost,
                                     String                               URIPrefix                   = DefaultURIPrefix,
                                     TimeSpan?                            QueryTimeout                = null)
@@ -115,6 +117,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                    TCPPort   != null              ? TCPPort      : DefaultTCPPort,
                    Service,
                    RemoteCertificateValidator,
+                   ClientCert,
                    VirtualHost.IsNotNullOrEmpty() ? VirtualHost  : DefaultVirtualHost,
                    URIPrefix.  IsNotNullOrEmpty() ? URIPrefix    : DefaultURIPrefix,
                    QueryTimeout.HasValue          ? QueryTimeout : DefaultQueryTimeout)
@@ -211,7 +214,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/EVSEStatus",
@@ -328,7 +332,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/Reservations",
@@ -481,7 +486,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation",
@@ -726,7 +732,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation",
@@ -958,7 +965,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/Reservations/" + ReservationId.ToString() + "/Delete",
@@ -1065,7 +1073,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId).ToString() + "/RemoteStart",
@@ -1248,7 +1257,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/RemoteStop",
@@ -1381,7 +1391,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
+                                                ClientCert,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/AuthLists/12345678",
@@ -1465,7 +1476,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
                                                 DNSClient: DNSClient).
 
                                  Execute(client => client.POST(URIPrefix + "/AuthLists/12345678",
@@ -1675,7 +1686,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
-                                                _RemoteCertificateValidator,
+                                                RemoteCertificateValidator,
                                                 DNSClient: DNSClient).
 
                                  Execute(client => client.DELETE(URIPrefix + "/AuthLists/12345678",

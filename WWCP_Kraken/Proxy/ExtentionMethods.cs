@@ -21,6 +21,7 @@ using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
 using System;
 using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 
 #endregion
 
@@ -56,6 +57,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                             IPPort                                    TCPPort                           = null,
                                                             String                                    Service                           = null,
                                                             RemoteCertificateValidationCallback       RemoteCertificateValidator        = null,
+                                                            X509Certificate                           ClientCert                        = null,
                                                             String                                    VirtualHost                       = ProxyChargingStation.DefaultVirtualHost,
                                                             String                                    URIPrefix                         = ProxyChargingStation.DefaultURIPrefix,
                                                             TimeSpan?                                 QueryTimeout                      = null,
@@ -87,6 +89,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                   TCPPort,
                                                                                                   Service,
                                                                                                   RemoteCertificateValidator,
+                                                                                                  ClientCert,
                                                                                                   VirtualHost,
                                                                                                   URIPrefix,
                                                                                                   QueryTimeout);
