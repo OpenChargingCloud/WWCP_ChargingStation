@@ -1181,7 +1181,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             {
 
                 case RemoteStopResultType.Error:
-                    result = RemoteStopEVSEResult.Error(SessionId, response.ErrorMessage);
+                    result = RemoteStopEVSEResult.Error(SessionId, response.Message);
                     break;
 
 
