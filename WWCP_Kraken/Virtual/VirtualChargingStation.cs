@@ -1274,16 +1274,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                  Object                                 Sender,
                                                  EventTracking_Id                       EventTrackingId,
                                                  ChargingReservation_Id                 ReservationId,
+                                                 ChargingReservation                    Reservation,
                                                  ChargingReservationCancellationReason  Reason)
         {
 
-            var OnReservationCancelledLocal = OnReservationCancelled;
-            if (OnReservationCancelledLocal != null)
-                OnReservationCancelledLocal(Timestamp,
-                                            Sender,
-                                            EventTrackingId,
-                                            ReservationId,
-                                            Reason);
+            OnReservationCancelled?.Invoke(Timestamp,
+                                           Sender,
+                                           EventTrackingId,
+                                           ReservationId,
+                                           Reservation,
+                                           Reason);
 
         }
 

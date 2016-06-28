@@ -1027,9 +1027,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusType.Reserved);
 
-                        var OnNewReservationLocal = OnNewReservation;
-                        if (OnNewReservationLocal != null)
-                            OnNewReservationLocal(DateTime.Now, this, _Reservation);
+                        OnNewReservation?.Invoke(DateTime.Now, this, _Reservation);
 
                     }
 
@@ -1038,13 +1036,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusType.Available);
 
-                        var OnReservationCancelledLocal = OnReservationCancelled;
-                        if (OnReservationCancelledLocal != null)
-                            OnReservationCancelled(DateTime.Now,
-                                                   this,
-                                                   EventTracking_Id.New,
-                                                   _Reservation.Id,
-                                                   ChargingReservationCancellationReason.EndOfProcess);
+                        OnReservationCancelled?.Invoke(DateTime.Now,
+                                                       this,
+                                                       EventTracking_Id.New,
+                                                       _Reservation.Id,
+                                                       _Reservation,
+                                                       ChargingReservationCancellationReason.EndOfProcess);
 
                         _Reservation = null;
 
@@ -1116,17 +1113,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 return CancelReservationResult.UnknownReservationId(ReservationId);
 
 
-            var OldReservationId = _Reservation.Id;
+            var SavedReservation = _Reservation;
 
             _Reservation = null;
 
-            var OnReservationCancelledLocal = OnReservationCancelled;
-            if (OnReservationCancelledLocal != null)
-                OnReservationCancelledLocal(DateTime.Now,
-                                            this,
-                                            EventTracking_Id.New,
-                                            OldReservationId,
-                                            Reason);
+            OnReservationCancelled?.Invoke(DateTime.Now,
+                                           this,
+                                           EventTracking_Id.New,
+                                           SavedReservation.Id,
+                                           SavedReservation,
+                                           Reason);
 
             // Will send events!
             SetStatus(EVSEStatusType.Available);

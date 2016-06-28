@@ -1003,17 +1003,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            var OldReservationId = _Reservation.Id;
+            var SavedReservation = _Reservation;
 
             _Reservation = null;
 
-            var OnReservationCancelledLocal = OnReservationCancelled;
-            if (OnReservationCancelledLocal != null)
-                OnReservationCancelledLocal(DateTime.Now,
-                                            this,
-                                            EventTracking_Id.New,
-                                            OldReservationId,
-                                            Reason);
+            OnReservationCancelled?.Invoke(DateTime.Now,
+                                           this,
+                                           EventTracking_Id.New,
+                                           SavedReservation?.Id,
+                                           SavedReservation,
+                                           Reason);
 
             //SetStatus(EVSEStatusType.Available);
 
