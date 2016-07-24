@@ -325,7 +325,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 //                                            RequestTimeout);
                 //
                 //if (result.Result == true)
-                Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(ResultType.True);
 
                 //else
                 //    Acknowledgement = new Acknowledgement(false, result.StatusCode.Description);
@@ -333,7 +333,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
 
             else
-                Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(ResultType.True);
 
 
             #region Send OnEVSEDataPushed event
@@ -450,7 +450,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                EventTrackingId,
                                                                RequestTimeout);
 
-            return new Acknowledgement(true);
+            return new Acknowledgement(ResultType.True);
 
         }
 
@@ -842,7 +842,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 //                                                RequestTimeout);
                 //
                 //  if (result.Result == true)
-                Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(ResultType.True);
 
                 //  else
                 //      Acknowledgement = new Acknowledgement(false, result.StatusCode.Description);
@@ -867,7 +867,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
 
             else
-                Acknowledgement = new Acknowledgement(true);
+                Acknowledgement = new Acknowledgement(ResultType.True);
 
 
             return Acknowledgement;
@@ -963,7 +963,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                           EventTrackingId,
                                                           RequestTimeout);
 
-            return new Acknowledgement(true);
+            return new Acknowledgement(ResultType.True);
 
         }
 
@@ -1003,7 +1003,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
             if (IncludeEVSEs != null && !IncludeEVSEs(EVSE))
-                return new Acknowledgement(true);
+                return new Acknowledgement(ResultType.True);
 
             return await AsIPushStatus.PushEVSEStatus(EVSEStatus.Snapshot(EVSE),
                                                       ActionType,
@@ -1064,7 +1064,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                           RequestTimeout);
 
             else
-                return new Acknowledgement(true);
+                return new Acknowledgement(ResultType.True);
 
         }
 
