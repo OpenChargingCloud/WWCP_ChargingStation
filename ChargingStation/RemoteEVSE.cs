@@ -1120,9 +1120,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if ((Object) RemoteEVSE == null)
-                throw new ArgumentNullException("The given virtual EVSE must not be null!");
+                throw new ArgumentNullException(nameof(RemoteEVSE),  "The given virtual EVSE must not be null!");
 
-            return _Id.CompareTo(RemoteEVSE._Id);
+            return Id.CompareTo(RemoteEVSE.Id);
 
         }
 
@@ -1169,7 +1169,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if ((Object) RemoteEVSE == null)
                 return false;
 
-            return _Id.Equals(RemoteEVSE._Id);
+            return Id.Equals(RemoteEVSE.Id);
 
         }
 
@@ -1183,9 +1183,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Get the hashcode of this object.
         /// </summary>
         public override Int32 GetHashCode()
-        {
-            return _Id.GetHashCode();
-        }
+
+            => Id.GetHashCode();
 
         #endregion
 
@@ -1195,9 +1194,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Return a string representation of this object.
         /// </summary>
         public override String ToString()
-        {
-            return _Id.ToString();
-        }
+
+            => Id.ToString();
 
         #endregion
 
