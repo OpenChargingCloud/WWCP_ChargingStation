@@ -31,7 +31,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 {
 
     /// <summary>
-    /// A remote EVSE operator.
+    /// A remote Charging Station Operator.
     /// </summary>
     public class RemoteEVSEOperator : IRemoteEVSEOperator
     {
@@ -70,7 +70,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
-        // Events towards the remote EVSE operator
+        // Events towards the remote Charging Station Operator
 
         /// <summary>
         /// An event fired whenever an EVSE is being reserved.

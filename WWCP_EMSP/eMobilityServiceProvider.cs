@@ -259,14 +259,14 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEData(GroupedEVSEs,     ActionType = fullLoad, ...)
 
         /// <summary>
-        /// Upload the EVSE data of the given lookup of EVSEs grouped by their EVSE operator.
+        /// Upload the EVSE data of the given lookup of EVSEs grouped by their Charging Station Operator.
         /// </summary>
-        /// <param name="GroupedEVSEs">A lookup of EVSEs grouped by their EVSE operator.</param>
+        /// <param name="GroupedEVSEs">A lookup of EVSEs grouped by their Charging Station Operator.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="RequestTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
         async Task<Acknowledgement>
 
-            IPushData.PushEVSEData(ILookup<EVSEOperator, EVSE>  GroupedEVSEs,
+            IPushData.PushEVSEData(ILookup<ChargingStationOperator, EVSE>  GroupedEVSEs,
                                    ActionType                   ActionType,
 
                                    DateTime?                    Timestamp,
@@ -628,15 +628,15 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEData(EVSEOperator,     ActionType = fullLoad, IncludeEVSEs, ...)
 
         /// <summary>
-        /// Upload the EVSE data of the given EVSE operator.
+        /// Upload the EVSE data of the given Charging Station Operator.
         /// </summary>
-        /// <param name="EVSEOperator">An EVSE operator.</param>
+        /// <param name="EVSEOperator">An Charging Station Operator.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="RequestTimeout">An optional timeout of the HTTP client [default 60 sec.]</param>
         async Task<Acknowledgement>
 
-            IPushData.PushEVSEData(EVSEOperator         EVSEOperator,
+            IPushData.PushEVSEData(ChargingStationOperator         EVSEOperator,
                                    ActionType           ActionType,
                                    IncludeEVSEDelegate  IncludeEVSEs,
 
@@ -650,11 +650,11 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperator == null)
-                throw new ArgumentNullException(nameof(EVSEOperator), "The given EVSE operator must not be null!");
+                throw new ArgumentNullException(nameof(EVSEOperator), "The given Charging Station Operator must not be null!");
 
             #endregion
 
-            return await AsIPushData.PushEVSEData(new EVSEOperator[] { EVSEOperator },
+            return await AsIPushData.PushEVSEData(new ChargingStationOperator[] { EVSEOperator },
                                                   ActionType,
                                                   IncludeEVSEs,
 
@@ -670,16 +670,16 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEData(EVSEOperators,    ActionType = fullLoad, IncludeEVSEs, ...)
 
         /// <summary>
-        /// Upload the EVSE data of the given EVSE operators.
+        /// Upload the EVSE data of the given Charging Station Operators.
         /// </summary>
-        /// <param name="EVSEOperators">An enumeration of EVSE operators.</param>
+        /// <param name="EVSEOperators">An enumeration of Charging Station Operators.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         /// <returns></returns>
         async Task<Acknowledgement>
 
-            IPushData.PushEVSEData(IEnumerable<EVSEOperator>  EVSEOperators,
+            IPushData.PushEVSEData(IEnumerable<ChargingStationOperator>  EVSEOperators,
                                    ActionType                 ActionType,
                                    IncludeEVSEDelegate        IncludeEVSEs,
 
@@ -693,7 +693,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperators == null)
-                throw new ArgumentNullException(nameof(EVSEOperators),  "The given enumeration of EVSE operators must not be null!");
+                throw new ArgumentNullException(nameof(EVSEOperators),  "The given enumeration of Charging Station Operators must not be null!");
 
             #endregion
 
@@ -772,9 +772,9 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEStatus(GroupedEVSEStatus, ActionType, ...)
 
         /// <summary>
-        /// Upload the EVSE status of the given lookup of EVSE status types grouped by their EVSE operator.
+        /// Upload the EVSE status of the given lookup of EVSE status types grouped by their Charging Station Operator.
         /// </summary>
-        /// <param name="GroupedEVSEStatus">A lookup of EVSE status grouped by their EVSE operator.</param>
+        /// <param name="GroupedEVSEStatus">A lookup of EVSE status grouped by their Charging Station Operator.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
@@ -783,7 +783,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IPushStatus.PushEVSEStatus(ILookup<EVSEOperator, EVSEStatus>  GroupedEVSEStatus,
+            IPushStatus.PushEVSEStatus(ILookup<ChargingStationOperator, EVSEStatus>  GroupedEVSEStatus,
                                        ActionType                         ActionType,
 
                                        DateTime?                          Timestamp,
@@ -954,7 +954,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
             if (_EVSEStatus.Length > 0)
-                return await AsIPushStatus.PushEVSEStatus(_EVSEStatus.ToLookup(evsestatus => RoamingNetwork.GetEVSEOperatorbyId(evsestatus.Id.OperatorId),
+                return await AsIPushStatus.PushEVSEStatus(_EVSEStatus.ToLookup(evsestatus => RoamingNetwork.GetChargingStationOperatorById(evsestatus.Id.OperatorId),
                                                                                evsestatus => evsestatus),
                                                           ActionType,
 
@@ -1264,9 +1264,9 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEStatus(EVSEOperator,      ActionType, IncludeEVSEs, ...)
 
         /// <summary>
-        /// Upload all EVSE status of the given EVSE operator.
+        /// Upload all EVSE status of the given Charging Station Operator.
         /// </summary>
-        /// <param name="EVSEOperator">An EVSE operator.</param>
+        /// <param name="EVSEOperator">An Charging Station Operator.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
         /// <param name="IncludeEVSEs">Only upload the EVSEs returned by the given filter delegate.</param>
         /// 
@@ -1276,7 +1276,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IPushStatus.PushEVSEStatus(EVSEOperator         EVSEOperator,
+            IPushStatus.PushEVSEStatus(ChargingStationOperator         EVSEOperator,
                                        ActionType           ActionType,
                                        IncludeEVSEDelegate  IncludeEVSEs,
 
@@ -1290,7 +1290,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperator == null)
-                throw new ArgumentNullException(nameof(EVSEOperator), "The given EVSE operator must not be null!");
+                throw new ArgumentNullException(nameof(EVSEOperator), "The given Charging Station Operator must not be null!");
 
             #endregion
 
@@ -1311,7 +1311,7 @@ namespace org.GraphDefined.WWCP.EMSP
         #region PushEVSEStatus(EVSEOperators,     ActionType, IncludeEVSEs, ...)
 
         /// <summary>
-        /// Upload all EVSE status of the given enumeration of EVSE operators.
+        /// Upload all EVSE status of the given enumeration of Charging Station Operators.
         /// </summary>
         /// <param name="EVSEOperators">An enumeration of EVSES operators.</param>
         /// <param name="ActionType">The server-side data management operation.</param>
@@ -1323,7 +1323,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IPushStatus.PushEVSEStatus(IEnumerable<EVSEOperator>  EVSEOperators,
+            IPushStatus.PushEVSEStatus(IEnumerable<ChargingStationOperator>  EVSEOperators,
                                        ActionType                 ActionType,
                                        IncludeEVSEDelegate        IncludeEVSEs,
 
@@ -1337,7 +1337,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (EVSEOperators == null)
-                throw new ArgumentNullException(nameof(EVSEOperator), "The given enumeration of EVSE operators must not be null!");
+                throw new ArgumentNullException(nameof(ChargingStationOperator), "The given enumeration of Charging Station Operators must not be null!");
 
             #endregion
 
@@ -1445,14 +1445,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an authorize start request.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="ChargingProductId">An optional charging product identification.</param>
         /// <param name="SessionId">An optional session identification.</param>
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStartResult>
 
-            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(ChargingStationOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             ChargingProduct_Id  ChargingProductId,
                                             ChargingSession_Id  SessionId,
@@ -1531,7 +1531,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an authorize start request at the given EVSE.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="EVSEId">The unique identification of an EVSE.</param>
         /// <param name="ChargingProductId">An optional charging product identification.</param>
@@ -1539,7 +1539,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStartEVSEResult>
 
-            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(ChargingStationOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             EVSE_Id             EVSEId,
                                             ChargingProduct_Id  ChargingProductId,
@@ -1619,7 +1619,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an AuthorizeStart request at the given charging station.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="ChargingStationId">The unique identification of a charging station.</param>
         /// <param name="ChargingProductId">An optional charging product identification.</param>
@@ -1627,7 +1627,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStartChargingStationResult>
 
-            IGeneralServices.AuthorizeStart(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStart(ChargingStationOperator_Id     OperatorId,
                                             Auth_Token          AuthToken,
                                             ChargingStation_Id  ChargingStationId,
                                             ChargingProduct_Id  ChargingProductId,
@@ -1711,13 +1711,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an authorize stop request.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStopResult>
 
-            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(ChargingStationOperator_Id     OperatorId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,
 
@@ -1807,14 +1807,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="EVSEId">The unique identification of an EVSE.</param>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStopEVSEResult>
 
-            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(ChargingStationOperator_Id     OperatorId,
                                            EVSE_Id             EVSEId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,
@@ -1908,14 +1908,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Create an authorize stop request at the given charging station.
         /// </summary>
-        /// <param name="OperatorId">An EVSE operator identification.</param>
+        /// <param name="OperatorId">An Charging Station Operator identification.</param>
         /// <param name="ChargingStationId">A charging station identification.</param>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="AuthToken">A (RFID) user identification.</param>
         /// <param name="RequestTimeout">An optional timeout for this query.</param>
         async Task<AuthStopChargingStationResult>
 
-            IGeneralServices.AuthorizeStop(EVSEOperator_Id     OperatorId,
+            IGeneralServices.AuthorizeStop(ChargingStationOperator_Id     OperatorId,
                                            ChargingStation_Id  ChargingStationId,
                                            ChargingSession_Id  SessionId,
                                            Auth_Token          AuthToken,

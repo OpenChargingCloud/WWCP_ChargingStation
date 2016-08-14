@@ -312,13 +312,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// A virtual WWCP charging station.
         /// </summary>
         /// <param name="Id">The unique identifier of the charging station.</param>
-        /// <param name="EVSEOperatorDNS">The optional DNS name of the EVSE operator backend to connect to.</param>
+        /// <param name="EVSEOperatorDNS">The optional DNS name of the Charging Station Operator backend to connect to.</param>
         /// <param name="UseIPv4">Wether to use IPv4 as networking protocol.</param>
         /// <param name="UseIPv6">Wether to use IPv6 as networking protocol.</param>
         /// <param name="PreferIPv6">Prefer IPv6 (instead of IPv4) as networking protocol.</param>
-        /// <param name="EVSEOperatorTimeout">The timeout connecting to the EVSE operator backend.</param>
+        /// <param name="EVSEOperatorTimeout">The timeout connecting to the Charging Station Operator backend.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
-        /// <param name="AutoConnect">Connect to the EVSE operator backend automatically on startup. Default is false.</param>
+        /// <param name="AutoConnect">Connect to the Charging Station Operator backend automatically on startup. Default is false.</param>
         public RemoteChargingStation(ChargingStation_Id  Id,
                                          String              EVSEOperatorDNS      = "",
                                          Boolean             UseIPv4              = true,
@@ -366,7 +366,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region Connect()
 
         /// <summary>
-        /// Connect to the given EVSE operator backend.
+        /// Connect to the given Charging Station Operator backend.
         /// </summary>
         public TCPConnectResult Connect()
         {
@@ -378,7 +378,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region Disconnect()
 
         /// <summary>
-        /// Disconnect from the given EVSE operator backend.
+        /// Disconnect from the given Charging Station Operator backend.
         /// </summary>
         public TCPDisconnectResult Disconnect()
         {
