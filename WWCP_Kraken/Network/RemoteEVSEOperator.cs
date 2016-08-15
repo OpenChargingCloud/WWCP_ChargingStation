@@ -33,7 +33,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     /// <summary>
     /// A remote Charging Station Operator.
     /// </summary>
-    public class RemoteEVSEOperator : IRemoteEVSEOperator
+    public class RemoteEVSEOperator : IRemoteChargingStationOperator
     {
 
         #region Properties
@@ -134,7 +134,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     DateTime?                StartTime,
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
-                    EVSP_Id                  ProviderId         = null,
+                    EMobilityProvider_Id                  ProviderId         = null,
                     eMA_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
@@ -156,28 +156,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Start a charging session at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of the request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be started.</param>
         /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartEVSEResult>
 
-            RemoteStart(DateTime                Timestamp,
-                        CancellationToken       CancellationToken,
-                        EventTracking_Id        EventTrackingId,
-                        EVSE_Id                 EVSEId,
+            RemoteStart(EVSE_Id                 EVSEId,
                         ChargingProduct_Id      ChargingProductId,
                         ChargingReservation_Id  ReservationId,
                         ChargingSession_Id      SessionId,
-                        EVSP_Id                 ProviderId,
+                        EMobilityProvider_Id    ProviderId,
                         eMA_Id                  eMAId,
-                        TimeSpan?               QueryTimeout  = null)
+
+                        DateTime?               Timestamp          = null,
+                        CancellationToken?      CancellationToken  = null,
+                        EventTracking_Id        EventTrackingId    = null,
+                        TimeSpan?               RequestTimeout     = null)
 
         {
 
@@ -189,8 +191,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var results = await Task.WhenAll(OnRemoteStartEVSELocal.
                                                  GetInvocationList().
                                                  Select(subscriber => (subscriber as OnRemoteStartEVSEDelegate)
-                                                     (Timestamp,
-                                                      CancellationToken,
+                                                     (Timestamp.Value,
+                                                      CancellationToken.Value,
                                                       EventTrackingId,
                                                       EVSEId,
                                                       ChargingProductId,
@@ -198,7 +200,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       SessionId,
                                                       ProviderId,
                                                       eMAId,
-                                                      QueryTimeout)));
+                                                      RequestTimeout)));
 
             var result = results.
                              Where(_result => _result.Result != RemoteStartEVSEResultType.Unspecified).
@@ -220,34 +222,32 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Start a charging session at the given charging stations.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of the request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ChargingStationId">The unique identification of the charging station to be started.</param>
         /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartChargingStationResult>
 
-            RemoteStart(DateTime                Timestamp,
-                        CancellationToken       CancellationToken,
-                        EventTracking_Id        EventTrackingId,
-                        ChargingStation_Id      ChargingStationId,
+            RemoteStart(ChargingStation_Id      ChargingStationId,
                         ChargingProduct_Id      ChargingProductId,
                         ChargingReservation_Id  ReservationId,
                         ChargingSession_Id      SessionId,
-                        EVSP_Id                 ProviderId,
+                        EMobilityProvider_Id    ProviderId,
                         eMA_Id                  eMAId,
-                        TimeSpan?               QueryTimeout  = null)
 
-        {
+                        DateTime?               Timestamp          = null,
+                        CancellationToken?      CancellationToken  = null,
+                        EventTracking_Id        EventTrackingId    = null,
+                        TimeSpan?               RequestTimeout     = null)
 
-            return RemoteStartChargingStationResult.UnknownChargingStation;
-
-        }
+            => RemoteStartChargingStationResult.UnknownChargingStation;
 
         #endregion
 
@@ -256,22 +256,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Stop the given charging session.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of the request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public async Task<RemoteStopResult> RemoteStop(DateTime             Timestamp,
-                                                       CancellationToken    CancellationToken,
-                                                       EventTracking_Id     EventTrackingId,
-                                                       ChargingSession_Id   SessionId,
-                                                       ReservationHandling  ReservationHandling,
-                                                       EVSP_Id              ProviderId    = null,
-                                                       eMA_Id               eMAId         = null,
-                                                       TimeSpan?            QueryTimeout  = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public async Task<RemoteStopResult>
+
+            RemoteStop(ChargingSession_Id    SessionId,
+                       ReservationHandling   ReservationHandling,
+                       EMobilityProvider_Id  ProviderId         = null,
+                       eMA_Id                eMAId              = null,
+
+                       DateTime?             Timestamp          = null,
+                       CancellationToken?    CancellationToken  = null,
+                       EventTracking_Id      EventTrackingId    = null,
+                       TimeSpan?             RequestTimeout     = null)
+
         {
 
             throw new NotImplementedException();
@@ -281,26 +286,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Stop the given charging session at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of the request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be stopped.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStopEVSEResult>
 
-            RemoteStop(DateTime             Timestamp,
-                       CancellationToken    CancellationToken,
-                       EventTracking_Id     EventTrackingId,
-                       EVSE_Id              EVSEId,
-                       ChargingSession_Id   SessionId,
-                       ReservationHandling  ReservationHandling,
-                       EVSP_Id              ProviderId    = null,
-                       eMA_Id               eMAId         = null,
-                       TimeSpan?            QueryTimeout  = null)
+            RemoteStop(EVSE_Id               EVSEId,
+                       ChargingSession_Id    SessionId,
+                       ReservationHandling   ReservationHandling,
+                       EMobilityProvider_Id  ProviderId         = null,
+                       eMA_Id                eMAId              = null,
+
+                       DateTime?             Timestamp          = null,
+                       CancellationToken?    CancellationToken  = null,
+                       EventTracking_Id      EventTrackingId    = null,
+                       TimeSpan?             RequestTimeout     = null)
 
         {
 
@@ -311,15 +318,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var results = await Task.WhenAll(OnRemoteStopEVSELocal.
                                                  GetInvocationList().
                                                  Select(subscriber => (subscriber as OnRemoteStopEVSEDelegate)
-                                                     (Timestamp,
-                                                      CancellationToken,
+                                                     (Timestamp.Value,
+                                                      CancellationToken.Value,
                                                       EventTrackingId,
                                                       ReservationHandling,
                                                       SessionId,
                                                       ProviderId,
                                                       eMAId,
                                                       EVSEId,
-                                                      QueryTimeout)));
+                                                      RequestTimeout)));
 
             var result = results.
                              Where(_result => _result.Result != RemoteStopEVSEResultType.Unspecified).
@@ -338,15 +345,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
-        public async Task<RemoteStopChargingStationResult> RemoteStop(DateTime             Timestamp,
-                                                                      CancellationToken    CancellationToken,
-                                                                      EventTracking_Id     EventTrackingId,
-                                                                      ChargingStation_Id   ChargingStationId,
-                                                                      ChargingSession_Id   SessionId,
-                                                                      ReservationHandling  ReservationHandling,
-                                                                      EVSP_Id              ProviderId    = null,
-                                                                      eMA_Id               eMAId         = null,
-                                                                      TimeSpan?            QueryTimeout  = null)
+        public async Task<RemoteStopChargingStationResult>
+
+            RemoteStop(ChargingStation_Id    ChargingStationId,
+                       ChargingSession_Id    SessionId,
+                       ReservationHandling   ReservationHandling,
+                       EMobilityProvider_Id  ProviderId         = null,
+                       eMA_Id                eMAId              = null,
+
+                       DateTime?             Timestamp          = null,
+                       CancellationToken?    CancellationToken  = null,
+                       EventTracking_Id      EventTrackingId    = null,
+                       TimeSpan?             RequestTimeout     = null)
+
         {
 
             throw new NotImplementedException();

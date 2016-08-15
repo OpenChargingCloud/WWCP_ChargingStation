@@ -31,29 +31,29 @@ namespace org.GraphDefined.WWCP
     public static class LocalEMobilityServiceExtentions
     {
 
-        public static eMobilityServiceProvider
+        //public static eMobilityServiceProvider
 
-            CreateMobilityServiceProvider(this RoamingNetwork  RoamingNetwork_QA,
-                                          EVSP_Id              Id,
-                                          I18NString           Name,
-                                          Authorizator_Id      AuthorizatorId,
-                                          UInt32               Priority = 10)
+        //    CreateMobilityServiceProvider(this RoamingNetwork  RoamingNetwork_QA,
+        //                                  EMobilityProvider_Id              Id,
+        //                                  I18NString           Name,
+        //                                  Authorizator_Id      AuthorizatorId,
+        //                                  UInt32               Priority = 10)
 
-        {
+        //{
 
-            var EMP = new eMobilityServiceProvider(RoamingNetwork_QA.CreateNewEVServiceProvider(
-                                                       Id,
-                                                       ServiceProvider => {
-                                                           ServiceProvider.Name = Name;
-                                                       }
-                                                   ),
-                                                   AuthorizatorId);
+        //    var EMP = new eMobilityServiceProvider(RoamingNetwork_QA.CreateNewEMobilityProvider(
+        //                                               Id,
+        //                                               ServiceProvider => {
+        //                                                   ServiceProvider.Name = Name;
+        //                                               }
+        //                                           ),
+        //                                           AuthorizatorId);
 
-            RoamingNetwork_QA.RegistereMobilityServiceProvider(Priority, EMP);
+        //    RoamingNetwork_QA.RegistereMobilityProvider(Priority, EMP);
 
-            return EMP;
+        //    return EMP;
 
-        }
+        //}
 
     }
 
