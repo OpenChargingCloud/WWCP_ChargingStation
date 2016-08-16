@@ -586,10 +586,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     _Reservation != null)
                 {
 
-                    CancelReservation(DateTime.Now,
-                                      new CancellationTokenSource().Token,
-                                      EventTracking_Id.New,
-                                      _Reservation.Id,
+                    CancelReservation(_Reservation.Id,
                                       ChargingReservationCancellationReason.Aborted).Wait();
 
                 }
@@ -854,9 +851,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
@@ -866,20 +860,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public virtual async Task<ReservationResult> Reserve(DateTime                 Timestamp,
-                                                             CancellationToken        CancellationToken,
-                                                             EventTracking_Id         EventTrackingId,
-                                                             DateTime?                StartTime,
-                                                             TimeSpan?                Duration,
-                                                             ChargingReservation_Id   ReservationId      = null,
-                                                             EMobilityProvider_Id                  ProviderId         = null,
-                                                             eMA_Id                   eMAId              = null,
-                                                             ChargingProduct_Id       ChargingProductId  = null,
-                                                             IEnumerable<Auth_Token>  AuthTokens         = null,
-                                                             IEnumerable<eMA_Id>      eMAIds             = null,
-                                                             IEnumerable<UInt32>      PINs               = null,
-                                                             TimeSpan?                QueryTimeout       = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public virtual async Task<ReservationResult>
+
+            Reserve(DateTime?                StartTime,
+                    TimeSpan?                Duration,
+                    ChargingReservation_Id   ReservationId      = null,
+                    EMobilityProvider_Id     ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
+                    ChargingProduct_Id       ChargingProductId  = null,
+                    IEnumerable<Auth_Token>  AuthTokens         = null,
+                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<UInt32>      PINs               = null,
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
+
         {
 
             #region Try to remove an existing reservation if this is an update!
@@ -910,7 +912,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 case EVSEStatusType.Available:
 
                     this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.New,
-                                                                Timestamp:               Timestamp,
+                                                                Timestamp:               Timestamp.Value,
                                                                 StartTime:               StartTime.HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration:                Duration. HasValue ? Duration. Value : MaxReservationDuration,
                                                                 EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
@@ -957,10 +959,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             {
 
-                await CancelReservation(DateTime.Now,
-                                        new CancellationTokenSource().Token,
-                                        EventTracking_Id.New,
-                                        _Reservation.Id,
+                await CancelReservation(_Reservation.Id,
                                         ChargingReservationCancellationReason.Expired);
 
             }
@@ -975,18 +974,24 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <param name="Reason">A reason for this cancellation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
-                                                                     CancellationToken                      CancellationToken,
-                                                                     EventTracking_Id                       EventTrackingId,
-                                                                     ChargingReservation_Id                 ReservationId,
-                                                                     ChargingReservationCancellationReason  Reason,
-                                                                     TimeSpan?                              QueryTimeout  = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public async Task<CancelReservationResult>
+
+            CancelReservation(ChargingReservation_Id                 ReservationId,
+                              ChargingReservationCancellationReason  Reason,
+                              EMobilityProvider_Id                   ProviderId         = null,
+
+                              DateTime?                              Timestamp          = null,
+                              CancellationToken?                     CancellationToken  = null,
+                              EventTracking_Id                       EventTrackingId    = null,
+                              TimeSpan?                              RequestTimeout     = null)
+
         {
 
             #region Initial checks
@@ -1008,6 +1013,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             _Reservation = null;
 
             OnReservationCancelled?.Invoke(DateTime.Now,
+                                           Timestamp.Value,
                                            this,
                                            EventTracking_Id.New,
                                            SavedReservation?.Id,

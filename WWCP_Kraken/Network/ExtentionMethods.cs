@@ -81,18 +81,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return ChargingPool.CreateNewStation(ChargingStationId,
                                                  ChargingStationConfigurator,
-                                                 OnSuccess,
-                                                 OnError,
                                                  newstation => {
 
                                                      var remotestation = new NetworkChargingStationStub(newstation, MaxStatusListSize, MaxAdminStatusListSize);
 
-                                                     if (RemoteChargingStationConfigurator != null)
-                                                         RemoteChargingStationConfigurator(remotestation);
+                                                     RemoteChargingStationConfigurator?.Invoke(remotestation);
 
                                                      return remotestation;
 
-                                                 }) ;
+                                                 },
+
+                                                 OnSuccess: OnSuccess,
+                                                 OnError:   OnError);
 
         }
 

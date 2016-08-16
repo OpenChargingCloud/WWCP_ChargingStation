@@ -75,8 +75,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return ChargingPool.CreateNewStation(ChargingStationId,
                                                  ChargingStationConfigurator,
-                                                 OnSuccess,
-                                                 OnError,
                                                  newstation => {
 
                                                      var remotestation = new ProxyChargingStation(newstation,
@@ -94,12 +92,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                   URIPrefix,
                                                                                                   QueryTimeout);
 
-                                                     if (ProxyChargingStationConfigurator != null)
-                                                         ProxyChargingStationConfigurator(remotestation);
+                                                     ProxyChargingStationConfigurator?.Invoke(remotestation);
 
                                                      return remotestation;
 
-                                                 }) ;
+                                                 },
+
+                                                 OnSuccess: OnSuccess,
+                                                 OnError:   OnError);
 
         }
 

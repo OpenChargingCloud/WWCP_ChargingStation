@@ -210,7 +210,7 @@ namespace org.GraphDefined.WWCP.EMSP
             this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
             this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
 
-            EVSP.RemoteEMobilityProvider = this;
+            //EVSP.RemoteEMobilityProvider = this;
 
         }
 
@@ -2067,9 +2067,6 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be reserved.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
@@ -2079,13 +2076,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<ReservationResult>
 
-            Reserve(DateTime                 Timestamp,
-                    CancellationToken        CancellationToken,
-                    EventTracking_Id         EventTrackingId,
-                    EVSE_Id                  EVSEId,
+            Reserve(EVSE_Id                  EVSEId,
                     DateTime?                StartTime          = null,
                     TimeSpan?                Duration           = null,
                     ChargingReservation_Id   ReservationId      = null,
@@ -2094,7 +2092,11 @@ namespace org.GraphDefined.WWCP.EMSP
                     IEnumerable<Auth_Token>  AuthTokens         = null,
                     IEnumerable<eMA_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
-                    TimeSpan?                RequestTimeout       = null)
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
 
         {
 
@@ -2115,8 +2117,9 @@ namespace org.GraphDefined.WWCP.EMSP
             try
             {
 
-                OnReserveEVSE?.Invoke(this,
-                                      Timestamp,
+                OnReserveEVSE?.Invoke(DateTime.Now,
+                                      Timestamp.Value,
+                                      this,
                                       EventTrackingId,
                                       RoamingNetwork.Id,
                                       ReservationId,
@@ -2134,16 +2137,13 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnReserveEVSE));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveEVSE));
             }
 
             #endregion
 
 
-            var response = await RoamingNetwork.Reserve(Timestamp,
-                                                        CancellationToken,
-                                                        EventTrackingId,
-                                                        EVSEId,
+            var response = await RoamingNetwork.Reserve(EVSEId,
                                                         StartTime,
                                                         Duration,
                                                         ReservationId,
@@ -2153,6 +2153,10 @@ namespace org.GraphDefined.WWCP.EMSP
                                                         AuthTokens,
                                                         eMAIds,
                                                         PINs,
+
+                                                        Timestamp,
+                                                        CancellationToken,
+                                                        EventTrackingId,
                                                         RequestTimeout);
 
 
@@ -2163,8 +2167,9 @@ namespace org.GraphDefined.WWCP.EMSP
             try
             {
 
-                OnEVSEReserved?.Invoke(this,
-                                       Timestamp,
+                OnEVSEReserved?.Invoke(DateTime.Now,
+                                       Timestamp.Value,
+                                       this,
                                        EventTrackingId,
                                        RoamingNetwork.Id,
                                        ReservationId,
@@ -2184,7 +2189,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnEVSEReserved));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnEVSEReserved));
             }
 
             #endregion
@@ -2200,29 +2205,35 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Cancel the given charging reservation.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <param name="Reason">A reason for this cancellation.</param>
         /// <param name="EVSEId">An optional identification of the EVSE.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
-                                                                     CancellationToken                      CancellationToken,
-                                                                     EventTracking_Id                       EventTrackingId,
-                                                                     ChargingReservation_Id                 ReservationId,
-                                                                     ChargingReservationCancellationReason  Reason,
-                                                                     EVSE_Id                                EVSEId        = null,
-                                                                     TimeSpan?                              RequestTimeout  = null)
+        public async Task<CancelReservationResult>
+
+            CancelReservation(ChargingReservation_Id                 ReservationId,
+                              ChargingReservationCancellationReason  Reason,
+                              EVSE_Id                                EVSEId             = null,
+
+                              DateTime?                              Timestamp          = null,
+                              CancellationToken?                     CancellationToken  = null,
+                              EventTracking_Id                       EventTrackingId    = null,
+                              TimeSpan?                              RequestTimeout     = null)
+
         {
 
-            var response = await RoamingNetwork.CancelReservation(Timestamp,
-                                                                  CancellationToken,
-                                                                  EventTrackingId,
-                                                                  ReservationId,
+            var response = await RoamingNetwork.CancelReservation(ReservationId,
                                                                   Reason,
                                                                   _Id,
                                                                   EVSEId,
+
+                                                                  Timestamp,
+                                                                  CancellationToken,
+                                                                  EventTrackingId,
                                                                   RequestTimeout);
 
 
@@ -2304,7 +2315,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnRemoteEVSEStart));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStart));
             }
 
             #endregion
@@ -2348,7 +2359,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnRemoteEVSEStarted));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStarted));
             }
 
             #endregion
@@ -2422,7 +2433,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnRemoteEVSEStop));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStop));
             }
 
             #endregion
@@ -2464,7 +2475,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(RoamingNetwork) + "." + nameof(OnRemoteEVSEStopped));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStopped));
             }
 
             #endregion

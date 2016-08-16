@@ -56,7 +56,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public const           String    DefaultURIPrefix                = "/ext/BoschEBike";
         public const           String    HTTPLogin                       = "boschsi";
         public const           String    HTTPPassword                    = "fad/09q23w!rf";
-        public static readonly TimeSpan  DefaultQueryTimeout             = TimeSpan.FromSeconds(180);
+        public static readonly TimeSpan  DefaultRequestTimeout             = TimeSpan.FromSeconds(180);
 
         private readonly Timer EVSEStatusImportTimer;
 
@@ -104,7 +104,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     X509Certificate                      ClientCert                  = null,
                                     String                               VirtualHost                 = DefaultVirtualHost,
                                     String                               URIPrefix                   = DefaultURIPrefix,
-                                    TimeSpan?                            QueryTimeout                = null)
+                                    TimeSpan?                            RequestTimeout                = null)
 
             : base(ChargingStation,
                    SelfCheckTimeSpan,
@@ -120,7 +120,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                    ClientCert,
                    VirtualHost.IsNotNullOrEmpty() ? VirtualHost  : DefaultVirtualHost,
                    URIPrefix.  IsNotNullOrEmpty() ? URIPrefix    : DefaultURIPrefix,
-                   QueryTimeout.HasValue          ? QueryTimeout : DefaultQueryTimeout)
+                   RequestTimeout.HasValue          ? RequestTimeout : DefaultRequestTimeout)
 
         {
 
@@ -208,7 +208,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             GetEVSEStatus(DateTime                 Timestamp,
                           CancellationToken        CancellationToken,
                           EventTracking_Id         EventTrackingId,
-                          TimeSpan?                QueryTimeout = null)
+                          TimeSpan?                RequestTimeout = null)
 
         {
 
@@ -226,7 +226,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -326,7 +326,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             GetReservations(DateTime                 Timestamp,
                             CancellationToken        CancellationToken,
                             EventTracking_Id         EventTrackingId,
-                            TimeSpan?                QueryTimeout  = null)
+                            TimeSpan?                RequestTimeout  = null)
 
         {
 
@@ -344,7 +344,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                       requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                   }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             // HTTP / 1.1 200 OK
@@ -434,9 +434,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be reserved.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
@@ -447,23 +444,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public override async Task<ReservationResult>
 
-            Reserve(DateTime                 Timestamp,
-                    CancellationToken        CancellationToken,
-                    EventTracking_Id         EventTrackingId,
-                    EVSE_Id                  EVSEId,
+            Reserve(EVSE_Id                  EVSEId,
                     DateTime?                StartTime,
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
-                    EMobilityProvider_Id                  ProviderId         = null,
+                    EMobilityProvider_Id     ProviderId         = null,
                     eMA_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
                     IEnumerable<eMA_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
-                    TimeSpan?                QueryTimeout       = null)
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
 
         {
 
@@ -524,7 +526,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -687,9 +689,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
@@ -699,22 +698,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public override async Task<ReservationResult>
 
-            Reserve(DateTime                 Timestamp,
-                    CancellationToken        CancellationToken,
-                    EventTracking_Id         EventTrackingId,
-                    DateTime?                StartTime,
+            Reserve(DateTime?                StartTime,
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
-                    EMobilityProvider_Id                  ProviderId         = null,
+                    EMobilityProvider_Id     ProviderId         = null,
                     eMA_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
                     IEnumerable<eMA_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
-                    TimeSpan?                QueryTimeout       = null)
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
 
         {
 
@@ -770,7 +774,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -938,24 +942,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <param name="Reason">A reason for this cancellation.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
         /// <param name="EVSEId">An optional identification of the EVSE.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public override async Task<CancelReservationResult>
 
-            CancelReservation(DateTime                               Timestamp,
-                              CancellationToken                      CancellationToken,
-                              EventTracking_Id                       EventTrackingId,
-                              ChargingReservation_Id                 ReservationId,
+            CancelReservation(ChargingReservation_Id                 ReservationId,
                               ChargingReservationCancellationReason  Reason,
-                              EMobilityProvider_Id                                ProviderId    = null,
-                              EVSE_Id                                EVSEId        = null,
-                              TimeSpan?                              QueryTimeout  = null)
+                              EMobilityProvider_Id                   ProviderId         = null,
+                              EVSE_Id                                EVSEId             = null,
+
+                              DateTime?                              Timestamp          = null,
+                              CancellationToken?                     CancellationToken  = null,
+                              EventTracking_Id                       EventTrackingId    = null,
+                              TimeSpan?                              RequestTimeout     = null)
 
         {
 
@@ -978,7 +980,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                          requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
                                                                      }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1288,7 +1290,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1390,7 +1392,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             GetWhiteList(DateTime           Timestamp,
                          CancellationToken  CancellationToken,
                          EventTracking_Id   EventTrackingId,
-                         TimeSpan?          QueryTimeout = null)
+                         TimeSpan?          RequestTimeout = null)
 
         { 
 
@@ -1408,7 +1410,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
 
-                                             Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1472,7 +1474,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                            EventTracking_Id         EventTrackingId,
                            IEnumerable<Auth_Token>  AuthTokens,
                            IEnumerable<eMA_Id>      eMAIds,
-                           TimeSpan?                QueryTimeout = null)
+                           TimeSpan?                RequestTimeout = null)
 
         {
 
@@ -1509,7 +1511,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                   ).ToUTF8Bytes();
                                                                 }),
 
-                                         Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                         Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                          CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1678,7 +1680,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                 EventTracking_Id         EventTrackingId,
                                 IEnumerable<Auth_Token>  AuthTokens,
                                 IEnumerable<eMA_Id>      eMAIds,
-                                TimeSpan?                QueryTimeout = null)
+                                TimeSpan?                RequestTimeout = null)
 
         {
 
@@ -1719,7 +1721,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                    ).ToUTF8Bytes();
                                                                  }),
 
-                                         Timeout:           QueryTimeout.HasValue ? QueryTimeout : DefaultQueryTimeout,
+                                         Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                          CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1860,14 +1862,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               EventTracking_Id         EventTrackingId,
                               IEnumerable<Auth_Token>  AuthTokens,
                               IEnumerable<eMA_Id>      eMAIds,
-                              TimeSpan?                QueryTimeout = null)
+                              TimeSpan?                RequestTimeout = null)
 
         {
 
             var CurrentWhiteList = await GetWhiteList(DateTime.Now,
                                                       CancellationToken,
                                                       EventTrackingId,
-                                                      QueryTimeout);
+                                                      RequestTimeout);
 
             var ToRemove = CurrentWhiteList.Where(item => item.AuthToken            != null && !AuthTokens.Contains(item.AuthToken) ||
                                                           item.RemoteIdentification != null && !eMAIds.    Contains(item.RemoteIdentification)).ToArray();
@@ -1884,7 +1886,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                           EventTrackingId,
                                                           ToRemove.Where(item => item.AuthToken            != null).Select(item => item.AuthToken),
                                                           ToRemove.Where(item => item.RemoteIdentification != null).Select(item => item.RemoteIdentification),
-                                                          QueryTimeout)
+                                                          RequestTimeout)
                               : new AuthInfoStatus[0];
 
             var Inserted = ToInsert.Any()
@@ -1893,7 +1895,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      EventTrackingId,
                                                      ToInsert.Where(item => item.AuthToken            != null).Select(item => item.AuthToken),
                                                      ToInsert.Where(item => item.RemoteIdentification != null).Select(item => item.RemoteIdentification),
-                                                     QueryTimeout)
+                                                     RequestTimeout)
                               : new AuthInfoStatus[0];
 
             return Removed.Concat(Inserted).

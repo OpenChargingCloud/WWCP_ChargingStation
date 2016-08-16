@@ -54,7 +54,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         public const UInt16 DefaultMaxAdminStatusListSize   = 50;
 
-        public static readonly TimeSpan  DefaultQueryTimeout  = TimeSpan.FromSeconds(180);
+        public static readonly TimeSpan  DefaultRequestTimeout  = TimeSpan.FromSeconds(180);
 
 
         /// <summary>
@@ -223,15 +223,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region QueryTimeout
+        #region RequestTimeout
 
-        private readonly TimeSpan _QueryTimeout;
+        private readonly TimeSpan _RequestTimeout;
 
-        public TimeSpan QueryTimeout
+        public TimeSpan RequestTimeout
         {
             get
             {
-                return _QueryTimeout;
+                return _RequestTimeout;
             }
         }
 
@@ -633,7 +633,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           X509Certificate                      ClientCert                  = null,
                                           String                               VirtualHost                 = null,
                                           String                               URIPrefix                   = null,
-                                          TimeSpan?                            QueryTimeout                = null)
+                                          TimeSpan?                            RequestTimeout                = null)
 
             : this(ChargingStation, MaxStatusListSize, MaxAdminStatusListSize)
 
@@ -649,7 +649,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this.ClientCert                   = ClientCert;
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
             this._URIPrefix                   = URIPrefix;
-            this._QueryTimeout                = QueryTimeout.HasValue          ? QueryTimeout.Value : DefaultQueryTimeout;
+            this._RequestTimeout                = RequestTimeout.HasValue          ? RequestTimeout.Value : DefaultRequestTimeout;
 
             this._SelfCheckTimeSpan           = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
             this._SelfCheckTimer              = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
@@ -905,7 +905,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 if (OnError == null)
                     throw new EVSEAlreadyExistsInStation(EVSEId, this.Id);
                 else
-                    OnError.FailSafeInvoke(this, EVSEId);
+                    OnError?.Invoke(this, EVSEId);
             }
 
             #endregion
@@ -913,7 +913,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var Now           = DateTime.Now;
             var _NetworkEVSE  = new NetworkEVSEStub(EVSEId, this);
 
-            Configurator.FailSafeInvoke(_NetworkEVSE);
+            Configurator?.Invoke(_NetworkEVSE);
 
             if (EVSEAddition.SendVoting(Now, this, _NetworkEVSE))
             {
@@ -929,7 +929,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                //     _EVSE.OnAdminStatusChanged  += (Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus)
                //                                     => UpdateEVSEAdminStatus(Timestamp, EVSE, OldEVSEStatus, NewEVSEStatus);
 
-                    OnSuccess.FailSafeInvoke(_NetworkEVSE);
+                    OnSuccess?.Invoke(_NetworkEVSE);
                     EVSEAddition.SendNotification(Now, this, _NetworkEVSE);
                //     UpdateEVSEStatus(Now, _EVSE, new Timestamped<EVSEStatusType>(Now, EVSEStatusType.Unspecified), _EVSE.Status);
 
@@ -955,7 +955,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime           Timestamp,
                                                                          CancellationToken  CancellationToken,
                                                                          EventTracking_Id   EventTrackingId,
-                                                                         TimeSpan?          QueryTimeout = null)
+                                                                         TimeSpan?          RequestTimeout = null)
         {
 
             return new EVSEStatus[] {
@@ -980,9 +980,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge at the given charging station.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
@@ -991,20 +988,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public virtual async Task<ReservationResult> Reserve(DateTime                 Timestamp,
-                                                             CancellationToken        CancellationToken,
-                                                             EventTracking_Id         EventTrackingId,
-                                                             DateTime?                StartTime,
-                                                             TimeSpan?                Duration,
-                                                             ChargingReservation_Id   ReservationId      = null,
-                                                             EMobilityProvider_Id                  ProviderId         = null,
-                                                             eMA_Id                   eMAId              = null,
-                                                             ChargingProduct_Id       ChargingProductId  = null,
-                                                             IEnumerable<Auth_Token>  AuthTokens         = null,
-                                                             IEnumerable<eMA_Id>      eMAIds             = null,
-                                                             IEnumerable<UInt32>      PINs               = null,
-                                                             TimeSpan?                QueryTimeout       = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public virtual async Task<ReservationResult>
+
+            Reserve(DateTime?                StartTime,
+                    TimeSpan?                Duration,
+                    ChargingReservation_Id   ReservationId      = null,
+                    EMobilityProvider_Id     ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
+                    ChargingProduct_Id       ChargingProductId  = null,
+                    IEnumerable<Auth_Token>  AuthTokens         = null,
+                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<UInt32>      PINs               = null,
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
+
         {
 
             return ReservationResult.OutOfService;
@@ -1018,9 +1023,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be reserved.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
@@ -1030,21 +1032,29 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public virtual async Task<ReservationResult> Reserve(DateTime                 Timestamp,
-                                                             CancellationToken        CancellationToken,
-                                                             EventTracking_Id         EventTrackingId,
-                                                             EVSE_Id                  EVSEId,
-                                                             DateTime?                StartTime,
-                                                             TimeSpan?                Duration,
-                                                             ChargingReservation_Id   ReservationId      = null,
-                                                             EMobilityProvider_Id                  ProviderId         = null,
-                                                             eMA_Id                   eMAId              = null,
-                                                             ChargingProduct_Id       ChargingProductId  = null,
-                                                             IEnumerable<Auth_Token>  AuthTokens         = null,
-                                                             IEnumerable<eMA_Id>      eMAIds             = null,
-                                                             IEnumerable<UInt32>      PINs               = null,
-                                                             TimeSpan?                QueryTimeout       = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public virtual async Task<ReservationResult>
+
+            Reserve(EVSE_Id                  EVSEId,
+                    DateTime?                StartTime,
+                    TimeSpan?                Duration,
+                    ChargingReservation_Id   ReservationId      = null,
+                    EMobilityProvider_Id     ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
+                    ChargingProduct_Id       ChargingProductId  = null,
+                    IEnumerable<Auth_Token>  AuthTokens         = null,
+                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<UInt32>      PINs               = null,
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
+
         {
 
             return ReservationResult.OutOfService;
@@ -1073,9 +1083,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         protected internal void SendNewReservation(ChargingReservation Reservation)
         {
 
-            var OnNewReservationLocal = OnNewReservation;
-            if (OnNewReservationLocal != null)
-                OnNewReservationLocal(DateTime.Now, this, Reservation);
+            OnNewReservation?.Invoke(DateTime.Now,
+                                     this,
+                                     Reservation);
 
         }
 
@@ -1085,22 +1095,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Try to remove the given charging reservation.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <param name="Reason">A reason for this cancellation.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
         /// <param name="EVSEId">An optional identification of the EVSE.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
-        public virtual async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
-                                                                             CancellationToken                      CancellationToken,
-                                                                             EventTracking_Id                       EventTrackingId,
-                                                                             ChargingReservation_Id                 ReservationId,
-                                                                             ChargingReservationCancellationReason  Reason,
-                                                                             EMobilityProvider_Id                                ProviderId    = null,
-                                                                             EVSE_Id                                EVSEId        = null,
-                                                                             TimeSpan?                              QueryTimeout  = null)
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public virtual async Task<CancelReservationResult>
+
+            CancelReservation(ChargingReservation_Id                 ReservationId,
+                              ChargingReservationCancellationReason  Reason,
+                              EMobilityProvider_Id                   ProviderId         = null,
+                              EVSE_Id                                EVSEId             = null,
+
+                              DateTime?                              Timestamp          = null,
+                              CancellationToken?                     CancellationToken  = null,
+                              EventTracking_Id                       EventTrackingId    = null,
+                              TimeSpan?                              RequestTimeout     = null)
+
         {
 
             #region Initial checks
@@ -1113,12 +1128,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return await _EVSEs.Where   (evse => evse.Reservation    != null &&
                                                  evse.Reservation.Id == ReservationId).
-                                MapFirst(evse => evse.CancelReservation(Timestamp,
+                                MapFirst(evse => evse.CancelReservation(ReservationId,
+                                                                        Reason,
+                                                                        ProviderId,
+
+                                                                        Timestamp,
                                                                         CancellationToken,
                                                                         EventTrackingId,
-                                                                        ReservationId,
-                                                                        Reason,
-                                                                        QueryTimeout),
+                                                                        RequestTimeout),
                                          Task.FromResult(CancelReservationResult.Error("The charging reservation could not be cancelled!")));
 
         }

@@ -58,8 +58,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             return ChargingPool.CreateNewStation(ChargingStationId,
                                                  ChargingStationConfigurator,
-                                                 OnSuccess,
-                                                 OnError,
                                                  newstation => {
 
                                                      var virtualstation = new VirtualChargingStation(newstation);
@@ -68,7 +66,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                                                      return virtualstation;
 
-                                                 }) ;
+                                                 },
+
+                                                 OnSuccess: OnSuccess,
+                                                 OnError:   OnError);
 
         }
 

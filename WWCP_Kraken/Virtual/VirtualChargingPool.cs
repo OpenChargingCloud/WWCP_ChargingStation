@@ -198,7 +198,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 if (OnError == null)
                     throw new ChargingStationAlreadyExistsInPool(ChargingStation.Id, this.Id);
                 else
-                    OnError.FailSafeInvoke(this, ChargingStation.Id);
+                    OnError?.Invoke(this, ChargingStation.Id);
             }
 
             #endregion
@@ -206,7 +206,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var Now              = DateTime.Now;
             var _VirtualStation  = new VirtualChargingStation(ChargingStation, this);
 
-            Configurator.FailSafeInvoke(_VirtualStation);
+            Configurator?.Invoke(_VirtualStation);
 
             if (_Stations.Add(_VirtualStation))
             {
@@ -220,7 +220,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 //_VirtualEVSE.OnNewChargingSession     += SendNewChargingSession;
                 //_VirtualEVSE.OnNewChargeDetailRecord  += SendNewChargeDetailRecord;
 
-                OnSuccess.FailSafeInvoke(_VirtualStation);
+                OnSuccess?.Invoke(_VirtualStation);
 
                 return _VirtualStation;
 

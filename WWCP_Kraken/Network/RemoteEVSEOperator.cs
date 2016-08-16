@@ -112,9 +112,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
         /// </summary>
-        /// <param name="Timestamp">The timestamp of this request.</param>
-        /// <param name="CancellationToken">A token to cancel this request.</param>
-        /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="EVSEId">The unique identification of the EVSE to be reserved.</param>
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
@@ -124,23 +121,28 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<ReservationResult>
 
-            Reserve(DateTime                 Timestamp,
-                    CancellationToken        CancellationToken,
-                    EventTracking_Id         EventTrackingId,
-                    EVSE_Id                  EVSEId,
+            Reserve(EVSE_Id                  EVSEId,
                     DateTime?                StartTime,
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
-                    EMobilityProvider_Id                  ProviderId         = null,
+                    EMobilityProvider_Id     ProviderId         = null,
                     eMA_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
                     IEnumerable<eMA_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
-                    TimeSpan?                QueryTimeout       = null)
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
 
         {
 
@@ -148,6 +150,119 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+        /// <summary>
+        /// Reserve the possibility to charge at the given charging station.
+        /// </summary>
+        /// <param name="ChargingStationId">The unique identification of the charging station to be reserved.</param>
+        /// <param name="StartTime">The starting time of the reservation.</param>
+        /// <param name="Duration">The duration of the reservation.</param>
+        /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
+        /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
+        /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
+        /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public async Task<ReservationResult>
+
+            Reserve(ChargingStation_Id       ChargingStationId,
+                    DateTime?                StartTime,
+                    TimeSpan?                Duration,
+                    ChargingReservation_Id   ReservationId      = null,
+                    EMobilityProvider_Id     ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
+                    ChargingProduct_Id       ChargingProductId  = null,
+                    IEnumerable<Auth_Token>  AuthTokens         = null,
+                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<UInt32>      PINs               = null,
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
+
+        {
+
+            return ReservationResult.UnknownChargingStation;
+
+        }
+
+        /// <summary>
+        /// Reserve the possibility to charge within the given charging pool.
+        /// </summary>
+        /// <param name="ChargingPoolId">The unique identification of the charging pool to be reserved.</param>
+        /// <param name="StartTime">The starting time of the reservation.</param>
+        /// <param name="Duration">The duration of the reservation.</param>
+        /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
+        /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
+        /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
+        /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public async Task<ReservationResult>
+
+            Reserve(ChargingPool_Id          ChargingPoolId,
+                    DateTime?                StartTime,
+                    TimeSpan?                Duration,
+                    ChargingReservation_Id   ReservationId      = null,
+                    EMobilityProvider_Id     ProviderId         = null,
+                    eMA_Id                   eMAId              = null,
+                    ChargingProduct_Id       ChargingProductId  = null,
+                    IEnumerable<Auth_Token>  AuthTokens         = null,
+                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<UInt32>      PINs               = null,
+
+                    DateTime?                Timestamp          = null,
+                    CancellationToken?       CancellationToken  = null,
+                    EventTracking_Id         EventTrackingId    = null,
+                    TimeSpan?                RequestTimeout     = null)
+
+        {
+
+            return ReservationResult.UnknownChargingPool;
+
+        }
+
+        /// <summary>
+        /// Try to remove the given charging reservation.
+        /// </summary>
+        /// <param name="ReservationId">The unique charging reservation identification.</param>
+        /// <param name="Reason">A reason for this cancellation.</param>
+        /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
+        /// <param name="EVSEId">An optional identification of the EVSE.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        public async Task<CancelReservationResult>
+
+            CancelReservation(ChargingReservation_Id                 ReservationId,
+                              ChargingReservationCancellationReason  Reason,
+                              EMobilityProvider_Id                   ProviderId         = null,
+                              EVSE_Id                                EVSEId             = null,
+
+                              DateTime?                              Timestamp          = null,
+                              CancellationToken?                     CancellationToken  = null,
+                              EventTracking_Id                       EventTrackingId    = null,
+                              TimeSpan?                              RequestTimeout     = null)
+
+        {
+
+            return CancelReservationResult.UnknownReservationId(ReservationId);
+
+        }
 
         #endregion
 
@@ -203,8 +318,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       RequestTimeout)));
 
             var result = results.
-                             Where(_result => _result.Result != RemoteStartEVSEResultType.Unspecified).
-                             FirstOrDefault();
+                             FirstOrDefault(_result => _result.Result != RemoteStartEVSEResultType.Unspecified);
 
             if (result        != null &&
                 result.Result == RemoteStartEVSEResultType.Success)
@@ -265,7 +379,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<RemoteStopResult>
+        public Task<RemoteStopResult>
 
             RemoteStop(ChargingSession_Id    SessionId,
                        ReservationHandling   ReservationHandling,
@@ -277,11 +391,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        EventTracking_Id      EventTrackingId    = null,
                        TimeSpan?             RequestTimeout     = null)
 
-        {
-
-            throw new NotImplementedException();
-
-        }
+            => Task.FromResult(RemoteStopResult.OutOfService(SessionId));
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -329,8 +439,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       RequestTimeout)));
 
             var result = results.
-                             Where(_result => _result.Result != RemoteStopEVSEResultType.Unspecified).
-                             FirstOrDefault();
+                             FirstOrDefault(_result => _result.Result != RemoteStopEVSEResultType.Unspecified);
 
             if (result        != null &&
                 result.Result == RemoteStopEVSEResultType.Success)
