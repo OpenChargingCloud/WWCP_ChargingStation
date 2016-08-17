@@ -196,7 +196,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (_Stations.Any(station => station.Id == ChargingStation.Id))
             {
                 if (OnError == null)
-                    throw new ChargingStationAlreadyExistsInPool(ChargingStation.Id, this.Id);
+                    throw new ChargingStationAlreadyExistsInPool(this.ChargingPool, ChargingStation.Id);
                 else
                     OnError?.Invoke(this, ChargingStation.Id);
             }

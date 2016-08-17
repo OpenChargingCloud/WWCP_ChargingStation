@@ -903,7 +903,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (_EVSEs.Any(evse => evse.Id == EVSEId))
             {
                 if (OnError == null)
-                    throw new EVSEAlreadyExistsInStation(EVSEId, this.Id);
+                    throw new EVSEAlreadyExistsInStation(this.ChargingStation, EVSEId);
                 else
                     OnError?.Invoke(this, EVSEId);
             }
