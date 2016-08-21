@@ -550,7 +550,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              JSONWrapper             JSON               = null;
 
-                                             eMA_Id                  eMAId              = null;
+                                             eMobilityAccount_Id                  eMAId              = null;
                                              ChargingReservation_Id  ReservationId      = null;
                                              DateTime?               StartTime          = null;
                                              TimeSpan?               Duration           = null;
@@ -564,7 +564,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              // AuthorizedIds
                                              var                     AuthTokens         = new List<Auth_Token>();
-                                             var                     eMAIds             = new List<eMA_Id>();
+                                             var                     eMAIds             = new List<eMobilityAccount_Id>();
                                              var                     PINs               = new List<UInt32>();
 
                                              if (Request.TryParseJObjectRequestBody(out JSON, out _HTTPResponse, AllowEmptyHTTPBody: true))
@@ -652,7 +652,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                  if (!JSON.ParseMandatory("eMAId",
                                                                           "e-Mobility account identification",
                                                                           HTTPServer.DefaultServerName,
-                                                                          eMA_Id.TryParse,
+                                                                          eMobilityAccount_Id.TryParse,
                                                                           out eMAId,
                                                                           Request,
                                                                           out _HTTPResponse))
@@ -859,9 +859,9 @@ namespace org.GraphDefined.WWCP.EMSP
                                                          foreach (var jtoken in eMAIdsJSON)
                                                          {
 
-                                                             eMA_Id eMAId2 = null;
+                                                             eMobilityAccount_Id eMAId2 = null;
 
-                                                             if (!eMA_Id.TryParse(jtoken.Value<String>(), out eMAId2))
+                                                             if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMAId2))
                                                                  return SendEVSEReserved(
                                                                      new HTTPResponseBuilder(Request) {
                                                                          HTTPStatusCode  = HTTPStatusCode.BadRequest,
@@ -1209,7 +1209,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              ChargingProduct_Id      ChargingProductId  = null;
                                              ChargingReservation_Id  ReservationId      = null;
                                              ChargingSession_Id      SessionId          = null;
-                                             eMA_Id                  eMAId              = null;
+                                             eMobilityAccount_Id                  eMAId              = null;
 
                                              if (!Request.TryParseJObjectRequestBody(out JSON,
                                                                                      out _HTTPResponse,
@@ -1264,7 +1264,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                  if (!JSON.ParseMandatory("eMAId",
                                                                           "e-Mobility account identification",
                                                                           HTTPServer.DefaultServerName,
-                                                                          eMA_Id.TryParse,
+                                                                          eMobilityAccount_Id.TryParse,
                                                                           out eMAId,
                                                                           Request,
                                                                           out _HTTPResponse))
@@ -1495,7 +1495,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              JSONWrapper         JSON       = null;
                                              ChargingSession_Id  SessionId  = null;
-                                             eMA_Id              eMAId      = null;
+                                             eMobilityAccount_Id              eMAId      = null;
 
                                              if (!Request.TryParseJObjectRequestBody(out JSON,
                                                                                      out _HTTPResponse,
@@ -1522,7 +1522,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                  if (!JSON.ParseOptional("eMAId",
                                                                           "e-Mobility account identification",
                                                                           HTTPServer.DefaultServerName,
-                                                                          eMA_Id.TryParse,
+                                                                          eMobilityAccount_Id.TryParse,
                                                                           out eMAId,
                                                                           Request,
                                                                           out _HTTPResponse))

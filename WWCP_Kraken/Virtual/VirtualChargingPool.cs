@@ -244,12 +244,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, EMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMA_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, EMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, EMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMA_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, EMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
@@ -282,12 +282,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        public Task<RemoteStartChargingStationResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, EMobilityProvider_Id ProviderId, eMA_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<RemoteStartChargingStationResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, EMobilityProvider_Id ProviderId, eMobilityAccount_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<RemoteStartEVSEResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, EMobilityProvider_Id ProviderId, eMA_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<RemoteStartEVSEResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, EMobilityProvider_Id ProviderId, eMobilityAccount_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }

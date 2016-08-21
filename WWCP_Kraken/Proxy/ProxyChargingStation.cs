@@ -456,10 +456,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
                     EMobilityProvider_Id     ProviderId         = null,
-                    eMA_Id                   eMAId              = null,
+                    eMobilityAccount_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
-                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<eMobilityAccount_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
 
                     DateTime?                Timestamp          = null,
@@ -709,10 +709,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                Duration,
                     ChargingReservation_Id   ReservationId      = null,
                     EMobilityProvider_Id     ProviderId         = null,
-                    eMA_Id                   eMAId              = null,
+                    eMobilityAccount_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
-                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<eMobilityAccount_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
 
                     DateTime?                Timestamp          = null,
@@ -1057,7 +1057,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId      = null,
                         ChargingSession_Id      SessionId          = null,
                         EMobilityProvider_Id    ProviderId         = null,
-                        eMA_Id                  eMAId              = null,
+                        eMobilityAccount_Id                  eMAId              = null,
 
                         DateTime?               Timestamp          = null,
                         CancellationToken?      CancellationToken  = null,
@@ -1236,7 +1236,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id    SessionId,
                        ReservationHandling   ReservationHandling,
                        EMobilityProvider_Id  ProviderId         = null,
-                       eMA_Id                eMAId              = null,
+                       eMobilityAccount_Id                eMAId              = null,
 
                        DateTime?             Timestamp          = null,
                        CancellationToken?    CancellationToken  = null,
@@ -1428,7 +1428,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 return new AuthInfo[0];
 
             Auth_Token AuthToken  = null;
-            eMA_Id     eMAId      = null;
+            eMobilityAccount_Id     eMAId      = null;
             var AuthInfos         = new HashSet<AuthInfo>();
 
             foreach (JObject entry in JObject.Parse(response.HTTPBody.ToUTF8String())["Identifications"] as JArray)
@@ -1447,7 +1447,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         break;
 
                     case "eMAId":
-                        if (!eMA_Id.TryParse(entry["id"].Value<String>(), out eMAId))
+                        if (!eMobilityAccount_Id.TryParse(entry["id"].Value<String>(), out eMAId))
                             continue;
                         AuthInfos.Add(AuthInfo.FromRemoteIdentification(eMAId));
                         break;
@@ -1473,13 +1473,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                            CancellationToken        CancellationToken,
                            EventTracking_Id         EventTrackingId,
                            IEnumerable<Auth_Token>  AuthTokens,
-                           IEnumerable<eMA_Id>      eMAIds,
+                           IEnumerable<eMobilityAccount_Id>      eMAIds,
                            TimeSpan?                RequestTimeout = null)
 
         {
 
             var _AuthTokens = AuthTokens != null ? AuthTokens : new Auth_Token[0];
-            var _eMAIds     = eMAIds     != null ? eMAIds     : new eMA_Id[0];
+            var _eMAIds     = eMAIds     != null ? eMAIds     : new eMobilityAccount_Id[0];
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
@@ -1679,7 +1679,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                 CancellationToken        CancellationToken,
                                 EventTracking_Id         EventTrackingId,
                                 IEnumerable<Auth_Token>  AuthTokens,
-                                IEnumerable<eMA_Id>      eMAIds,
+                                IEnumerable<eMobilityAccount_Id>      eMAIds,
                                 TimeSpan?                RequestTimeout = null)
 
         {
@@ -1689,7 +1689,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
 
             var _AuthTokens = AuthTokens != null ? AuthTokens : new Auth_Token[0];
-            var _eMAIds     = eMAIds     != null ? eMAIds     : new eMA_Id[0];
+            var _eMAIds     = eMAIds     != null ? eMAIds     : new eMobilityAccount_Id[0];
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
@@ -1861,7 +1861,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               CancellationToken        CancellationToken,
                               EventTracking_Id         EventTrackingId,
                               IEnumerable<Auth_Token>  AuthTokens,
-                              IEnumerable<eMA_Id>      eMAIds,
+                              IEnumerable<eMobilityAccount_Id>      eMAIds,
                               TimeSpan?                RequestTimeout = null)
 
         {

@@ -52,7 +52,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                       ChargingProduct_Id      ChargingProductId,
                                                                       ChargingReservation_Id  ReservationId,
                                                                       ChargingSession_Id      SessionId,
-                                                                      eMA_Id                  eMAId,
+                                                                      eMobilityAccount_Id                  eMAId,
                                                                       TimeSpan?               QueryTimeout  = null);
 
 
@@ -75,7 +75,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                     EVSE_Id              EVSEId,
                                                                     ReservationHandling  ReservationHandling,
                                                                     ChargingSession_Id   SessionId,
-                                                                    eMA_Id               eMAId,
+                                                                    eMobilityAccount_Id               eMAId,
                                                                     TimeSpan?            QueryTimeout  = null);
 
 
@@ -104,10 +104,10 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                   DateTime?                StartTime,
                                                                   TimeSpan?                Duration,
                                                                   ChargingReservation_Id   ReservationId,
-                                                                  eMA_Id                   eMAId,
+                                                                  eMobilityAccount_Id                   eMAId,
                                                                   ChargingProduct_Id       ChargingProductId,
                                                                   IEnumerable<Auth_Token>  AuthTokens,
-                                                                  IEnumerable<eMA_Id>      eMAIds,
+                                                                  IEnumerable<eMobilityAccount_Id>      eMAIds,
                                                                   IEnumerable<UInt32>      PINs,
                                                                   TimeSpan?                QueryTimeout  = null);
 
@@ -125,7 +125,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                               CancellationToken                      CancellationToken,
                                                                               EventTracking_Id                       EventTrackingId,
                                                                               ChargingReservation_Id                 ChargingReservationId,
-                                                                              eMA_Id                                 eMAId,
+                                                                              eMobilityAccount_Id                                 eMAId,
                                                                               TimeSpan?                              QueryTimeout  = null);
 
 }

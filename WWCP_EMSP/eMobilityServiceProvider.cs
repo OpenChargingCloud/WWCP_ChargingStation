@@ -2087,10 +2087,10 @@ namespace org.GraphDefined.WWCP.EMSP
                     DateTime?                StartTime          = null,
                     TimeSpan?                Duration           = null,
                     ChargingReservation_Id   ReservationId      = null,
-                    eMA_Id                   eMAId              = null,
+                    eMobilityAccount_Id                   eMAId              = null,
                     ChargingProduct_Id       ChargingProductId  = null,
                     IEnumerable<Auth_Token>  AuthTokens         = null,
-                    IEnumerable<eMA_Id>      eMAIds             = null,
+                    IEnumerable<eMobilityAccount_Id>      eMAIds             = null,
                     IEnumerable<UInt32>      PINs               = null,
 
                     DateTime?                Timestamp          = null,
@@ -2273,7 +2273,7 @@ namespace org.GraphDefined.WWCP.EMSP
                         ChargingProduct_Id      ChargingProductId  = null,
                         ChargingReservation_Id  ReservationId      = null,
                         ChargingSession_Id      SessionId          = null,
-                        eMA_Id                  eMAId              = null,
+                        eMobilityAccount_Id                  eMAId              = null,
 
                         DateTime?               Timestamp          = null,
                         CancellationToken?      CancellationToken  = null,
@@ -2389,7 +2389,7 @@ namespace org.GraphDefined.WWCP.EMSP
             RemoteStop(EVSE_Id              EVSEId,
                        ChargingSession_Id   SessionId,
                        ReservationHandling  ReservationHandling,
-                       eMA_Id               eMAId              = null,
+                       eMobilityAccount_Id               eMAId              = null,
 
                        DateTime?            Timestamp          = null,
                        CancellationToken?   CancellationToken  = null,
