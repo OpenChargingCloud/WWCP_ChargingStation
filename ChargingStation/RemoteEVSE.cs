@@ -857,7 +857,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public async Task<ReservationResult> Reserve(DateTime                Timestamp,
                                                      CancellationToken       CancellationToken,
                                                      EventTracking_Id        EventTrackingId,
-                                                     EMobilityProvider_Id                 ProviderId,
+                                                     eMobilityProvider_Id                 ProviderId,
                                                      eMobilityAccount_Id                  eMAId,
                                                      ChargingReservation_Id  ReservationId,
                                                      DateTime?               StartTime,
@@ -944,7 +944,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              ChargingProduct_Id      ChargingProductId,
                                                              ChargingReservation_Id  ReservationId,
                                                              ChargingSession_Id      SessionId,
-                                                             EMobilityProvider_Id                 ProviderId,
+                                                             eMobilityProvider_Id                 ProviderId,
                                                              eMobilityAccount_Id                  eMAId,
                                                              TimeSpan?               QueryTimeout  = null)
         {
@@ -984,7 +984,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                            EventTracking_Id     EventTrackingId,
                                                            ChargingSession_Id   SessionId,
                                                            ReservationHandling  ReservationHandling,
-                                                           EMobilityProvider_Id              ProviderId,
+                                                           eMobilityProvider_Id              ProviderId,
                                                            TimeSpan?            QueryTimeout  = null)
         {
 

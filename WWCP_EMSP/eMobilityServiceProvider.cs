@@ -50,12 +50,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Id
 
-        private readonly EMobilityProvider_Id _Id;
+        private readonly eMobilityProvider_Id _Id;
 
         /// <summary>
         /// The unique identification of the e-mobility service provider.
         /// </summary>
-        public EMobilityProvider_Id Id
+        public eMobilityProvider_Id Id
             => _Id;
 
         #endregion
@@ -71,9 +71,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region EVSP
 
-        private readonly EMobilityProvider _EVSP;
+        private readonly eMobilityProvider _EVSP;
 
-        public EMobilityProvider EVSP
+        public eMobilityProvider EVSP
             => _EVSP;
 
         #endregion
@@ -197,7 +197,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Constructor(s)
 
-        internal eMobilityServiceProvider(EMobilityProvider  EVSP,
+        internal eMobilityServiceProvider(eMobilityProvider  EVSP,
                                           Authorizator_Id    AuthorizatorId = null)
         {
 
