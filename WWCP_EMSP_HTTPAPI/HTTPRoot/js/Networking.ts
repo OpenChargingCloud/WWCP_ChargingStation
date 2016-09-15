@@ -23,6 +23,9 @@
 
             }
 
+            else if (this.status === 3001)
+            { }
+
             else
                 if (OnError && typeof OnError === 'function')
                     OnError(this.status, this.statusText);
