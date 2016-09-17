@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -360,7 +360,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (URIPrefix.IsNullOrEmpty())
                 throw new ArgumentNullException(nameof(URIPrefix),   "The given URI prefix must not be null or empty!");
 
-            if (!URIPrefix.StartsWith("/"))
+            if (!URIPrefix.StartsWith("/", StringComparison.Ordinal))
                 URIPrefix = "/" + URIPrefix;
 
             #endregion

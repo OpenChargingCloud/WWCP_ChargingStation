@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,26 +48,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Properties
 
-        #region Id
-
-        private readonly eMobilityProvider_Id _Id;
-
         /// <summary>
         /// The unique identification of the e-mobility service provider.
         /// </summary>
-        public eMobilityProvider_Id Id
-            => _Id;
+        public eMobilityProvider_Id  Id                 { get; }
 
-        #endregion
+        public RoamingNetwork        RoamingNetwork     { get; }
 
-        #region RoamingNetwork
+        public Authorizator_Id       AuthorizatorId     { get; }
 
-        private readonly RoamingNetwork _RoamingNetwork;
-
-        public RoamingNetwork RoamingNetwork
-            => _RoamingNetwork;
-
-        #endregion
 
         #region EVSP
 
@@ -75,15 +64,6 @@ namespace org.GraphDefined.WWCP.EMSP
 
         public eMobilityProvider EVSP
             => _EVSP;
-
-        #endregion
-
-        #region AuthorizatorId
-
-        private readonly Authorizator_Id _AuthorizatorId;
-
-        public Authorizator_Id AuthorizatorId
-            => _AuthorizatorId;
 
         #endregion
 
@@ -197,14 +177,31 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Constructor(s)
 
+        internal eMobilityServiceProvider(eMobilityProvider_Id  Id,
+                                          RoamingNetwork        RoamingNetwork,
+                                          Authorizator_Id       AuthorizatorId = null)
+        {
+
+            this.Id                          = Id;
+            this.RoamingNetwork              = RoamingNetwork;
+            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+
+            this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
+            this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
+            this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
+
+            //EVSP.RemoteEMobilityProvider = this;
+
+        }
+
         internal eMobilityServiceProvider(eMobilityProvider  EVSP,
                                           Authorizator_Id    AuthorizatorId = null)
         {
 
-            this._Id                         = EVSP.Id;
-            this._RoamingNetwork             = EVSP.RoamingNetwork;
+            this.Id                          = EVSP.Id;
+            this.RoamingNetwork              = EVSP.RoamingNetwork;
             this._EVSP                       = EVSP;
-            this._AuthorizatorId             = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
 
             this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
@@ -2126,7 +2123,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                       EVSEId,
                                       StartTime,
                                       Duration,
-                                      _Id,
+                                      Id,
                                       eMAId,
                                       ChargingProductId,
                                       AuthTokens,
@@ -2147,7 +2144,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                         StartTime,
                                                         Duration,
                                                         ReservationId,
-                                                        _Id,
+                                                        Id,
                                                         eMAId,
                                                         ChargingProductId,
                                                         AuthTokens,
@@ -2176,7 +2173,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEId,
                                        StartTime,
                                        Duration,
-                                       _Id,
+                                       Id,
                                        eMAId,
                                        ChargingProductId,
                                        AuthTokens,
@@ -2228,7 +2225,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             var response = await RoamingNetwork.CancelReservation(ReservationId,
                                                                   Reason,
-                                                                  _Id,
+                                                                  Id,
                                                                   EVSEId,
 
                                                                   Timestamp,
@@ -2308,7 +2305,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                           ChargingProductId,
                                           ReservationId,
                                           SessionId,
-                                          _Id,
+                                          Id,
                                           eMAId,
                                           RequestTimeout);
 
@@ -2325,7 +2322,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                             ChargingProductId,
                                                             ReservationId,
                                                             SessionId,
-                                                            _Id,
+                                                            Id,
                                                             eMAId,
 
                                                             Timestamp,
@@ -2350,7 +2347,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                             ChargingProductId,
                                             ReservationId,
                                             SessionId,
-                                            _Id,
+                                            Id,
                                             eMAId,
                                             RequestTimeout,
                                             response,
@@ -2426,7 +2423,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                          EVSEId,
                                          SessionId,
                                          ReservationHandling,
-                                         _Id,
+                                         Id,
                                          eMAId,
                                          RequestTimeout);
 
@@ -2442,7 +2439,7 @@ namespace org.GraphDefined.WWCP.EMSP
             var response = await RoamingNetwork.RemoteStop(EVSEId,
                                                            SessionId,
                                                            ReservationHandling,
-                                                           _Id,
+                                                           Id,
                                                            eMAId,
 
                                                            Timestamp,
@@ -2466,7 +2463,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                             EVSEId,
                                             SessionId,
                                             ReservationHandling,
-                                            _Id,
+                                            Id,
                                             eMAId,
                                             RequestTimeout,
                                             response,

@@ -100,7 +100,7 @@ module WWCP {
 
         private DownloadEVSEStatus(URI: string, Run: number, Intervall: number) {
 
-            Download(URI + '/EVSEStatus',
+            DownloadStatus(URI + '/EVSEs',
                 (NewData) => {
 
                     window.localStorage.setItem('EVSEStatus', NewData);

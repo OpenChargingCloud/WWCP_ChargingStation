@@ -1,6 +1,6 @@
 ﻿/*
  * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,29 +31,38 @@ namespace org.GraphDefined.WWCP
     public static class LocalEMobilityServiceExtentions
     {
 
-        //public static eMobilityServiceProvider
+        public static eMobilityServiceProvider
 
-        //    CreateMobilityServiceProvider(this RoamingNetwork  RoamingNetwork_QA,
-        //                                  eMobilityProvider_Id              Id,
-        //                                  I18NString           Name,
-        //                                  Authorizator_Id      AuthorizatorId,
-        //                                  UInt32               Priority = 10)
+            CreateNewEMobilityServiceProvider(this RoamingNetwork                           RoamingNetwork,
+                                              eMobilityProvider_Id                          Id,
+                                              Authorizator_Id                               AuthorizatorId,
+                                              I18NString                                    Name,
+                                              I18NString                                    Description   = null,
+                                              Action<eMobilityProvider>                     Configurator  = null,
+                                              eMobilityProviderPriority                     Priority      = null,
+                                              eMobilityProviderAdminStatusType              AdminStatus   = eMobilityProviderAdminStatusType.Available,
+                                              eMobilityProviderStatusType                   Status        = eMobilityProviderStatusType.Available,
+                                              Action<eMobilityProvider>                     OnSuccess     = null,
+                                              Action<RoamingNetwork, eMobilityProvider_Id>  OnError       = null)
 
-        //{
+        {
 
-        //    var EMP = new eMobilityServiceProvider(RoamingNetwork_QA.CreateNewEMobilityProvider(
-        //                                               Id,
-        //                                               ServiceProvider => {
-        //                                                   ServiceProvider.Name = Name;
-        //                                               }
-        //                                           ),
-        //                                           AuthorizatorId);
+            var a = RoamingNetwork.CreateNewEMobilityProvider(Id,
+                                                              Name,
+                                                              Description,
+                                                              Priority,
+                                                              Configurator,
+                                                              EMobilityProvider => new eMobilityServiceProvider(EMobilityProvider.Id,
+                                                                                                                EMobilityProvider.RoamingNetwork,
+                                                                                                                AuthorizatorId),
+                                                              AdminStatus,
+                                                              Status,
+                                                              OnSuccess,
+                                                              OnError);
 
-        //    RoamingNetwork_QA.RegistereMobilityProvider(Priority, EMP);
+            return a.RemoteEMobilityProvider as eMobilityServiceProvider;
 
-        //    return EMP;
-
-        //}
+        }
 
     }
 

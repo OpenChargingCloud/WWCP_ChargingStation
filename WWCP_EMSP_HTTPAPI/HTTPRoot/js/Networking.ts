@@ -39,6 +39,47 @@
 
 }
 
+function DownloadStatus(URI: string, OnSuccess, OnError) {
+
+    var ajax = new XMLHttpRequest();
+    ajax.open("STATUS", URI, true);
+    ajax.setRequestHeader("Accept", "application/json; charset=UTF-8");
+    //   ajax.setRequestHeader("Content-Type", "application/json; charset=UTF-8");
+
+    ajax.onreadystatechange = function () {
+
+        // 0 UNSENT | 1 OPENED | 2 HEADERS_RECEIVED | 3 LOADING | 4 DONE
+        if (this.readyState === 4) {
+
+            // Ok
+            if (this.status === 200) {
+
+                //alert(ajax.getAllResponseHeaders());
+                //alert(ajax.getResponseHeader("Date"));
+                //alert(ajax.getResponseHeader("Cache-control"));
+                //alert(ajax.getResponseHeader("ETag"));
+
+                if (OnSuccess && typeof OnSuccess === 'function')
+                    OnSuccess(ajax.responseText);
+
+            }
+
+            else if (this.status === 3001)
+            { }
+
+            else
+                if (OnError && typeof OnError === 'function')
+                    OnError(this.status, this.statusText);
+
+        }
+
+    }
+
+    ajax.send();
+    //ajax.send("{ \"username\": \"ahzf\" }");
+
+}
+
 function DownloadBlob(URI: string, OnSuccess, OnError) {
 
     var ajax = new XMLHttpRequest();
