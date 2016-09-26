@@ -1496,7 +1496,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                              EVSE:                   _ChargingSession.EVSE,
                                                                              ChargingStation:        _ChargingSession.EVSE.ChargingStation,
                                                                              ChargingPool:           _ChargingSession.EVSE.ChargingStation.ChargingPool,
-                                                                             EVSEOperator:           _ChargingSession.EVSE.Operator,
+                                                                             ChargingStationOperator:           _ChargingSession.EVSE.Operator,
                                                                              ProviderId:             _ChargingSession.ProviderId,
                                                                              ChargingProductId:      _ChargingSession.ChargingProductId,
                                                                              SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
