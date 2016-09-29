@@ -1281,7 +1281,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  ReservationId      = ReservationId,
                                                                  EVSEId             = Id,
                                                                  ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
-                                                                 ProviderId         = ProviderId,
+                                                                 ProviderIdStart         = ProviderId,
                                                                  eMAIdStart         = eMAId
                                                              };
 
@@ -1316,7 +1316,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingSession = new ChargingSession(SessionId) {
                                                                  EventTrackingId    = EventTrackingId,
                                                                  Reservation        = Reservation,
-                                                                 ProviderId         = ProviderId,
+                                                                 ProviderIdStart         = ProviderId,
                                                                  eMAIdStart         = eMAId,
                                                                  EVSEId             = Id,
                                                                  ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
@@ -1491,29 +1491,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                             var Now = DateTime.Now;
 
-                            var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:              _ChargingSession.Id,
-                                                                             Reservation:            _ChargingSession.Reservation,
-                                                                             EVSE:                   _ChargingSession.EVSE,
-                                                                             ChargingStation:        _ChargingSession.EVSE.ChargingStation,
-                                                                             ChargingPool:           _ChargingSession.EVSE.ChargingStation.ChargingPool,
-                                                                             ChargingStationOperator:           _ChargingSession.EVSE.Operator,
-                                                                             ProviderId:             _ChargingSession.ProviderId,
-                                                                             ChargingProductId:      _ChargingSession.ChargingProductId,
-                                                                             SessionTime:            new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
+                            var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:                 _ChargingSession.Id,
+                                                                             Reservation:               _ChargingSession.Reservation,
+                                                                             EVSE:                      _ChargingSession.EVSE,
+                                                                             ChargingStation:           _ChargingSession.EVSE.ChargingStation,
+                                                                             ChargingPool:              _ChargingSession.EVSE.ChargingStation.ChargingPool,
+                                                                             ChargingStationOperator:   _ChargingSession.EVSE.Operator,
+                                                                             ChargingProductId:         _ChargingSession.ChargingProductId,
+                                                                             ProviderIdStart:           _ChargingSession.ProviderIdStart,
+                                                                             ProviderIdStop:            _ChargingSession.ProviderIdStop,
+                                                                             SessionTime:               new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
 
-                                                                             IdentificationStart:    _ChargingSession.eMAIdStart != null
-                                                                                                         ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart)
-                                                                                                         : _ChargingSession.AuthTokenStart != null
-                                                                                                             ? AuthInfo.FromAuthToken(_ChargingSession.AuthTokenStart)
-                                                                                                             : null,
+                                                                             IdentificationStart:       _ChargingSession.eMAIdStart != null
+                                                                                                            ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart)
+                                                                                                            : _ChargingSession.AuthTokenStart != null
+                                                                                                                ? AuthInfo.FromAuthToken(_ChargingSession.AuthTokenStart)
+                                                                                                                : null,
 
-                                                                             IdentificationStop:     eMAId != null ? AuthInfo.FromRemoteIdentification(eMAId) : null,
+                                                                             IdentificationStop:        eMAId != null ? AuthInfo.FromRemoteIdentification(eMAId) : null,
 
-                                                                             EnergyMeterId:          EnergyMeter_Id.Parse("default"),
-                                                                             EnergyMeteringValues:   new List<Timestamped<Double>>() {
-                                                                                                         new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
-                                                                                                         new Timestamped<Double>(Now,                                          100)
-                                                                                                     }
+                                                                             EnergyMeterId:             EnergyMeter_Id.Parse("default"),
+                                                                             EnergyMeteringValues:      new List<Timestamped<Double>>() {
+                                                                                                            new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
+                                                                                                            new Timestamped<Double>(Now,                                          100)
+                                                                                                        }
 
                                                                             );
 

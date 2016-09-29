@@ -82,10 +82,6 @@
       <Project>{33836742-af1d-4aa4-963f-b0a8e60e6480}</Project>
       <Name>WWCP_Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\WWCP_OICP\WWCP_OICPv2_0\WWCP_OICPv2_0.csproj">
-      <Project>{4bb02c38-48c3-41cb-99f6-a1888881b942}</Project>
-      <Name>WWCP_OICPv2_0</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\WWCP_OICP\WWCP_OICPv2_1\WWCP_OICPv2_1.csproj">
       <Project>{a01e9361-39c7-4705-9173-7cea79364dd0}</Project>
       <Name>WWCP_OICPv2_1</Name>
