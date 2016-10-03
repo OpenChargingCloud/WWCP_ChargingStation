@@ -1512,7 +1512,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     case RemoteStartEVSEResultType.Timeout:
                         return RemoteStartChargingStationResult.Timeout;
 
-                    case RemoteStartEVSEResultType.UnknownChargingStationOperator:
+                    case RemoteStartEVSEResultType.UnknownOperator:
                         return RemoteStartChargingStationResult.UnknownOperator;
 
                     case RemoteStartEVSEResultType.Unspecified:

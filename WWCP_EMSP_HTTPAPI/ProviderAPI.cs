@@ -58,6 +58,11 @@ namespace org.GraphDefined.WWCP.EMSP
         public static readonly IPPort           DefaultHTTPServerPort               = new IPPort(3200);
 
         /// <summary>
+        /// The default HTTP server URI prefix.
+        /// </summary>
+        public const           String           DefaultURIPrefix                    = "/emsp";
+
+        /// <summary>
         /// The default HTTP logfile.
         /// </summary>
         public const           String           DefaultLogfileName                  = "ProviderMap_HTTPAPI.log";
@@ -279,7 +284,7 @@ namespace org.GraphDefined.WWCP.EMSP
                            String                            HTTPServerName                    = DefaultHTTPServerName,
                            IPPort                            HTTPServerPort                    = null,
                            HTTPHostname                      HTTPHostname                      = null,
-                           String                            URIPrefix                         = "/",
+                           String                            URIPrefix                         = DefaultURIPrefix,
 
                            String                            ServerThreadName                  = null,
                            ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
@@ -309,44 +314,23 @@ namespace org.GraphDefined.WWCP.EMSP
                                   DNSClient:                         DNSClient,
                                   Autostart:                         false),
                    HTTPHostname,
-                   URIPrefix,
+                   URIPrefix)
 
-                   ServerThreadName,
-                   ServerThreadPriority,
-                   ServerThreadIsBackground,
-                   ConnectionIdBuilder,
-                   ConnectionThreadsNameBuilder,
-                   ConnectionThreadsPriorityBuilder,
-                   ConnectionThreadsAreBackground,
-                   ConnectionTimeout,
-                   MaxClientConnections,
+        {
 
-                   Autostart)
+            if (Autostart)
+                HTTPServer.Start();
 
-        { }
+        }
 
         #endregion
 
         #region (private) ProviderAPI(HTTPServer, HTTPHostname = "*", URIPrefix = "/", ...)
 
-        private ProviderAPI(eMobilityServiceProvider          EMSP,
-
-                            HTTPServer                        HTTPServer,
-                            HTTPHostname                      HTTPHostname                      = null,
-                            String                            URIPrefix                         = "/",
-
-                            String                            ServerThreadName                  = null,
-                            ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
-                            Boolean                           ServerThreadIsBackground          = true,
-                            ConnectionIdBuilder               ConnectionIdBuilder               = null,
-                            ConnectionThreadsNameBuilder      ConnectionThreadsNameBuilder      = null,
-                            ConnectionThreadsPriorityBuilder  ConnectionThreadsPriorityBuilder  = null,
-                            Boolean                           ConnectionThreadsAreBackground    = true,
-                            TimeSpan?                         ConnectionTimeout                 = null,
-                            UInt32                            MaxClientConnections              = TCPServer.__DefaultMaxClientConnections,
-
-                            Boolean                           Autostart                         = false)
-
+        private ProviderAPI(eMobilityServiceProvider  EMSP,
+                            HTTPServer                HTTPServer,
+                            HTTPHostname              HTTPHostname  = null,
+                            String                    URIPrefix     = "/")
         {
 
             #region Initial checks
@@ -377,12 +361,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-
             RegisterURITemplates();
-
-
-            if (Autostart)
-                HTTPServer.Start();
 
         }
 
@@ -396,44 +375,15 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// Attach this HTTP API to the given HTTP server.
         /// </summary>
-        public static ProviderAPI AttachToHTTPAPI(eMobilityServiceProvider          EMSP,
+        public static ProviderAPI AttachToHTTPAPI(eMobilityServiceProvider  EMSP,
+                                                  HTTPServer                HTTPServer,
+                                                  HTTPHostname              HTTPHostname  = null,
+                                                  String                    URIPrefix     = "/")
 
-                                                  HTTPServer                        HTTPServer,
-                                                  HTTPHostname                      HTTPHostname                      = null,
-                                                  String                            URIPrefix                         = "/",
-
-                                                  String                            ServerThreadName                  = null,
-                                                  ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
-                                                  Boolean                           ServerThreadIsBackground          = true,
-                                                  ConnectionIdBuilder               ConnectionIdBuilder               = null,
-                                                  ConnectionThreadsNameBuilder      ConnectionThreadsNameBuilder      = null,
-                                                  ConnectionThreadsPriorityBuilder  ConnectionThreadsPriorityBuilder  = null,
-                                                  Boolean                           ConnectionThreadsAreBackground    = true,
-                                                  TimeSpan?                         ConnectionTimeout                 = null,
-                                                  UInt32                            MaxClientConnections              = TCPServer.__DefaultMaxClientConnections,
-
-                                                  Boolean                           Autostart                         = true)
-
-        {
-
-            return new ProviderAPI(EMSP,
-                                       HTTPServer,
-                                       HTTPHostname,
-                                       URIPrefix,
-
-                                       ServerThreadName,
-                                       ServerThreadPriority,
-                                       ServerThreadIsBackground,
-                                       ConnectionIdBuilder,
-                                       ConnectionThreadsNameBuilder,
-                                       ConnectionThreadsPriorityBuilder,
-                                       ConnectionThreadsAreBackground,
-                                       ConnectionTimeout,
-                                       MaxClientConnections,
-
-                                       Autostart);
-
-        }
+            => new ProviderAPI(EMSP,
+                               HTTPServer,
+                               HTTPHostname,
+                               URIPrefix);
 
         #endregion
 
