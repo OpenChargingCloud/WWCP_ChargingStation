@@ -1245,7 +1245,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId      = null,
                         ChargingSession_Id      SessionId          = null,
                         eMobilityProvider_Id    ProviderId         = null,
-                        eMobilityAccount_Id                  eMAId              = null,
+                        eMobilityAccount_Id     eMAId              = null,
 
                         DateTime?               Timestamp          = null,
                         CancellationToken?      CancellationToken  = null,
@@ -1274,14 +1274,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     case EVSEStatusType.Available:
                     case EVSEStatusType.AVAILABLE_DOOR_NOT_CLOSED:
 
-                        // Will also set the status -> EVSEStatusType.Charging;
+                        // Will also set the status -> EVSEStatusType.Charging!
                         ChargingSession = new ChargingSession(SessionId) {
                                                                  EventTrackingId    = EventTrackingId,
                                                                  Reservation        = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
                                                                  ReservationId      = ReservationId,
                                                                  EVSEId             = Id,
                                                                  ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
-                                                                 ProviderIdStart         = ProviderId,
+                                                                 ProviderIdStart    = ProviderId,
                                                                  eMAIdStart         = eMAId
                                                              };
 
@@ -1405,9 +1405,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusType.Charging);
 
-                        var OnNewChargingSessionLocal = OnNewChargingSession;
-                        if (OnNewChargingSessionLocal != null)
-                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
+                        OnNewChargingSession?.Invoke(DateTime.Now, this, _ChargingSession);
 
                     }
 

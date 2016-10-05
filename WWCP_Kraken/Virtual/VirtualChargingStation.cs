@@ -71,18 +71,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Id
 
-        private ChargingStation_Id _Id;
-
         /// <summary>
         /// The unique identification of this virtual charging station.
         /// </summary>
-        public ChargingStation_Id Id
-        {
-            get
-            {
-                return _Id;
-            }
-        }
+        public ChargingStation_Id Id { get; }
 
         #endregion
 
@@ -293,39 +285,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Links
 
-        #region ChargingStation
-
-        private readonly ChargingStation _ChargingStation;
-
         /// <summary>
         /// The linked charging station.
         /// </summary>
-        public ChargingStation ChargingStation
-        {
-            get
-            {
-                return _ChargingStation;
-            }
-        }
-
-        #endregion
-
-        #region ChargingPool
-
-        private readonly VirtualChargingPool _VirtualChargingPool;
+        public ChargingStation      ChargingStation   { get; }
 
         /// <summary>
         /// The optional linked charging pool.
         /// </summary>
-        public VirtualChargingPool ChargingPool
-        {
-            get
-            {
-                return _VirtualChargingPool;
-            }
-        }
-
-        #endregion
+        public VirtualChargingPool  ChargingPool      { get; }
 
         #endregion
 
@@ -353,8 +321,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._ChargingStation      = ChargingStation;
-            this._Id                   = ChargingStation.Id;
+            this.ChargingStation      = ChargingStation;
+            this.Id                   = ChargingStation.Id;
             this._EVSEs                = new HashSet<VirtualEVSE>();
 
             this._StatusSchedule       = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
@@ -403,7 +371,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._VirtualChargingPool = VirtualChargingPool;
+            this.ChargingPool = VirtualChargingPool;
 
         }
 
@@ -1131,22 +1099,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region ChargingReservations / OnNewReservation
+        #region ChargingReservations
 
         /// <summary>
         /// All current charging reservations.
         /// </summary>
+
         public IEnumerable<ChargingReservation> ChargingReservations
-        {
-            get
-            {
 
-                return _EVSEs.
-                           Select(evse => evse.Reservation).
-                           Where(reservation => reservation != null);
+            => _EVSEs.
+                   Select(evse => evse.Reservation).
+                   Where(reservation => reservation != null);
 
-            }
-        }
+        #endregion
+
+        #region OnNewReservation
 
         /// <summary>
         /// An event fired whenever a new charging reservation was created.
@@ -1159,9 +1126,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                          ChargingReservation  Reservation)
         {
 
-            var OnNewReservationLocal = OnNewReservation;
-            if (OnNewReservationLocal != null)
-                OnNewReservationLocal(Timestamp, Sender, Reservation);
+            OnNewReservation?.Invoke(Timestamp, Sender, Reservation);
 
         }
 
@@ -1337,7 +1302,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId      = null,
                         ChargingSession_Id      SessionId          = null,
                         eMobilityProvider_Id    ProviderId         = null,
-                        eMobilityAccount_Id                  eMAId              = null,
+                        eMobilityAccount_Id     eMAId              = null,
 
                         DateTime?               Timestamp          = null,
                         CancellationToken?      CancellationToken  = null,
@@ -1429,7 +1394,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId      = null,
                         ChargingSession_Id      SessionId          = null,
                         eMobilityProvider_Id    ProviderId         = null,
-                        eMobilityAccount_Id                  eMAId              = null,
+                        eMobilityAccount_Id     eMAId              = null,
 
                         DateTime?               Timestamp          = null,
                         CancellationToken?      CancellationToken  = null,
@@ -1540,23 +1505,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region ChargingSessions / OnNewChargingSession
+        #region ChargingSessions
 
         /// <summary>
         /// All current charging sessions.
         /// </summary>
+
         public IEnumerable<ChargingSession> ChargingSessions
-        {
-            get
-            {
 
-                return _EVSEs.
-                           Select(evse => evse.ChargingSession).
-                           Where(session => session != null);
+            => _EVSEs.
+                   Select(evse => evse.ChargingSession).
+                   Where(session => session != null);
 
-            }
-        }
+        #endregion
 
+        #region OnNewChargingSession
 
         /// <summary>
         /// An event fired whenever a new charging session was created.
@@ -1569,9 +1532,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                              ChargingSession  ChargingSession)
         {
 
-            var OnNewChargingSessionLocal = OnNewChargingSession;
-            if (OnNewChargingSessionLocal != null)
-                OnNewChargingSessionLocal(Timestamp, Sender, ChargingSession);
+            OnNewChargingSession?.Invoke(Timestamp, Sender, ChargingSession);
 
         }
 
@@ -1947,9 +1908,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 ChargeDetailRecord  ChargeDetailRecord)
         {
 
-            var OnNewChargeDetailRecordLocal = OnNewChargeDetailRecord;
-            if (OnNewChargeDetailRecordLocal != null)
-                OnNewChargeDetailRecordLocal(Timestamp, Sender, ChargeDetailRecord);
+            OnNewChargeDetailRecord?.Invoke(Timestamp, Sender, ChargeDetailRecord);
 
         }
 
@@ -1962,11 +1921,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region GetWhiteList(Name)
 
         public HashSet<AuthInfo> GetWhiteList(String Name)
-        {
 
-            return _WhiteLists[Name];
-
-        }
+            => _WhiteLists[Name];
 
         #endregion
 

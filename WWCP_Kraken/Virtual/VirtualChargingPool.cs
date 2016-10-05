@@ -36,6 +36,25 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public class VirtualChargingPool : IRemoteChargingPool
     {
 
+        #region Data
+
+        /// <summary>
+        /// The default max size of the status history.
+        /// </summary>
+        public const UInt16 DefaultMaxStatusListSize = 50;
+
+        /// <summary>
+        /// The default max size of the admin status history.
+        /// </summary>
+        public const UInt16 DefaultMaxAdminStatusListSize = 50;
+
+        /// <summary>
+        /// The maximum time span for a reservation.
+        /// </summary>
+        public static readonly TimeSpan MaxReservationDuration = TimeSpan.FromMinutes(15);
+
+        #endregion
+
         #region Properties
 
         #region Id
