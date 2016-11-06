@@ -263,12 +263,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id? ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id? ProviderId = null, ChargingProduct_Id ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
