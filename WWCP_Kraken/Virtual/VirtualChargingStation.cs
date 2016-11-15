@@ -1175,7 +1175,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             CancelReservation(ChargingReservation_Id                 ReservationId,
                               ChargingReservationCancellationReason  Reason,
                               eMobilityProvider_Id?                  ProviderId          = null,
-                              EVSE_Id                                EVSEId              = null,
+                              EVSE_Id?                               EVSEId              = null,
 
                               DateTime?                              Timestamp           = null,
                               CancellationToken?                     CancellationToken   = null,
@@ -1205,10 +1205,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var _Reservation = ChargingReservations.FirstOrDefault(reservation => reservation.Id == ReservationId);
 
             if (_Reservation        != null &&
-                _Reservation.EVSEId != null)
+                _Reservation.EVSEId.HasValue)
             {
 
-                result = await GetEVSEbyId(_Reservation.EVSEId).
+                result = await GetEVSEbyId(_Reservation.EVSEId.Value).
                                    CancelReservation(ReservationId,
                                                      Reason,
                                                      ProviderId,

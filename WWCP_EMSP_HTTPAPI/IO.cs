@@ -135,7 +135,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                           out HTTPResponse  HTTPResponse)
         {
 
-            EVSEId        = null;
+            EVSEId        = default(EVSE_Id);
             HTTPResponse  = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)

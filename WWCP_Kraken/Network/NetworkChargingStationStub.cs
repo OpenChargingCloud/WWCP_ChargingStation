@@ -849,7 +849,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public EVSE_Id MapOutgoingId(EVSE_Id EVSEIdOut)
         {
 
-            EVSE_Id EVSEIdIn = null;
+            EVSE_Id EVSEIdIn;
 
             if (MapOutgoing.TryGetValue(EVSEIdOut, out EVSEIdIn))
                 return EVSEIdIn;
@@ -861,7 +861,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public EVSE_Id MapIncomingId(EVSE_Id EVSEIdIn)
         {
 
-            EVSE_Id EVSEIdOut = null;
+            EVSE_Id EVSEIdOut;
 
             if (MapIncoming.TryGetValue(EVSEIdIn, out EVSEIdOut))
                 return EVSEIdOut;
@@ -1085,7 +1085,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             CancelReservation(ChargingReservation_Id                 ReservationId,
                               ChargingReservationCancellationReason  Reason,
                               eMobilityProvider_Id?                  ProviderId          = null,
-                              EVSE_Id                                EVSEId              = null,
+                              EVSE_Id?                               EVSEId              = null,
 
                               DateTime?                              Timestamp           = null,
                               CancellationToken?                     CancellationToken   = null,
