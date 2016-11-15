@@ -827,7 +827,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration            = null,
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id               eMAId               = null,
+                    eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id                ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -973,7 +973,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration            = null,
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id               eMAId               = null,
+                    eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id                ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -1241,7 +1241,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId       = null,
                         ChargingSession_Id      SessionId           = null,
                         eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id     eMAId               = null,
+                        eMobilityAccount_Id?    eMAId               = null,
 
                         DateTime?               Timestamp           = null,
                         CancellationToken?      CancellationToken   = null,
@@ -1302,7 +1302,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         #region ...or a matching reservation identification!
 
                         // Check if this remote start is allowed!
-                        if (!Reservation.eMAIds.Contains(eMAId))
+                        if (!Reservation.eMAIds.Contains(eMAId.Value))
                             return RemoteStartEVSEResult.InvalidCredentials;
 
 
@@ -1312,7 +1312,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingSession = new ChargingSession(SessionId) {
                                                                  EventTrackingId    = EventTrackingId,
                                                                  Reservation        = Reservation,
-                                                                 ProviderIdStart         = ProviderId,
+                                                                 ProviderIdStart    = ProviderId,
                                                                  eMAIdStart         = eMAId,
                                                                  EVSEId             = Id,
                                                                  ChargingProductId  = ChargingProductId != null ? ChargingProductId : ChargingProduct_Id.Parse("AC1"),
@@ -1444,7 +1444,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             RemoteStop(ChargingSession_Id     SessionId,
                        ReservationHandling    ReservationHandling,
                        eMobilityProvider_Id?  ProviderId          = null,
-                       eMobilityAccount_Id    eMAId               = null,
+                       eMobilityAccount_Id?   eMAId               = null,
 
                        DateTime?              Timestamp           = null,
                        CancellationToken?     CancellationToken   = null,
@@ -1496,13 +1496,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                              ProviderIdStop:            _ChargingSession.ProviderIdStop,
                                                                              SessionTime:               new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
 
-                                                                             IdentificationStart:       _ChargingSession.eMAIdStart != null
-                                                                                                            ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart)
+                                                                             IdentificationStart:       _ChargingSession.eMAIdStart.HasValue
+                                                                                                            ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart.Value)
                                                                                                             : _ChargingSession.AuthTokenStart != null
                                                                                                                 ? AuthInfo.FromAuthToken(_ChargingSession.AuthTokenStart)
                                                                                                                 : null,
 
-                                                                             IdentificationStop:        eMAId != null ? AuthInfo.FromRemoteIdentification(eMAId) : null,
+                                                                             IdentificationStop:        eMAId.HasValue
+                                                                                                            ? AuthInfo.FromRemoteIdentification(eMAId.Value)
+                                                                                                            : null,
 
                                                                              EnergyMeterId:             EnergyMeter_Id.Parse("default"),
                                                                              EnergyMeteringValues:      new List<Timestamped<Double>>() {

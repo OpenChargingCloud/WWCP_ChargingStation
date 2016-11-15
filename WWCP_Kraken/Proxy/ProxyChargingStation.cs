@@ -456,7 +456,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id               eMAId               = null,
+                    eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id                ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -709,7 +709,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id               eMAId               = null,
+                    eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id                ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -1057,7 +1057,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         ChargingReservation_Id  ReservationId       = null,
                         ChargingSession_Id      SessionId           = null,
                         eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id     eMAId               = null,
+                        eMobilityAccount_Id?    eMAId               = null,
 
                         DateTime?               Timestamp           = null,
                         CancellationToken?      CancellationToken   = null,
@@ -1236,7 +1236,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        ChargingSession_Id     SessionId,
                        ReservationHandling    ReservationHandling,
                        eMobilityProvider_Id?  ProviderId          = null,
-                       eMobilityAccount_Id    eMAId               = null,
+                       eMobilityAccount_Id?   eMAId               = null,
 
                        DateTime?              Timestamp           = null,
                        CancellationToken?     CancellationToken   = null,
@@ -1427,9 +1427,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             if (response.HTTPStatusCode != HTTPStatusCode.OK)
                 return new AuthInfo[0];
 
-            Auth_Token AuthToken  = null;
-            eMobilityAccount_Id     eMAId      = null;
-            var AuthInfos         = new HashSet<AuthInfo>();
+            Auth_Token            AuthToken  = null;
+            eMobilityAccount_Id?  eMAId      = null;
+            var AuthInfos                    = new HashSet<AuthInfo>();
 
             foreach (JObject entry in JObject.Parse(response.HTTPBody.ToUTF8String())["Identifications"] as JArray)
             {
@@ -1449,7 +1449,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     case "eMAId":
                         if (!eMobilityAccount_Id.TryParse(entry["id"].Value<String>(), out eMAId))
                             continue;
-                        AuthInfos.Add(AuthInfo.FromRemoteIdentification(eMAId));
+                        AuthInfos.Add(AuthInfo.FromRemoteIdentification(eMAId.Value));
                         break;
 
                 }
