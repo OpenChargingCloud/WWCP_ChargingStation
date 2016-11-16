@@ -1871,8 +1871,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       EventTrackingId,
                                                       RequestTimeout);
 
-            var ToRemove = CurrentWhiteList.Where(item => item.AuthToken            != null && !AuthTokens.Contains(item.AuthToken) ||
-                                                          item.RemoteIdentification != null && !eMAIds.    Contains(item.RemoteIdentification)).ToArray();
+            var ToRemove = CurrentWhiteList.Where(item => item.AuthToken             != null && !AuthTokens.Contains(item.AuthToken) ||
+                                                          item.RemoteIdentification.HasValue && !eMAIds.    Contains(item.RemoteIdentification.Value)).ToArray();
 
             var ToInsert = AuthTokens.Where (item => !CurrentWhiteList.Contains(AuthInfo.FromAuthToken(item))).
                                       Select(item => AuthInfo.FromAuthToken(item)).Concat(
@@ -1884,8 +1884,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               ? await REMOVEFromWhiteList(DateTime.Now,
                                                           CancellationToken,
                                                           EventTrackingId,
-                                                          ToRemove.Where(item => item.AuthToken            != null).Select(item => item.AuthToken),
-                                                          ToRemove.Where(item => item.RemoteIdentification != null).Select(item => item.RemoteIdentification),
+                                                          ToRemove.Where(item => item.AuthToken             != null).Select(item => item.AuthToken),
+                                                          ToRemove.Where(item => item.RemoteIdentification.HasValue).Select(item => item.RemoteIdentification.Value),
                                                           RequestTimeout)
                               : new AuthInfoStatus[0];
 
@@ -1893,8 +1893,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               ? await ADDToWhiteList(DateTime.Now,
                                                      CancellationToken,
                                                      EventTrackingId,
-                                                     ToInsert.Where(item => item.AuthToken            != null).Select(item => item.AuthToken),
-                                                     ToInsert.Where(item => item.RemoteIdentification != null).Select(item => item.RemoteIdentification),
+                                                     ToInsert.Where(item => item.AuthToken             != null).Select(item => item.AuthToken),
+                                                     ToInsert.Where(item => item.RemoteIdentification.HasValue).Select(item => item.RemoteIdentification.Value),
                                                      RequestTimeout)
                               : new AuthInfoStatus[0];
 
