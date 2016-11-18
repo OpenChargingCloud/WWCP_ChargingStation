@@ -828,7 +828,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
-                    ChargingProduct_Id                ChargingProductId   = null,
+                    ChargingProduct_Id?               ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
                     IEnumerable<UInt32>               PINs                = null,
@@ -974,7 +974,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     ChargingReservation_Id            ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
-                    ChargingProduct_Id                ChargingProductId   = null,
+                    ChargingProduct_Id?               ChargingProductId   = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
                     IEnumerable<UInt32>               PINs                = null,
@@ -1237,9 +1237,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartEVSEResult>
 
-            RemoteStart(ChargingProduct_Id      ChargingProductId   = null,
+            RemoteStart(ChargingProduct_Id?     ChargingProductId   = null,
                         ChargingReservation_Id  ReservationId       = null,
-                        ChargingSession_Id      SessionId           = null,
+                        ChargingSession_Id?     SessionId           = null,
                         eMobilityProvider_Id?   ProviderId          = null,
                         eMobilityAccount_Id?    eMAId               = null,
 
@@ -1271,7 +1271,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     case EVSEStatusType.AVAILABLE_DOOR_NOT_CLOSED:
 
                         // Will also set the status -> EVSEStatusType.Charging!
-                        ChargingSession = new ChargingSession(SessionId) {
+                        ChargingSession = new ChargingSession(SessionId.Value) {
                                                                  EventTrackingId    = EventTrackingId,
                                                                  Reservation        = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
                                                                  ReservationId      = ReservationId,
@@ -1309,7 +1309,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         Reservation.AddToConsumedReservationTime(Reservation.Duration - Reservation.TimeLeft);
 
                         // Will also set the status -> EVSEStatusType.Charging;
-                        ChargingSession = new ChargingSession(SessionId) {
+                        ChargingSession = new ChargingSession(SessionId.Value) {
                                                                  EventTrackingId    = EventTrackingId,
                                                                  Reservation        = Reservation,
                                                                  ProviderIdStart    = ProviderId,

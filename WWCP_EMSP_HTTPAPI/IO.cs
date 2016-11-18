@@ -269,7 +269,7 @@ namespace org.GraphDefined.WWCP.EMSP
         {
 
             ChargingReservation_Id ChargingReservationId  = null;
-                                   ChargingSessionId      = null;
+                                   ChargingSessionId      = default(ChargingSession_Id);
                                    HTTPResponse           = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)

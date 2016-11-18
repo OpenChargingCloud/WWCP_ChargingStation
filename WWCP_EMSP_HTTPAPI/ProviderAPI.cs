@@ -508,7 +508,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              // IntendedCharging
                                              DateTime?               ChargingStartTime  = null;
                                              TimeSpan?               CharingDuration    = null;
-                                             ChargingProduct_Id      ChargingProductId  = null;
+                                             ChargingProduct_Id?     ChargingProductId  = null;
                                              var                     Plug               = PlugTypes.Unspecified;
                                              var                     Consumption        = 0U;
 
@@ -679,18 +679,28 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check ChargingProductId    [optional]
 
-                                                     if (JSON.TryGetValue("ChargingProductId", out JSONToken) &&
-                                                         !ChargingProduct_Id.TryParse(JSONToken.ToString(), out ChargingProductId))
-                                                     {
+                                                     if (!JSON.ParseOptionalN("ChargingProductId",
+                                                                              "Charging product identification",
+                                                                              HTTPServer.DefaultServerName,
+                                                                              ChargingProduct_Id.TryParse,
+                                                                              out ChargingProductId,
+                                                                              Request,
+                                                                              out _HTTPResponse))
 
-                                                         return SendEVSEReserved(
-                                                             new HTTPResponseBuilder(Request) {
-                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                 ContentType     = HTTPContentType.JSON_UTF8,
-                                                                 Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/ChargingProductId!")).ToUTF8Bytes()
-                                                             });
+                                                         return SendEVSEReserved(_HTTPResponse);
 
-                                                     }
+                                                     //if (JSON.TryGetValue("ChargingProductId", out JSONToken) &&
+                                                     //    !ChargingProduct_Id.TryParse(JSONToken.ToString(), out ChargingProductId))
+                                                     //{
+                                                     //
+                                                     //    return SendEVSEReserved(
+                                                     //        new HTTPResponseBuilder(Request) {
+                                                     //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
+                                                     //            ContentType     = HTTPContentType.JSON_UTF8,
+                                                     //            Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/ChargingProductId!")).ToUTF8Bytes()
+                                                     //        });
+                                                     //
+                                                     //}
 
                                                      #endregion
 
@@ -1156,9 +1166,9 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #region Parse JSON  [mandatory]
 
                                              JSONWrapper             JSON               = null;
-                                             ChargingProduct_Id      ChargingProductId  = null;
+                                             ChargingProduct_Id?     ChargingProductId  = null;
                                              ChargingReservation_Id  ReservationId      = null;
-                                             ChargingSession_Id      SessionId          = null;
+                                             ChargingSession_Id      SessionId          = default(ChargingSession_Id);
                                              eMobilityAccount_Id?    eMAId              = null;
 
                                              if (!Request.TryParseJObjectRequestBody(out JSON,
@@ -1169,13 +1179,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ChargingProductId  [optional]
 
-                                                 if (!JSON.ParseOptional("ChargingProductId",
-                                                                         "Charging product identification",
-                                                                         HTTPServer.DefaultServerName,
-                                                                         ChargingProduct_Id.TryParse,
-                                                                         out ChargingProductId,
-                                                                         Request,
-                                                                         out _HTTPResponse))
+                                                 if (!JSON.ParseOptionalN("ChargingProductId",
+                                                                          "Charging product identification",
+                                                                          HTTPServer.DefaultServerName,
+                                                                          ChargingProduct_Id.TryParse,
+                                                                          out ChargingProductId,
+                                                                          Request,
+                                                                          out _HTTPResponse))
 
                                                      return SendEVSERemoteStarted(_HTTPResponse);
 
@@ -1258,7 +1268,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                              AccessControlAllowHeaders  = "Content-Type, Accept, Authorization",
                                                              ContentType                = HTTPContentType.JSON_UTF8,
                                                              Content                    = JSONObject.Create(
-                                                                                              new JProperty("SessionId",  response?.Session?.Id?.ToString())
+                                                                                              new JProperty("SessionId",  response?.Session?.Id.ToString())
                                                                                           ).ToUTF8Bytes()
                                                          });
 
@@ -1444,7 +1454,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #region Parse JSON  [mandatory]
 
                                              JSONWrapper           JSON       = null;
-                                             ChargingSession_Id    SessionId  = null;
+                                             ChargingSession_Id    SessionId  = default(ChargingSession_Id);
                                              eMobilityAccount_Id?  eMAId      = null;
 
                                              if (!Request.TryParseJObjectRequestBody(out JSON,

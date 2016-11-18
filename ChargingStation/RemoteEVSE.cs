@@ -854,19 +854,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reserve(...)
 
-        public async Task<ReservationResult> Reserve(DateTime                Timestamp,
-                                                     CancellationToken       CancellationToken,
-                                                     EventTracking_Id        EventTrackingId,
-                                                     eMobilityProvider_Id                 ProviderId,
-                                                     eMobilityAccount_Id                  eMAId,
-                                                     ChargingReservation_Id  ReservationId,
-                                                     DateTime?               StartTime,
-                                                     TimeSpan?               Duration,
-                                                     ChargingProduct_Id      ChargingProductId  = null,
-                                                     IEnumerable<Auth_Token> AuthTokens         = null,
-                                                     IEnumerable<eMobilityAccount_Id>     eMAIds             = null,
-                                                     IEnumerable<UInt32>     PINs               = null,
-                                                     TimeSpan?               QueryTimeout       = null)
+        public async Task<ReservationResult> Reserve(DateTime                          Timestamp,
+                                                     CancellationToken                 CancellationToken,
+                                                     EventTracking_Id                  EventTrackingId,
+                                                     eMobilityProvider_Id              ProviderId,
+                                                     eMobilityAccount_Id               eMAId,
+                                                     ChargingReservation_Id            ReservationId,
+                                                     DateTime?                         StartTime,
+                                                     TimeSpan?                         Duration,
+                                                     ChargingProduct_Id?               ChargingProductId  = null,
+                                                     IEnumerable<Auth_Token>           AuthTokens         = null,
+                                                     IEnumerable<eMobilityAccount_Id>  eMAIds             = null,
+                                                     IEnumerable<UInt32>               PINs               = null,
+                                                     TimeSpan?                         RequestTimeout     = null)
         {
 
             #region Try to remove an existing reservation if this is an update!
@@ -944,9 +944,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              ChargingProduct_Id      ChargingProductId,
                                                              ChargingReservation_Id  ReservationId,
                                                              ChargingSession_Id      SessionId,
-                                                             eMobilityProvider_Id                 ProviderId,
-                                                             eMobilityAccount_Id                  eMAId,
-                                                             TimeSpan?               QueryTimeout  = null)
+                                                             eMobilityProvider_Id    ProviderId,
+                                                             eMobilityAccount_Id     eMAId,
+                                                             TimeSpan?               RequestTimeout  = null)
         {
 
             return RemoteStartEVSEResult.Offline;
@@ -964,7 +964,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             //                             SessionId,
             //                             ProviderId,
             //                             eMAId,
-            //                             QueryTimeout);
+            //                             RequestTimeout);
 
         }
 
@@ -979,13 +979,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <returns>A RemoteStopResult task.</returns>
-        public async Task<RemoteStopEVSEResult> RemoteStop(DateTime             Timestamp,
-                                                           CancellationToken    CancellationToken,
-                                                           EventTracking_Id     EventTrackingId,
-                                                           ChargingSession_Id   SessionId,
-                                                           ReservationHandling  ReservationHandling,
-                                                           eMobilityProvider_Id              ProviderId,
-                                                           TimeSpan?            QueryTimeout  = null)
+        public async Task<RemoteStopEVSEResult> RemoteStop(DateTime              Timestamp,
+                                                           CancellationToken     CancellationToken,
+                                                           EventTracking_Id      EventTrackingId,
+                                                           ChargingSession_Id    SessionId,
+                                                           ReservationHandling   ReservationHandling,
+                                                           eMobilityProvider_Id  ProviderId,
+                                                           TimeSpan?             RequestTimeout  = null)
         {
 
             return RemoteStopEVSEResult.Offline(SessionId);
@@ -1002,7 +1002,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             //                                   SessionId,
             //                                   ReservationHandling,
             //                                   ProviderId,
-            //                                   QueryTimeout);
+            //                                   RequestTimeout);
 
             //switch (result2.Result)
             //{
