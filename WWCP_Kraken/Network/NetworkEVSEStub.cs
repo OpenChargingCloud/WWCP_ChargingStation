@@ -63,6 +63,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         public static readonly TimeSpan ReservationSelfCancelAfter  = TimeSpan.FromSeconds(10);
 
+        private static readonly Random _random = new Random(DateTime.Now.Millisecond);
+
         #endregion
 
         #region Properties
@@ -869,7 +871,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             Reserve(DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -911,10 +913,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusType.Available:
 
-                    this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.New,
+                    this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(Operator.Id, _random.GetString(25)),
                                                                 Timestamp:               Timestamp.Value,
-                                                                StartTime:               StartTime.HasValue ? StartTime.Value : DateTime.Now,
-                                                                Duration:                Duration. HasValue ? Duration. Value : MaxReservationDuration,
+                                                                StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
+                                                                Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
                                                                 EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                 ConsumedReservationTime: TimeSpan.FromSeconds(0),
                                                                 ReservationLevel:        ChargingReservationLevel.EVSE,
@@ -997,10 +999,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (_Reservation == null)
-                return CancelReservationResult.Success(null);
-
-            if (ReservationId == null)
-                throw new ArgumentNullException(nameof(ReservationId), "The given charging reservation identification must not be null!");
+                return CancelReservationResult.Success(ReservationId);
 
             if (_Reservation.Id != ReservationId)
                 return CancelReservationResult.UnknownReservationId(ReservationId);
@@ -1016,7 +1015,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                            Timestamp.Value,
                                            this,
                                            EventTracking_Id.New,
-                                           SavedReservation?.Id,
+                                           SavedReservation.Id,
                                            SavedReservation,
                                            Reason);
 
@@ -1111,16 +1110,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartEVSEResult>
 
-            RemoteStart(ChargingProduct_Id?     ChargingProductId   = null,
-                        ChargingReservation_Id  ReservationId       = null,
-                        ChargingSession_Id?     SessionId           = null,
-                        eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id?    eMAId               = null,
+            RemoteStart(ChargingProduct_Id?      ChargingProductId   = null,
+                        ChargingReservation_Id?  ReservationId       = null,
+                        ChargingSession_Id?      SessionId           = null,
+                        eMobilityProvider_Id?    ProviderId          = null,
+                        eMobilityAccount_Id?     eMAId               = null,
 
-                        DateTime?               Timestamp           = null,
-                        CancellationToken?      CancellationToken   = null,
-                        EventTracking_Id        EventTrackingId     = null,
-                        TimeSpan?               RequestTimeout      = null)
+                        DateTime?                Timestamp           = null,
+                        CancellationToken?       CancellationToken   = null,
+                        EventTracking_Id         EventTrackingId     = null,
+                        TimeSpan?                RequestTimeout      = null)
 
         {
 

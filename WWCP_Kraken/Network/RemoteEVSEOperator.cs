@@ -131,7 +131,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             Reserve(EVSE_Id                           EVSEId,
                     DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -170,7 +170,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             Reserve(ChargingStation_Id                ChargingStationId,
                     DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -209,7 +209,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             Reserve(ChargingPool_Id                   ChargingPoolId,
                     DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -272,17 +272,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartEVSEResult>
 
-            RemoteStart(EVSE_Id                 EVSEId,
-                        ChargingProduct_Id?     ChargingProductId,
-                        ChargingReservation_Id  ReservationId,
-                        ChargingSession_Id?     SessionId,
-                        eMobilityProvider_Id?   ProviderId,
-                        eMobilityAccount_Id?    eMAId,
+            RemoteStart(EVSE_Id                  EVSEId,
+                        ChargingProduct_Id?      ChargingProductId,
+                        ChargingReservation_Id?  ReservationId,
+                        ChargingSession_Id?      SessionId,
+                        eMobilityProvider_Id?    ProviderId,
+                        eMobilityAccount_Id?     eMAId,
 
-                        DateTime?               Timestamp          = null,
-                        CancellationToken?      CancellationToken  = null,
-                        EventTracking_Id        EventTrackingId    = null,
-                        TimeSpan?               RequestTimeout     = null)
+                        DateTime?                Timestamp          = null,
+                        CancellationToken?       CancellationToken  = null,
+                        EventTracking_Id         EventTrackingId    = null,
+                        TimeSpan?                RequestTimeout     = null)
 
         {
 
@@ -337,17 +337,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartChargingStationResult>
 
-            RemoteStart(ChargingStation_Id      ChargingStationId,
-                        ChargingProduct_Id?     ChargingProductId,
-                        ChargingReservation_Id  ReservationId,
-                        ChargingSession_Id?     SessionId,
-                        eMobilityProvider_Id?   ProviderId,
-                        eMobilityAccount_Id?    eMAId,
+            RemoteStart(ChargingStation_Id       ChargingStationId,
+                        ChargingProduct_Id?      ChargingProductId,
+                        ChargingReservation_Id?  ReservationId,
+                        ChargingSession_Id?      SessionId,
+                        eMobilityProvider_Id?    ProviderId,
+                        eMobilityAccount_Id?     eMAId,
 
-                        DateTime?               Timestamp          = null,
-                        CancellationToken?      CancellationToken  = null,
-                        EventTracking_Id        EventTrackingId    = null,
-                        TimeSpan?               RequestTimeout     = null)
+                        DateTime?                Timestamp          = null,
+                        CancellationToken?       CancellationToken  = null,
+                        EventTracking_Id         EventTrackingId    = null,
+                        TimeSpan?                RequestTimeout     = null)
 
             => RemoteStartChargingStationResult.UnknownChargingStation;
 

@@ -981,7 +981,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             Reserve(DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -1022,7 +1022,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             Reserve(EVSE_Id                           EVSEId,
                     DateTime?                         StartTime,
                     TimeSpan?                         Duration,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -1140,17 +1140,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public virtual async Task<RemoteStartEVSEResult>
 
-            RemoteStart(EVSE_Id                 EVSEId,
-                        ChargingProduct_Id?     ChargingProductId   = null,
-                        ChargingReservation_Id  ReservationId       = null,
-                        ChargingSession_Id?     SessionId           = null,
-                        eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id?    eMAId               = null,
+            RemoteStart(EVSE_Id                  EVSEId,
+                        ChargingProduct_Id?      ChargingProductId   = null,
+                        ChargingReservation_Id?  ReservationId       = null,
+                        ChargingSession_Id?      SessionId           = null,
+                        eMobilityProvider_Id?    ProviderId          = null,
+                        eMobilityAccount_Id?     eMAId               = null,
 
-                        DateTime?               Timestamp           = null,
-                        CancellationToken?      CancellationToken   = null,
-                        EventTracking_Id        EventTrackingId     = null,
-                        TimeSpan?               RequestTimeout      = null)
+                        DateTime?                Timestamp           = null,
+                        CancellationToken?       CancellationToken   = null,
+                        EventTracking_Id         EventTrackingId     = null,
+                        TimeSpan?                RequestTimeout      = null)
 
             => RemoteStartEVSEResult.OutOfService;
 
@@ -1173,16 +1173,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartChargingStationResult>
 
-            RemoteStart(ChargingProduct_Id?     ChargingProductId   = null,
-                        ChargingReservation_Id  ReservationId       = null,
-                        ChargingSession_Id?     SessionId           = null,
-                        eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id?    eMAId               = null,
+            RemoteStart(ChargingProduct_Id?      ChargingProductId   = null,
+                        ChargingReservation_Id?  ReservationId       = null,
+                        ChargingSession_Id?      SessionId           = null,
+                        eMobilityProvider_Id?    ProviderId          = null,
+                        eMobilityAccount_Id?     eMAId               = null,
 
-                        DateTime?               Timestamp           = null,
-                        CancellationToken?      CancellationToken   = null,
-                        EventTracking_Id        EventTrackingId     = null,
-                        TimeSpan?               RequestTimeout      = null)
+                        DateTime?                Timestamp           = null,
+                        CancellationToken?       CancellationToken   = null,
+                        EventTracking_Id         EventTrackingId     = null,
+                        TimeSpan?                RequestTimeout      = null)
 
             => RemoteStartChargingStationResult.OutOfService;
 

@@ -182,7 +182,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                          out HTTPResponse            HTTPResponse)
         {
 
-            ChargingReservationId  = null;
+            ChargingReservationId  = default(ChargingReservation_Id);
             HTTPResponse           = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)
@@ -228,8 +228,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                                        out HTTPResponse         HTTPResponse)
         {
 
-            ChargingReservation_Id ChargingReservationId  = null;
-            ChargingReservation = null;
+            var ChargingReservationId  = default(ChargingReservation_Id);
+                ChargingReservation    = null;
 
             if (!HTTPRequest.ParseChargingReservationId(DefaultServerName,
                                                         out ChargingReservationId,
@@ -268,9 +268,9 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      out HTTPResponse        HTTPResponse)
         {
 
-            ChargingReservation_Id ChargingReservationId  = null;
-                                   ChargingSessionId      = default(ChargingSession_Id);
-                                   HTTPResponse           = null;
+            var ChargingReservationId  = default(ChargingReservation_Id);
+                ChargingSessionId      = default(ChargingSession_Id);
+                HTTPResponse           = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {

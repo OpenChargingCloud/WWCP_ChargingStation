@@ -825,7 +825,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             Reserve(ChargingReservationLevel          ReservationLevel,
                     DateTime?                         StartTime           = null,
                     TimeSpan?                         Duration            = null,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -905,7 +905,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         // Will do: Status = EVSEStatusType.Reserved
                         // Will do: Send OnNewReservation event!
-                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.New,
+                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(Operator.Id, _random.GetString(25)),
                                                                    Timestamp:               Timestamp.Value,
                                                                    StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
                                                                    Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
@@ -971,7 +971,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             Reserve(DateTime?                         StartTime           = null,
                     TimeSpan?                         Duration            = null,
-                    ChargingReservation_Id            ReservationId       = null,
+                    ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
                     ChargingProduct_Id?               ChargingProductId   = null,
@@ -1237,16 +1237,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartEVSEResult>
 
-            RemoteStart(ChargingProduct_Id?     ChargingProductId   = null,
-                        ChargingReservation_Id  ReservationId       = null,
-                        ChargingSession_Id?     SessionId           = null,
-                        eMobilityProvider_Id?   ProviderId          = null,
-                        eMobilityAccount_Id?    eMAId               = null,
+            RemoteStart(ChargingProduct_Id?      ChargingProductId   = null,
+                        ChargingReservation_Id?  ReservationId       = null,
+                        ChargingSession_Id?      SessionId           = null,
+                        eMobilityProvider_Id?    ProviderId          = null,
+                        eMobilityAccount_Id?     eMAId               = null,
 
-                        DateTime?               Timestamp           = null,
-                        CancellationToken?      CancellationToken   = null,
-                        EventTracking_Id        EventTrackingId     = null,
-                        TimeSpan?               RequestTimeout      = null)
+                        DateTime?                Timestamp           = null,
+                        CancellationToken?       CancellationToken   = null,
+                        EventTracking_Id         EventTrackingId     = null,
+                        TimeSpan?                RequestTimeout      = null)
 
         {
 

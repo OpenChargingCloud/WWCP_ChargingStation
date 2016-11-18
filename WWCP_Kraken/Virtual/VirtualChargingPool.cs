@@ -263,16 +263,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
             }
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id? ProviderId = null, ChargingProduct_Id? ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id ReservationId = null, eMobilityProvider_Id? ProviderId = null, ChargingProduct_Id? ChargingProductId = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
-        {
-            throw new NotImplementedException();
-        }
-
         public bool TryGetReservationById(ChargingReservation_Id ReservationId, out ChargingReservation Reservation)
         {
             throw new NotImplementedException();
@@ -301,31 +291,40 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        public Task<RemoteStartChargingStationResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, eMobilityProvider_Id ProviderId, eMobilityAccount_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<RemoteStartEVSEResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingProduct_Id ChargingProductId, ChargingReservation_Id ReservationId, ChargingSession_Id SessionId, eMobilityProvider_Id ProviderId, eMobilityAccount_Id eMAId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<RemoteStopResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id ProviderId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<RemoteStartChargingStationResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingProduct_Id? ChargingProductId, ChargingReservation_Id? ReservationId, ChargingSession_Id? SessionId, eMobilityProvider_Id? ProviderId, eMobilityAccount_Id? eMAId, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<RemoteStopEVSEResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id ProviderId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<RemoteStartEVSEResult> RemoteStart(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingProduct_Id? ChargingProductId, ChargingReservation_Id? ReservationId, ChargingSession_Id? SessionId, eMobilityProvider_Id? ProviderId, eMobilityAccount_Id? eMAId, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<RemoteStopChargingStationResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingStation_Id ChargingStationId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id ProviderId, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<RemoteStopResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id? ProviderId, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
+        public Task<RemoteStopEVSEResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id? ProviderId, TimeSpan? RequestTimeout = default(TimeSpan?))
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoteStopChargingStationResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingStation_Id ChargingStationId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id? ProviderId, TimeSpan? RequestTimeout = default(TimeSpan?))
+        {
+            throw new NotImplementedException();
+        }
 
     }
 

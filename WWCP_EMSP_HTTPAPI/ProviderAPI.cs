@@ -498,24 +498,24 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Parse JSON  [mandatory]
 
-                                             JSONWrapper             JSON               = null;
+                                             JSONWrapper              JSON               = null;
 
-                                             eMobilityAccount_Id?    eMAId              = null;
-                                             ChargingReservation_Id  ReservationId      = null;
-                                             DateTime?               StartTime          = null;
-                                             TimeSpan?               Duration           = null;
+                                             eMobilityAccount_Id?     eMAId              = null;
+                                             ChargingReservation_Id?  ReservationId      = null;
+                                             DateTime?                StartTime          = null;
+                                             TimeSpan?                Duration           = null;
 
                                              // IntendedCharging
-                                             DateTime?               ChargingStartTime  = null;
-                                             TimeSpan?               CharingDuration    = null;
-                                             ChargingProduct_Id?     ChargingProductId  = null;
-                                             var                     Plug               = PlugTypes.Unspecified;
-                                             var                     Consumption        = 0U;
+                                             DateTime?                ChargingStartTime  = null;
+                                             TimeSpan?                CharingDuration    = null;
+                                             ChargingProduct_Id?      ChargingProductId  = null;
+                                             var                      Plug               = PlugTypes.Unspecified;
+                                             var                      Consumption        = 0U;
 
                                              // AuthorizedIds
-                                             var                     AuthTokens         = new List<Auth_Token>();
-                                             var                     eMAIds             = new List<eMobilityAccount_Id>();
-                                             var                     PINs               = new List<UInt32>();
+                                             var                      AuthTokens         = new List<Auth_Token>();
+                                             var                      eMAIds             = new List<eMobilityAccount_Id>();
+                                             var                      PINs               = new List<UInt32>();
 
                                              if (Request.TryParseJObjectRequestBody(out JSON, out _HTTPResponse, AllowEmptyHTTPBody: true))
                                              {
@@ -582,18 +582,28 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ReservationId        [optional]
 
-                                                 if (JSON.TryGetValue("ReservationId", out JSONToken) &&
-                                                     !ChargingReservation_Id.TryParse(JSONToken.ToString(), out ReservationId))
-                                                 {
+                                                 if (!JSON.ParseOptionalN("ReservationId",
+                                                                          "Charging reservation identification",
+                                                                          HTTPServer.DefaultServerName,
+                                                                          ChargingReservation_Id.TryParse,
+                                                                          out ReservationId,
+                                                                          Request,
+                                                                          out _HTTPResponse))
 
-                                                     return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
-                                                             HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                             ContentType     = HTTPContentType.JSON_UTF8,
-                                                             Content         = new JObject(new JProperty("description", "Invalid ReservationId!")).ToUTF8Bytes()
-                                                         });
+                                                     return SendEVSEReserved(_HTTPResponse);
 
-                                                 }
+                                                 //if (JSON.TryGetValue("ReservationId", out JSONToken) &&
+                                                 //    !ChargingReservation_Id.TryParse(JSONToken.ToString(), out ReservationId))
+                                                 //{
+                                                 //
+                                                 //    return SendEVSEReserved(
+                                                 //        new HTTPResponseBuilder(Request) {
+                                                 //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
+                                                 //            ContentType     = HTTPContentType.JSON_UTF8,
+                                                 //            Content         = new JObject(new JProperty("description", "Invalid ReservationId!")).ToUTF8Bytes()
+                                                 //        });
+                                                 //
+                                                 //}
 
                                                  #endregion
 
@@ -1165,11 +1175,11 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Parse JSON  [mandatory]
 
-                                             JSONWrapper             JSON               = null;
-                                             ChargingProduct_Id?     ChargingProductId  = null;
-                                             ChargingReservation_Id  ReservationId      = null;
-                                             ChargingSession_Id      SessionId          = default(ChargingSession_Id);
-                                             eMobilityAccount_Id?    eMAId              = null;
+                                             JSONWrapper              JSON               = null;
+                                             ChargingProduct_Id?      ChargingProductId  = null;
+                                             ChargingReservation_Id?  ReservationId      = null;
+                                             ChargingSession_Id       SessionId          = default(ChargingSession_Id);
+                                             eMobilityAccount_Id?     eMAId              = null;
 
                                              if (!Request.TryParseJObjectRequestBody(out JSON,
                                                                                      out _HTTPResponse,
@@ -1193,13 +1203,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ReservationId      [optional]
 
-                                                 if (!JSON.ParseOptional("ReservationId",
-                                                                         "Charging reservation identification",
-                                                                         HTTPServer.DefaultServerName,
-                                                                         ChargingReservation_Id.TryParse,
-                                                                         out ReservationId,
-                                                                         Request,
-                                                                         out _HTTPResponse))
+                                                 if (!JSON.ParseOptionalN("ReservationId",
+                                                                          "Charging reservation identification",
+                                                                          HTTPServer.DefaultServerName,
+                                                                          ChargingReservation_Id.TryParse,
+                                                                          out ReservationId,
+                                                                          Request,
+                                                                          out _HTTPResponse))
 
                                                      return SendEVSERemoteStarted(_HTTPResponse);
 
