@@ -34,23 +34,23 @@ using org.GraphDefined.Vanaheimr.Hermod.Sockets.TCP;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.EMSP
+namespace org.GraphDefined.WWCP.SmartCity
 {
 
-    public class ProviderAPI
+    public class SmartCityAPI
     {
 
         #region Data
 
         private                HTTPEventSource  DebugLog;
 
-        private const          String           HTTPRoot                            = "org.GraphDefined.WWCP.EMSP.HTTPRoot";
+        private const          String           HTTPRoot                            = "org.GraphDefined.WWCP.SmartCity.HTTPRoot";
 
 
         /// <summary>
         /// The default HTTP server name.
         /// </summary>
-        public const           String           DefaultHTTPServerName               = "GraphDefined Provider API HTTP Service v0.3";
+        public const           String           DefaultHTTPServerName               = "GraphDefined Smart City API HTTP Service v0.3";
 
         /// <summary>
         /// The default HTTP server TCP port.
@@ -65,13 +65,13 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// The default HTTP logfile.
         /// </summary>
-        public const           String           DefaultLogfileName                  = "ProviderMap_HTTPAPI.log";
+        public const           String           DefaultLogfileName                  = "SmartCity_HTTPAPI.log";
 
 
         public  const           String          HTTPLogin                           = "chargingmap";
         public  const           String          HTTPPassword                        = "gf0c31j08ufgw3j9w3t";
 
-        public const            String          WWWAuthenticationRealm              = "Open Charging Cloud";
+        public const            String          WWWAuthenticationRealm              = "SmartCity";
 
         public readonly static  HTTPMethod      RESERVE                             = HTTPMethod.Create("RESERVE",     IsSafe: false, IsIdempotent: true);
         public readonly static  HTTPMethod      REMOTESTART                         = HTTPMethod.Create("REMOTESTART", IsSafe: false, IsIdempotent: true);
@@ -82,9 +82,9 @@ namespace org.GraphDefined.WWCP.EMSP
         #region Properties
 
         /// <summary>
-        /// The attached e-mobility service provider.
+        /// The attached smart city.
         /// </summary>
-        public IEMobilityProviderUserInterface         EMSP            { get; }
+        public ISmartCity                 SmartCity       { get; }
 
         /// <summary>
         /// The HTTP server of the API.
@@ -258,29 +258,29 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Constructor(s)
 
-        #region ProviderAPI(HTTPServerName = DefaultHTTPServerName, ...)
+        #region SmartCityAPI(HTTPServerName = DefaultHTTPServerName, ...)
 
-        public ProviderAPI(eMobilityServiceProvider          EMSP,
+        public SmartCityAPI(SmartCity                         SmartCity,
 
-                           String                            HTTPServerName                    = DefaultHTTPServerName,
-                           IPPort                            HTTPServerPort                    = null,
-                           HTTPHostname                      HTTPHostname                      = null,
-                           String                            URIPrefix                         = DefaultURIPrefix,
+                            String                            HTTPServerName                    = DefaultHTTPServerName,
+                            IPPort                            HTTPServerPort                    = null,
+                            HTTPHostname                      HTTPHostname                      = null,
+                            String                            URIPrefix                         = DefaultURIPrefix,
 
-                           String                            ServerThreadName                  = null,
-                           ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
-                           Boolean                           ServerThreadIsBackground          = true,
-                           ConnectionIdBuilder               ConnectionIdBuilder               = null,
-                           ConnectionThreadsNameBuilder      ConnectionThreadsNameBuilder      = null,
-                           ConnectionThreadsPriorityBuilder  ConnectionThreadsPriorityBuilder  = null,
-                           Boolean                           ConnectionThreadsAreBackground    = true,
-                           TimeSpan?                         ConnectionTimeout                 = null,
-                           UInt32                            MaxClientConnections              = TCPServer.__DefaultMaxClientConnections,
+                            String                            ServerThreadName                  = null,
+                            ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
+                            Boolean                           ServerThreadIsBackground          = true,
+                            ConnectionIdBuilder               ConnectionIdBuilder               = null,
+                            ConnectionThreadsNameBuilder      ConnectionThreadsNameBuilder      = null,
+                            ConnectionThreadsPriorityBuilder  ConnectionThreadsPriorityBuilder  = null,
+                            Boolean                           ConnectionThreadsAreBackground    = true,
+                            TimeSpan?                         ConnectionTimeout                 = null,
+                            UInt32                            MaxClientConnections              = TCPServer.__DefaultMaxClientConnections,
 
-                           DNSClient                         DNSClient                         = null,
-                           Boolean                           Autostart                         = false)
+                            DNSClient                         DNSClient                         = null,
+                            Boolean                           Autostart                         = false)
 
-            : this(EMSP,
+            : this(SmartCity,
                    new HTTPServer(TCPPort:                           HTTPServerPort ?? DefaultHTTPServerPort,
                                   DefaultServerName:                 HTTPServerName,
                                   ServerThreadName:                  ServerThreadName,
@@ -306,18 +306,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region (private) ProviderAPI(HTTPServer, HTTPHostname = "*", URIPrefix = "/", ...)
+        #region (private) SmartCityAPI(SmartCity, HTTPServer, HTTPHostname = "*", URIPrefix = "/", ...)
 
-        private ProviderAPI(eMobilityServiceProvider  EMSP,
-                            HTTPServer                HTTPServer,
-                            HTTPHostname              HTTPHostname  = null,
-                            String                    URIPrefix     = "/")
+        private SmartCityAPI(SmartCity                 SmartCity,
+                             HTTPServer                HTTPServer,
+                             HTTPHostname              HTTPHostname  = null,
+                             String                    URIPrefix     = "/")
         {
 
             #region Initial checks
 
-            if (EMSP == null)
-                throw new ArgumentNullException(nameof(EMSP),        "The given e-mobility service provider must not be null!");
+            if (SmartCity == null)
+                throw new ArgumentNullException(nameof(SmartCity),        "The given e-mobility service provider must not be null!");
 
             if (HTTPServer == null)
                 throw new ArgumentNullException(nameof(HTTPServer),  "The given HTTP server must not be null!");
@@ -332,7 +332,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Init data
 
-            this.EMSP          = EMSP;
+            this.SmartCity     = SmartCity;
 
             this.HTTPServer    = HTTPServer;
             this.HTTPHostname  = HTTPHostname ?? HTTPHostname.Any;
@@ -351,20 +351,20 @@ namespace org.GraphDefined.WWCP.EMSP
         #endregion
 
 
-        #region (static) AttachToHTTPAPI(HTTPServer, HTTPHostname = "*", URIPrefix = "/", ...)
+        #region (static) AttachToHTTPAPI(SmartCity, HTTPServer, HTTPHostname = "*", URIPrefix = "/", ...)
 
         /// <summary>
         /// Attach this HTTP API to the given HTTP server.
         /// </summary>
-        public static ProviderAPI AttachToHTTPAPI(eMobilityServiceProvider  EMSP,
-                                                  HTTPServer                HTTPServer,
-                                                  HTTPHostname              HTTPHostname  = null,
-                                                  String                    URIPrefix     = "/")
+        public static SmartCityAPI AttachToHTTPAPI(SmartCity     SmartCity,
+                                                   HTTPServer    HTTPServer,
+                                                   HTTPHostname  HTTPHostname  = null,
+                                                   String        URIPrefix     = "/")
 
-            => new ProviderAPI(EMSP,
-                               HTTPServer,
-                               HTTPHostname,
-                               URIPrefix);
+            => new SmartCityAPI(SmartCity,
+                                HTTPServer,
+                                HTTPHostname,
+                                URIPrefix);
 
         #endregion
 
@@ -873,7 +873,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var result = await EMSP.Reserve(EVSEId,
+                                             var result = await SmartCity.Reserve(EVSEId,
                                                                              StartTime,
                                                                              Duration,
                                                                              ReservationId,
@@ -1232,7 +1232,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var response = await EMSP.RemoteStart(EVSEId,
+                                             var response = await SmartCity.RemoteStart(EVSEId,
                                                                                    ChargingProductId,
                                                                                    ReservationId,
                                                                                    SessionId,
@@ -1492,7 +1492,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var response = await EMSP.RemoteStop(EVSEId,
+                                             var response = await SmartCity.RemoteStop(EVSEId,
                                                                                   SessionId,
                                                                                   ReservationHandling.Close, //ReservationHandling.KeepAlive(TimeSpan.FromMinutes(1)), // ToDo: Parse this property!
                                                                                   eMAId,

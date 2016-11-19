@@ -38,11 +38,11 @@ namespace org.GraphDefined.WWCP
                                               Authorizator_Id                               AuthorizatorId,
                                               I18NString                                    Name,
                                               I18NString                                    Description   = null,
-                                              Action<eMobilityProvider>                     Configurator  = null,
+                                              Action<eMobilityProviderStub>                     Configurator  = null,
                                               eMobilityProviderPriority                     Priority      = null,
                                               eMobilityProviderAdminStatusType              AdminStatus   = eMobilityProviderAdminStatusType.Available,
                                               eMobilityProviderStatusType                   Status        = eMobilityProviderStatusType.Available,
-                                              Action<eMobilityProvider>                     OnSuccess     = null,
+                                              Action<eMobilityProviderStub>                     OnSuccess     = null,
                                               Action<RoamingNetwork, eMobilityProvider_Id>  OnError       = null)
 
         {

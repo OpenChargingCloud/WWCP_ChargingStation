@@ -27,7 +27,7 @@ using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.EMSP
+namespace org.GraphDefined.WWCP.SmartCity
 {
 
     /// <summary>
@@ -45,14 +45,14 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
     /// <param name="QueryTimeout">An optional timeout for this request.</param>
     public delegate Task<RemoteStartEVSEResult> OnRemoteStartDelegate(DateTime                Timestamp,
-                                                                      ProviderAPI             Sender,
+                                                                      SmartCityAPI             Sender,
                                                                       CancellationToken       CancellationToken,
                                                                       EventTracking_Id        EventTrackingId,
                                                                       EVSE_Id                 EVSEId,
                                                                       ChargingProduct_Id      ChargingProductId,
                                                                       ChargingReservation_Id  ReservationId,
                                                                       ChargingSession_Id      SessionId,
-                                                                      eMobilityAccount_Id                  eMAId,
+                                                                      eMobilityAccount_Id     eMAId,
                                                                       TimeSpan?               QueryTimeout  = null);
 
 
@@ -69,7 +69,7 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="eMAId">The unique identification of the e-mobility account.</param>
     /// <param name="QueryTimeout">An optional timeout for this request.</param>
     public delegate Task<RemoteStopEVSEResult> OnRemoteStopDelegate(DateTime             Timestamp,
-                                                                    ProviderAPI          Sender,
+                                                                    SmartCityAPI          Sender,
                                                                     CancellationToken    CancellationToken,
                                                                     EventTracking_Id     EventTrackingId,
                                                                     EVSE_Id              EVSEId,
@@ -97,7 +97,7 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
     /// <param name="QueryTimeout">An optional timeout for this request.</param>
     public delegate Task<ReservationResult> OnReserveEVSEDelegate(DateTime                 Timestamp,
-                                                                  ProviderAPI              Sender,
+                                                                  SmartCityAPI              Sender,
                                                                   CancellationToken        CancellationToken,
                                                                   EventTracking_Id         EventTrackingId,
                                                                   EVSE_Id                  EVSEId,
@@ -113,7 +113,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
     public delegate Task<CancelReservationResult> OnCancelReservationDelegate(DateTime                               Timestamp,
-                                                                              ProviderAPI                            Sender,
+                                                                              SmartCityAPI                            Sender,
                                                                               CancellationToken                      CancellationToken,
                                                                               EventTracking_Id                       EventTrackingId,
                                                                               ChargingReservation_Id                 ChargingReservationId,
@@ -121,7 +121,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                               TimeSpan?                              QueryTimeout  = null);
 
     public delegate Task<CancelReservationResult> OnDeleteReservationDelegate(DateTime                               Timestamp,
-                                                                              ProviderAPI                            Sender,
+                                                                              SmartCityAPI                            Sender,
                                                                               CancellationToken                      CancellationToken,
                                                                               EventTracking_Id                       EventTrackingId,
                                                                               ChargingReservation_Id                 ChargingReservationId,

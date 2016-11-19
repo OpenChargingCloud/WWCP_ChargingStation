@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<svg version            = "1.1"
+     xmlns              = "http://www.w3.org/2000/svg"
+     xmlns:xlink        = "http://www.w3.org/1999/xlink" x="0px" y="0px"
+     viewBox            = "0 0 24.716 27.295"
+     enable-background  = "new 0 0 24.716 27.295"
+     xml:space          = "preserve">
+
+    <path d="M18.327,3.848h0.04l-1.857-2.851c-2.783-1.269-5.279-1.357-8.185-0.089L6.33,3.848h0.059c-3.809,2-6.389,6.34-6.389,11c0,6.825,5.533,12.447,12.358,12.447s12.358-5.666,12.358-12.491C24.716,10.144,22.136,5.848,18.327,3.848z"/>
+
+    <circle cx="12.358" cy="14.848" r="11.05" fill="#FFFFFF" />
+
+    <g>
+        <circle                  stroke-miterlimit="10" cx="12.377" cy="8.420"  r="4.0" />
+        <circle fill  ="#FFFFFF" stroke-miterlimit="10" cx="12.377" cy="8.420"  r="3.0" />
+        <line   stroke="#000000" stroke-miterlimit="10" x1="10.466" y1="6.436" x2="14.355" y2="10.325" />
+        <line   stroke="#000000" stroke-miterlimit="10" x1="14.222" y1="6.524" x2="10.466" y2="10.280" />
+    </g>
+
+    <circle cx="18.563" cy="15.04"  r="3.774" />
+    <circle cx="6.11"   cy="15.342" r="3.774" />
+
+    <g>
+        <circle                  stroke-miterlimit="10" cx="12.377" cy="21.476"  r="4.0" />
+        <circle fill  ="#FFFFFF" stroke-miterlimit="10" cx="12.377" cy="21.476"  r="3.0" />
+        <line   stroke="#000000" stroke-miterlimit="10" x1="10.466" y1="19.492" x2="14.355" y2="23.381" />
+        <line   stroke="#000000" stroke-miterlimit="10" x1="14.222" y1="19.580" x2="10.466" y2="23.337" />
+    </g>
+
+</svg>

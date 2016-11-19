@@ -1,0 +1,260 @@
+﻿.EVSE_available {
+  background-image: linear-gradient(to bottom, #B3DB92, #73B53E);
+  Content: "Available";
+  font-size: 75%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center; }
+
+.EVSE_reserved {
+  background-image: linear-gradient(to bottom, #FFE07F, #E2C264);
+  Content: "Reserved";
+  font-size: 75%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center; }
+
+.EVSE_occupied {
+  background-image: linear-gradient(to bottom, #E87D7D, #BD3535);
+  Content: "Occupied";
+  font-size: 75%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center; }
+
+.EVSE_unknown {
+  background-image: linear-gradient(to bottom, #cdcdcd, #b3b3b3);
+  Content: "Unknown";
+  font-size: 75%;
+  padding: 4px 6px;
+  border-radius: 4px;
+  text-align: center; }
+
+#InfoText {
+  position: absolute;
+  top: 113px;
+  bottom: 0px;
+  left: 0px;
+  /*min-width:              17vw;
+    max-width:              25vw;*/
+  width: 18vw;
+  display: none;
+  background-color: rgba(245, 245, 245, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 0px 10px 0px 0px;
+  box-shadow: 3px 3px 15px 0px gray;
+  font-size: 140%;
+  z-index: 1000; }
+
+#TextGroup {
+  background-color: whitesmoke;
+  border-radius: 0px 10px 0px 0px;
+  padding: 8px;
+  border-bottom: 1px solid rgba(200, 200, 200, 0.6); }
+
+#ChargingStationName {
+  font-size: 120%;
+  font-weight: bold;
+  margin-bottom: 4px; }
+
+.ChargingStationInfo {
+  font-size: 60%;
+  padding: 0px 20px 1px 10px; }
+
+.ChargingStations {
+  padding-left: 5px;
+  padding-top: 5px; }
+
+.ChargingStations .EVSEs:nth-child(2) {
+  border-radius: 7px 7px 0px 0px; }
+
+.ChargingStations .EVSEs:last-child {
+  border-bottom: 1px solid rgba(200, 200, 200, 0.6);
+  border-radius: 0px 0px 7px 7px; }
+
+@keyframes fadeIn {
+  from {
+    opacity: 0; }
+  to {
+    opacity: 1; } }
+
+.fade-in {
+  opacity: 0;
+  /* making it invisible at startup */
+  animation: fadeIn ease-in 1;
+  animation-fill-mode: forwards;
+  animation-duration: 0.3s; }
+
+.EVSEs {
+  display: table;
+  width: calc(100% - 42px);
+  padding: 15px 15px 10px 15px;
+  border-top: 1px solid rgba(200, 200, 200, 0.6);
+  border-left: 1px solid rgba(200, 200, 200, 0.6);
+  border-right: 1px solid rgba(200, 200, 200, 0.6);
+  border-radius: 0px;
+  background-color: rgba(230, 230, 230, 0.6); }
+
+.SVGSockets {
+  width: 36px;
+  height: 36px; }
+
+.PlugInfos {
+  width: 36px;
+  height: 36px;
+  float: left;
+  overflow: hidden; }
+
+.PlugImage {
+  height: 36px; }
+
+.EVSEInfos {
+  float: left;
+  margin: 0px 0px 0px 10px;
+  font-size: 65%; }
+
+.ElectricalInfos {
+  font-size: 130%;
+  font-weight: bold; }
+
+.EVSEStatusCharging {
+  color: rgba(167, 167, 167, 0.7); }
+
+.EVSEStatusInfos {
+  margin-top: 4px; }
+
+.EVSEButtons {
+  float: right;
+  margin-top: 1px;
+  margin-left: 12px; }
+
+.EVSEButtons > button {
+  height: 32px;
+  vertical-align: top;
+  border-radius: 6px;
+  border: 1px solid rgba(170, 170, 170, 0.8);
+  padding: 1px 10px 1px 10px;
+  font-size: 90%; }
+
+.EVSEButtons > button:disabled {
+  color: rgba(156, 156, 156, 0.6); }
+
+.ReserveButton {
+  background: linear-gradient(rgba(129, 166, 210, 0.9), rgba(85, 134, 191, 0.9)); }
+
+.ReserveButton:disabled {
+  background: linear-gradient(rgba(129, 166, 210, 0.4), rgba(85, 134, 191, 0.4)); }
+
+.RemoteStartButton {
+  margin-left: 4px;
+  background: linear-gradient(rgba(111, 193, 111, 0.9), rgba(71, 146, 71, 0.9)); }
+
+.RemoteStartButton:disabled {
+  background: linear-gradient(rgba(111, 193, 111, 0.4), rgba(71, 146, 71, 0.4)); }
+
+@media only screen and (max-width: 512px) {
+  #InfoText {
+    top: auto;
+    min-width: 0%;
+    max-width: 100%;
+    width: 100%;
+    border-radius: 0px 0px 0px 0px;
+    font-size: 110%; }
+  #TextGroup {
+    border-radius: 0px 0px 0px 0px; }
+  .EVSEs {
+    width: calc(100% - 20px);
+    padding: 9px 10px 8px 10px;
+    margin: 0px; }
+  .ChargingStationInfo {
+    font-size: 70%; }
+  .ChargingStations .EVSEs:nth-child(2) {
+    border-radius: 7px 0px 0px 0px; }
+  .ChargingStations .EVSEs:last-child {
+    border-bottom: 1px solid rgba(200, 200, 200, 0.6);
+    border-radius: 0px 0px 0px 7px; }
+  .PlugImage {
+    height: 36px; } }
+
+body {
+  background-color: #4789d7;
+  /*background:             url("../images/clouds-bg.jpg") no-repeat center center fixed;*/
+  background-size: cover;
+  margin: 0px;
+  padding: 0px;
+  font-family: Arial, helvetica, Verdana, "Trebuchet MS", sans-serif;
+  font-size: 12px; }
+
+#logo {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  width: calc(35% - 15px);
+  height: 42px;
+  background-color: rgba(247, 247, 247, 0.8);
+  padding: 0 0 0 15px;
+  overflow: hidden;
+  color: #5252A2;
+  font-size: 100%;
+  line-height: 42px; }
+
+#search {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  width: 65%;
+  height: 42px;
+  background-color: rgba(247, 247, 247, 0.8);
+  transform-style: preserve-3d;
+  overflow: hidden; }
+
+#searchframe {
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #ffffff;
+  font-size: 60%;
+  padding: 0px 5px 0px 7px;
+  margin: 0px 4px 0px 8px;
+  border: 1px solid rgba(109, 109, 109, 0.6);
+  border-radius: 10px; }
+
+#searchglass {
+  display: inline-block;
+  width: 15px; }
+
+#searchslot {
+  display: inline-block;
+  width: calc(100% - 50px); }
+
+#searchslotinput {
+  width: 100%;
+  border: 0px;
+  background-color: transparent;
+  margin: 0px 3px;
+  padding: 2px 5px;
+  font-size: 200%; }
+
+#cog {
+  display: inline-block;
+  width: 30px;
+  text-align: right;
+  color: rgba(107, 107, 107, 0.8); }
+
+#map {
+  position: absolute;
+  top: 42px;
+  left: 0px;
+  height: calc(100% - 42px);
+  width: 100%; }
+
+.leaflet-control-attribution {
+  font-size: 80% !important; }
+
+span.hidden {
+  display: none; }
+
+@media only screen and (max-width: 512px) {
+  #logo {
+    top: 0px; } }
+

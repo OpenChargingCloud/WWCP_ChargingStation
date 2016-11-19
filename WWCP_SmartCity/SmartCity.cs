@@ -29,14 +29,14 @@ using org.GraphDefined.Vanaheimr.Illias;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.EMSP
+namespace org.GraphDefined.WWCP.SmartCity
 {
 
     /// <summary>
-    /// An e-mobility service provider.
+    /// A smart city.
     /// </summary>
-    public class eMobilityServiceProvider : IEMobilityProviderUserInterface,
-                                            IRemoteEMobilityProvider
+    public class SmartCity : ISmartCity,
+                             IRemoteSmartCity
     {
 
         #region Data
@@ -50,19 +50,22 @@ namespace org.GraphDefined.WWCP.EMSP
         #region Properties
 
         /// <summary>
-        /// The unique identification of the e-mobility service provider.
+        /// The unique identification of a smart city.
         /// </summary>
-        public eMobilityProvider_Id  Id                 { get; }
+        public SmartCity_Id          Id                 { get; }
 
         public Authorizator_Id       AuthorizatorId     { get; }
 
 
-        #region EVSP
+        public eMobilityProvider_Id  eMobilityProviderId { get; }
 
-        private readonly eMobilityProviderStub _EVSP;
 
-        public eMobilityProviderStub EVSP
-            => _EVSP;
+        #region SmartCityStub
+
+        private readonly SmartCityStub _SmartCityStub;
+
+        public SmartCityStub SmartCityStub
+            => _SmartCityStub;
 
         #endregion
 
@@ -185,14 +188,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Constructor(s)
 
-        internal eMobilityServiceProvider(eMobilityProvider_Id  Id,
-                                          RoamingNetwork        RoamingNetwork,
-                                          Authorizator_Id       AuthorizatorId = null)
+        internal SmartCity(SmartCity_Id          Id,
+                           RoamingNetwork        RoamingNetwork,
+                           Authorizator_Id       AuthorizatorId = null)
         {
 
             this.Id                          = Id;
             this.RoamingNetwork              = RoamingNetwork;
-            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP Smart City");
 
             this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
@@ -202,14 +205,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
         }
 
-        internal eMobilityServiceProvider(eMobilityProviderStub  EVSP,
-                                          Authorizator_Id    AuthorizatorId = null)
+        internal SmartCity(SmartCityStub    SmartCity,
+                           Authorizator_Id  AuthorizatorId = null)
         {
 
-            this.Id                          = EVSP.Id;
-            this.RoamingNetwork              = EVSP.RoamingNetwork;
-            this._EVSP                       = EVSP;
-            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+            this.Id                          = SmartCity.Id;
+            this.RoamingNetwork              = SmartCity.RoamingNetwork;
+            this._SmartCityStub              = SmartCity;
+            this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP Smart City");
 
             this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
@@ -584,7 +587,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Initial checks
 
             if (RoamingNetwork == null)
-                throw new ArgumentNullException(nameof(SmartCityStub), "The given roaming network must not be null!");
+                throw new ArgumentNullException(nameof(WWCP.SmartCityStub), "The given roaming network must not be null!");
 
             #endregion
 
@@ -992,7 +995,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                     return AuthStartResult.Authorized(AuthorizatorId,
                                                       _SessionId,
-                                                      EVSP.Id);
+                                                      eMobilityProviderId);
 
                 }
 
@@ -1002,7 +1005,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStartResult.Blocked(AuthorizatorId,
-                                                   EVSP.Id,
+                                                   eMobilityProviderId,
                                                    "Token is blocked!");
 
                 #endregion
@@ -1019,7 +1022,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStartResult.NotAuthorized(AuthorizatorId,
-                                                 EVSP.Id,
+                                                 eMobilityProviderId,
                                                  "Unkown token!");
 
             #endregion
@@ -1084,7 +1087,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                     return AuthStartEVSEResult.Authorized(AuthorizatorId,
                                                           _SessionId,
-                                                          EVSP.Id);
+                                                          eMobilityProviderId);
 
                 }
 
@@ -1094,7 +1097,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStartEVSEResult.Blocked(AuthorizatorId,
-                                                       EVSP.Id,
+                                                       eMobilityProviderId,
                                                        "Token is blocked!");
 
                 #endregion
@@ -1111,7 +1114,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
-                                                     EVSP.Id,
+                                                     eMobilityProviderId,
                                                      "Unkown token!");
 
             #endregion
@@ -1179,7 +1182,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                     return AuthStartChargingStationResult.Authorized(AuthorizatorId,
                                                                      _SessionId,
-                                                                     EVSP.Id);
+                                                                     eMobilityProviderId);
 
                 }
 
@@ -1189,7 +1192,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStartChargingStationResult.Blocked(AuthorizatorId,
-                                                                  EVSP.Id,
+                                                                  eMobilityProviderId,
                                                                   "Token is blocked!");
 
                 #endregion
@@ -1206,7 +1209,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStartChargingStationResult.NotAuthorized(AuthorizatorId,
-                                                                EVSP.Id,
+                                                                eMobilityProviderId,
                                                                 "Unkown token!");
 
             #endregion
@@ -1277,12 +1280,12 @@ namespace org.GraphDefined.WWCP.EMSP
                     // Authorized
                     if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
                         return AuthStopResult.Authorized(AuthorizatorId,
-                                                         EVSP.Id);
+                                                         eMobilityProviderId);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopResult.NotAuthorized(AuthorizatorId,
-                                                            EVSP.Id,
+                                                            eMobilityProviderId,
                                                             "Invalid token for given session identification!");
 
                 }
@@ -1293,7 +1296,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopResult.Blocked(AuthorizatorId,
-                                                  EVSP.Id,
+                                                  eMobilityProviderId,
                                                   "Token is blocked!");
 
                 #endregion
@@ -1309,7 +1312,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             // Unkown Token!
             return AuthStopResult.NotAuthorized(AuthorizatorId,
-                                                EVSP.Id,
+                                                eMobilityProviderId,
                                                 "Unkown token!");
 
         }
@@ -1382,12 +1385,12 @@ namespace org.GraphDefined.WWCP.EMSP
                     // Authorized
                     if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
                         return AuthStopEVSEResult.Authorized(AuthorizatorId,
-                                                             EVSP.Id);
+                                                             eMobilityProviderId);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
-                                                                EVSP.Id,
+                                                                eMobilityProviderId,
                                                                 "Invalid token for given session identification!");
 
                 }
@@ -1398,7 +1401,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopEVSEResult.Blocked(AuthorizatorId,
-                                                      EVSP.Id,
+                                                      eMobilityProviderId,
                                                       "Token is blocked!");
 
                 #endregion
@@ -1414,7 +1417,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             // Unkown Token!
             return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
-                                                    EVSP.Id,
+                                                    eMobilityProviderId,
                                                     "Unkown token!");
 
         }
@@ -1625,7 +1628,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                       EVSEId,
                                       StartTime,
                                       Duration,
-                                      Id,
+                                      eMobilityProviderId,
                                       eMAId,
                                       ChargingProductId,
                                       AuthTokens,
@@ -1636,7 +1639,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveEVSE));
+                e.Log(nameof(SmartCity) + "." + nameof(OnReserveEVSE));
             }
 
             #endregion
@@ -1646,7 +1649,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                         StartTime,
                                                         Duration,
                                                         ReservationId,
-                                                        Id,
+                                                        eMobilityProviderId,
                                                         eMAId,
                                                         ChargingProductId,
                                                         AuthTokens,
@@ -1675,7 +1678,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                        EVSEId,
                                        StartTime,
                                        Duration,
-                                       Id,
+                                       eMobilityProviderId,
                                        eMAId,
                                        ChargingProductId,
                                        AuthTokens,
@@ -1688,7 +1691,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnEVSEReserved));
+                e.Log(nameof(SmartCity) + "." + nameof(OnEVSEReserved));
             }
 
             #endregion
@@ -1727,7 +1730,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             var response = await RoamingNetwork.CancelReservation(ReservationId,
                                                                   Reason,
-                                                                  Id,
+                                                                  eMobilityProviderId,
                                                                   EVSEId,
 
                                                                   Timestamp,
@@ -1807,14 +1810,14 @@ namespace org.GraphDefined.WWCP.EMSP
                                           ChargingProductId,
                                           ReservationId,
                                           SessionId,
-                                          Id,
+                                          eMobilityProviderId,
                                           eMAId,
                                           RequestTimeout);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStart));
+                e.Log(nameof(SmartCity) + "." + nameof(OnRemoteEVSEStart));
             }
 
             #endregion
@@ -1824,7 +1827,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                             ChargingProductId,
                                                             ReservationId,
                                                             SessionId,
-                                                            Id,
+                                                            eMobilityProviderId,
                                                             eMAId,
 
                                                             Timestamp,
@@ -1849,7 +1852,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                             ChargingProductId,
                                             ReservationId,
                                             SessionId,
-                                            Id,
+                                            eMobilityProviderId,
                                             eMAId,
                                             RequestTimeout,
                                             response,
@@ -1858,7 +1861,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStarted));
+                e.Log(nameof(SmartCity) + "." + nameof(OnRemoteEVSEStarted));
             }
 
             #endregion
@@ -1925,14 +1928,14 @@ namespace org.GraphDefined.WWCP.EMSP
                                          EVSEId,
                                          SessionId,
                                          ReservationHandling,
-                                         Id,
+                                         eMobilityProviderId,
                                          eMAId,
                                          RequestTimeout);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStop));
+                e.Log(nameof(SmartCity) + "." + nameof(OnRemoteEVSEStop));
             }
 
             #endregion
@@ -1941,7 +1944,7 @@ namespace org.GraphDefined.WWCP.EMSP
             var response = await RoamingNetwork.RemoteStop(EVSEId,
                                                            SessionId,
                                                            ReservationHandling,
-                                                           Id,
+                                                           eMobilityProviderId,
                                                            eMAId,
 
                                                            Timestamp,
@@ -1965,7 +1968,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                             EVSEId,
                                             SessionId,
                                             ReservationHandling,
-                                            Id,
+                                            eMobilityProviderId,
                                             eMAId,
                                             RequestTimeout,
                                             response,
@@ -1974,7 +1977,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStopped));
+                e.Log(nameof(SmartCity) + "." + nameof(OnRemoteEVSEStopped));
             }
 
             #endregion
