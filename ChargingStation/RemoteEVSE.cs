@@ -976,7 +976,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Initiate a remote stop of the given charging session at the given EVSE.
         /// </summary>
         /// <param name="EVSEId">The unique identification of an EVSE.</param>
-        /// <param name="ReservationHandling">Wether to remove the reservation after session end, or to keep it open for some more time.</param>
+        /// <param name="ReservationHandling">Whether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <returns>A RemoteStopResult task.</returns>
         public async Task<RemoteStopEVSEResult> RemoteStop(DateTime              Timestamp,

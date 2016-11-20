@@ -313,8 +313,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="Id">The unique identifier of the charging station.</param>
         /// <param name="EVSEOperatorDNS">The optional DNS name of the Charging Station Operator backend to connect to.</param>
-        /// <param name="UseIPv4">Wether to use IPv4 as networking protocol.</param>
-        /// <param name="UseIPv6">Wether to use IPv6 as networking protocol.</param>
+        /// <param name="UseIPv4">Whether to use IPv4 as networking protocol.</param>
+        /// <param name="UseIPv6">Whether to use IPv6 as networking protocol.</param>
         /// <param name="PreferIPv6">Prefer IPv6 (instead of IPv4) as networking protocol.</param>
         /// <param name="EVSEOperatorTimeout">The timeout connecting to the Charging Station Operator backend.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
