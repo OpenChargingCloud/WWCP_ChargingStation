@@ -207,9 +207,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Status
 
-        private ChargingStationStatusType _Status;
+        private ChargingStationStatusTypes _Status;
 
-        public ChargingStationStatusType Status
+        public ChargingStationStatusTypes Status
         {
             get
             {
@@ -336,7 +336,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 throw new ArgumentNullException("Id", "The charging station identifier must not be null!");
 
             this._Id         = Id;
-            this._Status     = ChargingStationStatusType.Offline;
+            this._Status     = ChargingStationStatusTypes.Offline;
 
             this._TCPClient  = new TCPClient(DNSName:            EVSEOperatorDNS,
                                              ServiceName:        "WWCP",

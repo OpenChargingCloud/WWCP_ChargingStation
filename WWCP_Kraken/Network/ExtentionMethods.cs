@@ -79,20 +79,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            return ChargingPool.CreateNewStation(ChargingStationId,
-                                                 ChargingStationConfigurator,
-                                                 newstation => {
+            return ChargingPool.CreateChargingStation(ChargingStationId,
+                                                      ChargingStationConfigurator,
+                                                      newstation => {
 
-                                                     var remotestation = new NetworkChargingStationStub(newstation, MaxStatusListSize, MaxAdminStatusListSize);
+                                                          var remotestation = new NetworkChargingStationStub(newstation, MaxStatusListSize, MaxAdminStatusListSize);
 
-                                                     RemoteChargingStationConfigurator?.Invoke(remotestation);
+                                                          RemoteChargingStationConfigurator?.Invoke(remotestation);
 
-                                                     return remotestation;
+                                                          return remotestation;
 
-                                                 },
+                                                      },
 
-                                                 OnSuccess: OnSuccess,
-                                                 OnError:   OnError);
+                                                      OnSuccess: OnSuccess,
+                                                      OnError:   OnError);
 
         }
 

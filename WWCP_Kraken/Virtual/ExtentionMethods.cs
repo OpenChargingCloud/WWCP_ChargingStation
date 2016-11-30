@@ -56,20 +56,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            return ChargingPool.CreateNewStation(ChargingStationId,
-                                                 ChargingStationConfigurator,
-                                                 newstation => {
+            return ChargingPool.CreateChargingStation(ChargingStationId,
+                                                      ChargingStationConfigurator,
+                                                      newstation => {
 
-                                                     var virtualstation = new VirtualChargingStation(newstation);
+                                                          var virtualstation = new VirtualChargingStation(newstation);
 
-                                                     VirtualChargingStationConfigurator?.Invoke(virtualstation);
+                                                          VirtualChargingStationConfigurator?.Invoke(virtualstation);
 
-                                                     return virtualstation;
+                                                          return virtualstation;
 
-                                                 },
+                                                      },
 
-                                                 OnSuccess: OnSuccess,
-                                                 OnError:   OnError);
+                                                      OnSuccess: OnSuccess,
+                                                      OnError:   OnError);
 
         }
 

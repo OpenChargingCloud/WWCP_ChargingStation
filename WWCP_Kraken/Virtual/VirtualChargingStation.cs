@@ -117,7 +117,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The current charging station status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<ChargingStationStatusType> Status
+        public Timestamped<ChargingStationStatusTypes> Status
         {
 
             get
@@ -142,12 +142,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region StatusSchedule
 
-        private StatusSchedule<ChargingStationStatusType> _StatusSchedule;
+        private StatusSchedule<ChargingStationStatusTypes> _StatusSchedule;
 
         /// <summary>
         /// The charging station status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<ChargingStationStatusType>> StatusSchedule
+        public IEnumerable<Timestamped<ChargingStationStatusTypes>> StatusSchedule
         {
             get
             {
@@ -164,7 +164,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The current charging station admin status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<ChargingStationAdminStatusType> AdminStatus
+        public Timestamped<ChargingStationAdminStatusTypes> AdminStatus
         {
 
             get
@@ -189,12 +189,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region AdminStatusSchedule
 
-        private StatusSchedule<ChargingStationAdminStatusType> _AdminStatusSchedule;
+        private StatusSchedule<ChargingStationAdminStatusTypes> _AdminStatusSchedule;
 
         /// <summary>
         /// The charging station admin status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<ChargingStationAdminStatusType>> AdminStatusSchedule
+        public IEnumerable<Timestamped<ChargingStationAdminStatusTypes>> AdminStatusSchedule
         {
             get
             {
@@ -325,11 +325,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this.Id                   = ChargingStation.Id;
             this._EVSEs                = new HashSet<VirtualEVSE>();
 
-            this._StatusSchedule       = new StatusSchedule<ChargingStationStatusType>(MaxStatusListSize);
-            this._StatusSchedule.Insert(ChargingStationStatusType.OutOfService);
+            this._StatusSchedule       = new StatusSchedule<ChargingStationStatusTypes>(MaxStatusListSize);
+            this._StatusSchedule.Insert(ChargingStationStatusTypes.OutOfService);
 
-            this._AdminStatusSchedule  = new StatusSchedule<ChargingStationAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusType.OutOfService);
+            this._AdminStatusSchedule  = new StatusSchedule<ChargingStationAdminStatusTypes>(MaxStatusListSize);
+            this._AdminStatusSchedule.Insert(ChargingStationAdminStatusTypes.OutOfService);
 
             this._WhiteLists           = new Dictionary<String, HashSet<AuthInfo>>();
             _WhiteLists.Add("default", new HashSet<AuthInfo>());
@@ -417,7 +417,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
-        public void SetStatus(ChargingStationStatusType  NewStatus)
+        public void SetStatus(ChargingStationStatusTypes  NewStatus)
         {
             _StatusSchedule.Insert(NewStatus);
         }
@@ -430,7 +430,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewTimestampedStatus">A new timestamped status.</param>
-        public void SetStatus(Timestamped<ChargingStationStatusType> NewTimestampedStatus)
+        public void SetStatus(Timestamped<ChargingStationStatusTypes> NewTimestampedStatus)
         {
             _StatusSchedule.Insert(NewTimestampedStatus);
         }
@@ -444,7 +444,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        public void SetStatus(ChargingStationStatusType  NewStatus,
+        public void SetStatus(ChargingStationStatusTypes  NewStatus,
                               DateTime                   Timestamp)
         {
             _StatusSchedule.Insert(NewStatus, Timestamp);
@@ -459,7 +459,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatusList">A list of new timestamped status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetStatus(IEnumerable<Timestamped<ChargingStationStatusType>>  NewStatusList,
+        public void SetStatus(IEnumerable<Timestamped<ChargingStationStatusTypes>>  NewStatusList,
                               ChangeMethods                                        ChangeMethod = ChangeMethods.Replace)
         {
             _StatusSchedule.Insert(NewStatusList, ChangeMethod);
@@ -474,7 +474,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(ChargingStationAdminStatusType  NewAdminStatus)
+        public void SetAdminStatus(ChargingStationAdminStatusTypes  NewAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus);
         }
@@ -487,7 +487,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusType> NewTimestampedAdminStatus)
+        public void SetAdminStatus(Timestamped<ChargingStationAdminStatusTypes> NewTimestampedAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
         }
@@ -501,8 +501,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewAdminStatus">A new admin status.</param>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        public void SetAdminStatus(ChargingStationAdminStatusType  NewAdminStatus,
-                                   DateTime                        Timestamp)
+        public void SetAdminStatus(ChargingStationAdminStatusTypes  NewAdminStatus,
+                                   DateTime                         Timestamp)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
         }
@@ -516,8 +516,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetAdminStatus(IEnumerable<Timestamped<ChargingStationAdminStatusType>>  NewAdminStatusList,
-                                   ChangeMethods                                             ChangeMethod = ChangeMethods.Replace)
+        public void SetAdminStatus(IEnumerable<Timestamped<ChargingStationAdminStatusTypes>>  NewAdminStatusList,
+                                   ChangeMethods                                              ChangeMethod = ChangeMethods.Replace)
         {
             _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
         }
@@ -534,8 +534,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OldStatus">The old EVSE status.</param>
         /// <param name="NewStatus">The new EVSE status.</param>
         internal void UpdateStatus(DateTime                                Timestamp,
-                                   Timestamped<ChargingStationStatusType>  OldStatus,
-                                   Timestamped<ChargingStationStatusType>  NewStatus)
+                                   Timestamped<ChargingStationStatusTypes>  OldStatus,
+                                   Timestamped<ChargingStationStatusTypes>  NewStatus)
         {
 
             var OnStatusChangedLocal = OnStatusChanged;
@@ -554,14 +554,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
         /// <param name="OldStatus">The old EVSE admin status.</param>
         /// <param name="NewStatus">The new EVSE admin status.</param>
-        internal void UpdateAdminStatus(DateTime                                     Timestamp,
-                                        Timestamped<ChargingStationAdminStatusType>  OldStatus,
-                                        Timestamped<ChargingStationAdminStatusType>  NewStatus)
+        internal void UpdateAdminStatus(DateTime                                      Timestamp,
+                                        Timestamped<ChargingStationAdminStatusTypes>  OldStatus,
+                                        Timestamped<ChargingStationAdminStatusTypes>  NewStatus)
         {
 
-            var OnAdminStatusChangedLocal = OnAdminStatusChanged;
-            if (OnAdminStatusChangedLocal != null)
-                OnAdminStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
+            OnAdminStatusChanged?.Invoke(Timestamp, this, OldStatus, NewStatus);
 
         }
 
@@ -933,8 +931,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1041,8 +1039,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1195,8 +1193,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Check admin status
 
-            if (AdminStatus.Value != ChargingStationAdminStatusType.Operational &&
-                AdminStatus.Value != ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value != ChargingStationAdminStatusTypes.Operational &&
+                AdminStatus.Value != ChargingStationAdminStatusTypes.InternalUse)
                 return CancelReservationResult.OutOfService;
 
             #endregion
@@ -1326,8 +1324,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1414,8 +1412,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1581,8 +1579,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1714,8 +1712,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list
@@ -1811,8 +1809,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #endregion
 
 
-            if (AdminStatus.Value == ChargingStationAdminStatusType.Operational ||
-                AdminStatus.Value == ChargingStationAdminStatusType.InternalUse)
+            if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
+                AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
             {
 
                 #region Check if the eMAId is on the white list

@@ -73,33 +73,33 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            return ChargingPool.CreateNewStation(ChargingStationId,
-                                                 ChargingStationConfigurator,
-                                                 newstation => {
+            return ChargingPool.CreateChargingStation(ChargingStationId,
+                                                      ChargingStationConfigurator,
+                                                      newstation => {
 
-                                                     var remotestation = new ProxyChargingStation(newstation,
-                                                                                                  SelfCheckTimeSpan,
-                                                                                                  MaxStatusListSize,
-                                                                                                  MaxAdminStatusListSize,
-                                                                                                  IPTransport,
-                                                                                                  DNSClient,
-                                                                                                  Hostname,
-                                                                                                  TCPPort,
-                                                                                                  Service,
-                                                                                                  RemoteCertificateValidator,
-                                                                                                  ClientCert,
-                                                                                                  VirtualHost,
-                                                                                                  URIPrefix,
-                                                                                                  QueryTimeout);
+                                                          var remotestation = new ProxyChargingStation(newstation,
+                                                                                                       SelfCheckTimeSpan,
+                                                                                                       MaxStatusListSize,
+                                                                                                       MaxAdminStatusListSize,
+                                                                                                       IPTransport,
+                                                                                                       DNSClient,
+                                                                                                       Hostname,
+                                                                                                       TCPPort,
+                                                                                                       Service,
+                                                                                                       RemoteCertificateValidator,
+                                                                                                       ClientCert,
+                                                                                                       VirtualHost,
+                                                                                                       URIPrefix,
+                                                                                                       QueryTimeout);
 
-                                                     ProxyChargingStationConfigurator?.Invoke(remotestation);
+                                                          ProxyChargingStationConfigurator?.Invoke(remotestation);
 
-                                                     return remotestation;
+                                                          return remotestation;
 
-                                                 },
+                                                      },
 
-                                                 OnSuccess: OnSuccess,
-                                                 OnError:   OnError);
+                                                      OnSuccess: OnSuccess,
+                                                      OnError:   OnError);
 
         }
 
