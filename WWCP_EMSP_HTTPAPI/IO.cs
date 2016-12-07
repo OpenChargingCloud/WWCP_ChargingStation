@@ -45,8 +45,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                   out HTTPResponse     HTTPResponse)
         {
 
-            ChargingPoolId  = null;
-            HTTPResponse    = null;
+            HTTPResponse = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
@@ -57,6 +56,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     Date            = DateTime.Now
                 };
 
+                ChargingPoolId = default(ChargingPool_Id);
                 return false;
 
             }
