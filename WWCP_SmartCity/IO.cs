@@ -90,7 +90,6 @@ namespace org.GraphDefined.WWCP.SmartCity
                                                      out HTTPResponse        HTTPResponse)
         {
 
-            ChargingStationId  = null;
             HTTPResponse       = null;
 
             if (HTTPRequest.ParsedURIParameters.Length < 1)
@@ -101,6 +100,8 @@ namespace org.GraphDefined.WWCP.SmartCity
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
                 };
+
+                ChargingStationId = default(ChargingStation_Id);
 
                 return false;
 

@@ -53,7 +53,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              //Action<ChargingStation>                   OnSuccess                          = null,
                                                              //Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
                                                              this ChargingPool                         ChargingPool,
-                                                             ChargingStation_Id                        ChargingStationId                  = null,
+                                                             ChargingStation_Id?                       ChargingStationId                  = null,
                                                              Action<ChargingStation>                   ChargingStationConfigurator        = null,
                                                              TimeSpan?                                 SelfCheckTimeSpan                  = null,
                                                              UInt16                                    MaxStatusListSize                  = ChargingStations.NetworkChargingStationStub.DefaultMaxStatusListSize,
