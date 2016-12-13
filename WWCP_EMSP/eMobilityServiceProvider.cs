@@ -1758,6 +1758,8 @@ namespace org.GraphDefined.WWCP.EMSP
         /// </summary>
         /// <param name="EVSEId">The unique identification of the EVSE to be started.</param>
         /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
+        /// <param name="PlannedDuration">An optional maximum time span to charge. When it is reached, the charging process will stop automatically.</param>
+        /// <param name="PlannedEnergy">An optional maximum amount of energy to charge. When it is reached, the charging process will stop automatically.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
@@ -1770,6 +1772,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             RemoteStart(EVSE_Id                  EVSEId,
                         ChargingProduct_Id?      ChargingProductId   = null,
+                        TimeSpan?                PlannedDuration     = null,
+                        Single?                  PlannedEnergy       = null,
                         ChargingReservation_Id?  ReservationId       = null,
                         ChargingSession_Id?      SessionId           = null,
                         eMobilityAccount_Id?     eMAId               = null,
@@ -1805,6 +1809,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                           RoamingNetwork.Id,
                                           EVSEId,
                                           ChargingProductId,
+                                          PlannedDuration,
+                                          PlannedEnergy,
                                           ReservationId,
                                           SessionId,
                                           Id,
@@ -1822,6 +1828,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             var response = await RoamingNetwork.RemoteStart(EVSEId,
                                                             ChargingProductId,
+                                                            PlannedDuration,
+                                                            PlannedEnergy,
                                                             ReservationId,
                                                             SessionId,
                                                             Id,
@@ -1847,6 +1855,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                             RoamingNetwork.Id,
                                             EVSEId,
                                             ChargingProductId,
+                                            PlannedDuration,
+                                            PlannedEnergy,
                                             ReservationId,
                                             SessionId,
                                             Id,

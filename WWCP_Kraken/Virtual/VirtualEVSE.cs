@@ -473,32 +473,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         private readonly VirtualChargingStation _ChargingStation;
 
         /// <summary>
-        /// The charging station of this EVSE.
+        /// The charging station of this virtual EVSE.
         /// </summary>
         [InternalUseOnly]
         public IRemoteChargingStation ChargingStation
-        {
-            get
-            {
-                return _ChargingStation;
-            }
-        }
+            => _ChargingStation;
 
         #endregion
 
-        #region Operator
+        #region OperatorId
 
         /// <summary>
-        /// The operator of this EVSE.
+        /// The identification of the operator of this virtual EVSE.
         /// </summary>
         [InternalUseOnly]
-        public ChargingStationOperator Operator
-        {
-            get
-            {
-                return null;// _ChargingStation.ChargingPool.EVSEOperator;
-            }
-        }
+        public ChargingStationOperator_Id OperatorId
+            => _ChargingStation.Id.OperatorId;
 
         #endregion
 
@@ -905,7 +895,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         // Will do: Status = EVSEStatusType.Reserved
                         // Will do: Send OnNewReservation event!
-                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(Operator.Id, _random.GetString(25)),
+                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.GetString(25)),
                                                                    Timestamp:               Timestamp.Value,
                                                                    StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
                                                                    Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
@@ -1032,24 +1022,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusType.Reserved);
 
-                        OnNewReservation?.Invoke(DateTime.Now, this, _Reservation);
+                        OnNewReservation?.Invoke(DateTime.Now,
+                                                 this,
+                                                 _Reservation);
 
                     }
 
                     else
                     {
 
+                        _Reservation = null;
+
                         SetStatus(EVSEStatusType.Available);
 
-                        OnReservationCancelled?.Invoke(DateTime.Now,
-                                                       DateTime.Now,
-                                                       this,
-                                                       EventTracking_Id.New,
-                                                       _Reservation.Id,
-                                                       _Reservation,
-                                                       ChargingReservationCancellationReason.EndOfProcess);
-
-                        _Reservation = null;
+                        //OnReservationCancelled?.Invoke(DateTime.Now,
+                        //                               DateTime.Now,
+                        //                               this,
+                        //                               EventTracking_Id.New,
+                        //                               RoamingNetworkId,
+                        //                               _Reservation.Id,
+                        //                               _Reservation,
+                        //                               ChargingReservationCancellationReason.EndOfProcess);
 
                     }
 
@@ -1119,25 +1112,37 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation == null || _Reservation.Id != ReservationId)
-                return CancelReservationResult.UnknownReservationId(ReservationId);
+                return CancelReservationResult.UnknownReservationId(ReservationId,
+                                                                    Reason);
 
 
             var SavedReservation = _Reservation;
 
             _Reservation = null;
 
+            var result = CancelReservationResult.Success(ReservationId,
+                                                         Reason,
+                                                         SavedReservation);
+
             OnReservationCancelled?.Invoke(DateTime.Now,
-                                           Timestamp.Value,
+                                           Timestamp.HasValue
+                                               ? Timestamp.Value
+                                               : DateTime.Now,
                                            this,
-                                           EventTracking_Id.New,
+                                           EventTrackingId,
+                                           new RoamingNetwork_Id?(),
+                                           ProviderId,
                                            SavedReservation.Id,
                                            SavedReservation,
-                                           Reason);
+                                           Reason,
+                                           result,
+                                           TimeSpan.FromMilliseconds(5),
+                                           RequestTimeout);
 
             // Will send events!
             SetStatus(EVSEStatusType.Available);
 
-            return CancelReservationResult.Success(ReservationId);
+            return result;
 
         }
 
@@ -1168,17 +1173,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            #region Initial checks
-
-            if (ReservationId == null)
-                throw new ArgumentNullException(nameof(ReservationId),  "The given charging reservation identification must not be null!");
-
-            #endregion
-
-
             if (AdminStatus.Value == EVSEAdminStatusType.Operational ||
                 AdminStatus.Value == EVSEAdminStatusType.InternalUse)
-            {
 
                 return await __CancelReservation(ReservationId,
                                                  Reason,
@@ -1189,17 +1185,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                  EventTrackingId,
                                                  RequestTimeout);
 
-            }
-            else
+
+            switch (AdminStatus.Value)
             {
 
-                switch (AdminStatus.Value)
-                {
-
-                    default:
-                        return CancelReservationResult.OutOfService;
-
-                }
+                default:
+                    return CancelReservationResult.OutOfService(ReservationId,
+                                                                Reason);
 
             }
 
@@ -1212,7 +1204,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// An event fired whenever a charging reservation was deleted.
         /// </summary>
-        public event OnReservationCancelledInternalDelegate OnReservationCancelled;
+        public event OnCancelReservationResponseDelegate OnReservationCancelled;
 
         #endregion
 
@@ -1226,6 +1218,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Start a charging session.
         /// </summary>
         /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
+        /// <param name="PlannedDuration">An optional maximum time span to charge. When it is reached, the charging process will stop automatically.</param>
+        /// <param name="PlannedEnergy">An optional maximum amount of energy to charge. When it is reached, the charging process will stop automatically.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
@@ -1238,6 +1232,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public async Task<RemoteStartEVSEResult>
 
             RemoteStart(ChargingProduct_Id?      ChargingProductId   = null,
+                        TimeSpan?                PlannedDuration     = null,
+                        Single?                  PlannedEnergy       = null,
                         ChargingReservation_Id?  ReservationId       = null,
                         ChargingSession_Id?      SessionId           = null,
                         eMobilityProvider_Id?    ProviderId          = null,

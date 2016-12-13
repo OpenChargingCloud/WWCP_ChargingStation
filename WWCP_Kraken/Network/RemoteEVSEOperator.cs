@@ -249,7 +249,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               EventTracking_Id                       EventTrackingId     = null,
                               TimeSpan?                              RequestTimeout      = null)
 
-            => CancelReservationResult.UnknownReservationId(ReservationId);
+            => CancelReservationResult.UnknownReservationId(ReservationId,
+                                                            Reason);
 
 
         #endregion
@@ -261,6 +262,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="EVSEId">The unique identification of the EVSE to be started.</param>
         /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
+        /// <param name="PlannedDuration">An optional maximum time span to charge. When it is reached, the charging process will stop automatically.</param>
+        /// <param name="PlannedEnergy">An optional maximum amount of energy to charge. When it is reached, the charging process will stop automatically.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
@@ -274,6 +277,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStart(EVSE_Id                  EVSEId,
                         ChargingProduct_Id?      ChargingProductId,
+                        TimeSpan?                PlannedDuration,
+                        Single?                  PlannedEnergy,
                         ChargingReservation_Id?  ReservationId,
                         ChargingSession_Id?      SessionId,
                         eMobilityProvider_Id?    ProviderId,

@@ -1234,6 +1234,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              var response = await EMSP.RemoteStart(EVSEId,
                                                                                    ChargingProductId,
+                                                                                   null,
+                                                                                   null,
                                                                                    ReservationId,
                                                                                    SessionId,
                                                                                    eMAId,
@@ -1712,7 +1714,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             var OnCancelReservationLocal = OnCancelReservation;
             if (OnCancelReservationLocal == null)
-                return CancelReservationResult.Error();
+                return CancelReservationResult.Error(ReservationId,
+                                                     Reason);
 
             var results = await Task.WhenAll(OnCancelReservationLocal.
                                                  GetInvocationList().
