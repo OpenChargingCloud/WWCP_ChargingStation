@@ -1503,9 +1503,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                             : null,
 
                                                                              EnergyMeterId:             EnergyMeter_Id.Parse("default"),
-                                                                             EnergyMeteringValues:      new List<Timestamped<Double>>() {
-                                                                                                            new Timestamped<Double>(_ChargingSession.SessionTime.Value.StartTime,   0),
-                                                                                                            new Timestamped<Double>(Now,                                          100)
+                                                                             EnergyMeteringValues:      new List<Timestamped<Single>>() {
+                                                                                                            new Timestamped<Single>(_ChargingSession.SessionTime.Value.StartTime,   0),
+                                                                                                            new Timestamped<Single>(Now,                                          100)
                                                                                                         }
 
                                                                             );
