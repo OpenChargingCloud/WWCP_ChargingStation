@@ -1264,7 +1264,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     #region Available
 
                     case EVSEStatusType.Available:
-                    case EVSEStatusType.AVAILABLE_DOOR_NOT_CLOSED:
+                    case EVSEStatusType.DoorNotClosed:
 
                         // Will also set the status -> EVSEStatusType.Charging!
                         ChargingSession = new ChargingSession(SessionId.Value) {
