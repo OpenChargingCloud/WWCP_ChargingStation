@@ -777,47 +777,59 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region (internal) UpdateEVSEStatus(Timestamp, RemoteEVSE, OldStatus, NewStatus)
-
-        /// <summary>
-        /// Update the remote EVSE station status.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="RemoteEVSE">The updated EVSE.</param>
-        /// <param name="OldStatus">The old EVSE status.</param>
-        /// <param name="NewStatus">The new EVSE status.</param>
-        internal void UpdateEVSEStatus(DateTime                     Timestamp,
-                                       IRemoteEVSE                  RemoteEVSE,
-                                       Timestamped<EVSEStatusType>  OldStatus,
-                                       Timestamped<EVSEStatusType>  NewStatus)
-        {
-
-            var OnEVSEStatusChangedLocal = OnEVSEStatusChanged;
-            if (OnEVSEStatusChangedLocal != null)
-                OnEVSEStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
-
-        }
-
-        #endregion
-
-        #region (internal) UpdateEVSEAdminStatus(Timestamp, RemoteEVSE, OldStatus, NewStatus)
+        #region (internal) UpdateEVSEAdminStatus(Timestamp, EventTrackingId, RemoteEVSE, OldStatus, NewStatus)
 
         /// <summary>
         /// Update the current charging station status.
         /// </summary>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="EventTrackingId">An event tracking identification for correlating this request with other events.</param>
         /// <param name="RemoteEVSE">The updated remote EVSE.</param>
         /// <param name="OldStatus">The old EVSE status.</param>
         /// <param name="NewStatus">The new EVSE status.</param>
-        internal void UpdateEVSEAdminStatus(DateTime                          Timestamp,
-                                            IRemoteEVSE                       RemoteEVSE,
-                                            Timestamped<EVSEAdminStatusType>  OldStatus,
-                                            Timestamped<EVSEAdminStatusType>  NewStatus)
+        internal async Task UpdateEVSEAdminStatus(DateTime                          Timestamp,
+                                                  EventTracking_Id                  EventTrackingId,
+                                                  IRemoteEVSE                       RemoteEVSE,
+                                                  Timestamped<EVSEAdminStatusType>  OldStatus,
+                                                  Timestamped<EVSEAdminStatusType>  NewStatus)
         {
 
             var OnEVSEAdminStatusChangedLocal = OnEVSEAdminStatusChanged;
             if (OnEVSEAdminStatusChangedLocal != null)
-                OnEVSEAdminStatusChangedLocal(Timestamp, RemoteEVSE, OldStatus, NewStatus);
+                await OnEVSEAdminStatusChangedLocal(Timestamp,
+                                                    EventTrackingId,
+                                                    RemoteEVSE,
+                                                    OldStatus,
+                                                    NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateEVSEStatus     (Timestamp, EventTrackingId, RemoteEVSE, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the remote EVSE station status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="EventTrackingId">An event tracking identification for correlating this request with other events.</param>
+        /// <param name="RemoteEVSE">The updated EVSE.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal async Task UpdateEVSEStatus(DateTime                     Timestamp,
+                                             EventTracking_Id             EventTrackingId,
+                                             IRemoteEVSE                  RemoteEVSE,
+                                             Timestamped<EVSEStatusType>  OldStatus,
+                                             Timestamped<EVSEStatusType>  NewStatus)
+        {
+
+            var OnEVSEStatusChangedLocal = OnEVSEStatusChanged;
+            if (OnEVSEStatusChangedLocal != null)
+                await OnEVSEStatusChangedLocal(Timestamp,
+                                               EventTrackingId,
+                                               RemoteEVSE,
+                                               OldStatus,
+                                               NewStatus);
 
         }
 
