@@ -42,7 +42,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OnSuccess">An optional delegate for reporting success.</param>
         /// <param name="OnError">An optional delegate for reporting an error.</param>
         public static ChargingStation CreateNewVirtualStation(this ChargingPool                         ChargingPool,
-                                                              ChargingStation_Id?                       ChargingStationId                   = null,
+                                                              ChargingStation_Id                        ChargingStationId,
                                                               Action<ChargingStation>                   ChargingStationConfigurator         = null,
                                                               Action<VirtualChargingStation>            VirtualChargingStationConfigurator  = null,
                                                               Action<ChargingStation>                   OnSuccess                           = null,

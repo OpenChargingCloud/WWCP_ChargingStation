@@ -33,7 +33,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public static partial class ExtentionMethods
     {
 
-        #region CreateNewRemoteStation(this ChargingPool, ChargingStationId = null, ChargingStationConfigurator = null, RemoteChargingStationConfigurator = null, OnSuccess = null, OnError = null)
+        #region CreateNewRemoteStation(this ChargingPool, ChargingStationId, ChargingStationConfigurator = null, RemoteChargingStationConfigurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
         /// Create a new remote charging station.
@@ -53,7 +53,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              //Action<ChargingStation>                   OnSuccess                          = null,
                                                              //Action<ChargingPool, ChargingStation_Id>  OnError                            = null)
                                                              this ChargingPool                         ChargingPool,
-                                                             ChargingStation_Id?                       ChargingStationId                  = null,
+                                                             ChargingStation_Id                        ChargingStationId,
                                                              Action<ChargingStation>                   ChargingStationConfigurator        = null,
                                                              TimeSpan?                                 SelfCheckTimeSpan                  = null,
                                                              UInt16                                    MaxStatusListSize                  = ChargingStations.NetworkChargingStationStub.DefaultMaxStatusListSize,
