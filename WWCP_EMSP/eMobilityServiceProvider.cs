@@ -142,12 +142,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// An event fired whenever an EVSE is being reserved.
         /// </summary>
-        public event OnReserveEVSERequestDelegate              OnReserveEVSE;
+        public event OnReserveEVSERequestDelegate              OnReserveEVSERequest;
 
         /// <summary>
         /// An event fired whenever an EVSE was reserved.
         /// </summary>
-        public event OnReserveEVSEResponseDelegate             OnEVSEReserved;
+        public event OnReserveEVSEResponseDelegate             OnReservedEVSEResponse;
 
         #endregion
 
@@ -156,12 +156,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// An event fired whenever a remote start EVSE command was received.
         /// </summary>
-        public event OnRemoteStartEVSERequestDelegate              OnRemoteEVSEStart;
+        public event OnRemoteStartEVSERequestDelegate              OnRemoteEVSEStartRequest;
 
         /// <summary>
         /// An event fired whenever a remote start EVSE command completed.
         /// </summary>
-        public event OnRemoteStartEVSEResponseDelegate             OnRemoteEVSEStarted;
+        public event OnRemoteStartEVSEResponseDelegate             OnRemoteEVSEStartResponse;
 
         #endregion
 
@@ -1571,7 +1571,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
-        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
@@ -1587,7 +1587,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     TimeSpan?                         Duration            = null,
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityAccount_Id?              eMAId               = null,
-                    ChargingProduct_Id?               ChargingProductId   = null,
+                    ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
                     IEnumerable<UInt32>               PINs                = null,
@@ -1609,86 +1609,87 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            #region Send OnReserveEVSE event
+            #region Send OnReserveEVSERequest event
 
             var Runtime = Stopwatch.StartNew();
 
             try
             {
 
-                OnReserveEVSE?.Invoke(DateTime.Now,
-                                      Timestamp.Value,
-                                      this,
-                                      EventTrackingId,
-                                      RoamingNetwork.Id,
-                                      ReservationId,
-                                      EVSEId,
-                                      StartTime,
-                                      Duration,
-                                      Id,
-                                      eMAId,
-                                      ChargingProductId,
-                                      AuthTokens,
-                                      eMAIds,
-                                      PINs,
-                                      RequestTimeout);
+                OnReserveEVSERequest?.Invoke(DateTime.Now,
+                                             Timestamp.Value,
+                                             this,
+                                             EventTrackingId,
+                                             RoamingNetwork.Id,
+                                             ReservationId,
+                                             EVSEId,
+                                             StartTime,
+                                             Duration,
+                                             Id,
+                                             eMAId,
+                                             ChargingProduct,
+                                             AuthTokens,
+                                             eMAIds,
+                                             PINs,
+                                             RequestTimeout);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveEVSE));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveEVSERequest));
             }
 
             #endregion
 
 
-            var response = await RoamingNetwork.Reserve(EVSEId,
-                                                        StartTime,
-                                                        Duration,
-                                                        ReservationId,
-                                                        Id,
-                                                        eMAId,
-                                                        ChargingProductId,
-                                                        AuthTokens,
-                                                        eMAIds,
-                                                        PINs,
+            var response = await RoamingNetwork.
+                                     Reserve(EVSEId,
+                                             StartTime,
+                                             Duration,
+                                             ReservationId,
+                                             Id,
+                                             eMAId,
+                                             ChargingProduct,
+                                             AuthTokens,
+                                             eMAIds,
+                                             PINs,
 
-                                                        Timestamp,
-                                                        CancellationToken,
-                                                        EventTrackingId,
-                                                        RequestTimeout);
+                                             Timestamp,
+                                             CancellationToken,
+                                             EventTrackingId,
+                                             RequestTimeout);
 
 
-            #region Send OnEVSEReserved event
+            #region Send OnReservedEVSEResponse event
 
             Runtime.Stop();
 
             try
             {
 
-                OnEVSEReserved?.Invoke(DateTime.Now,
-                                       Timestamp.Value,
-                                       this,
-                                       EventTrackingId,
-                                       RoamingNetwork.Id,
-                                       ReservationId,
-                                       EVSEId,
-                                       StartTime,
-                                       Duration,
-                                       Id,
-                                       eMAId,
-                                       ChargingProductId,
-                                       AuthTokens,
-                                       eMAIds,
-                                       PINs,
-                                       response,
-                                       Runtime.Elapsed,
-                                       RequestTimeout);
+                OnReservedEVSEResponse?.Invoke(DateTime.Now,
+                                               Timestamp.Value,
+                                               this,
+                                               EventTrackingId,
+                                               RoamingNetwork.Id,
+                                               ReservationId,
+                                               EVSEId,
+                                               StartTime,
+                                               Duration,
+                                               Id,
+                                               eMAId,
+                                               ChargingProduct,
+                                               AuthTokens,
+                                               eMAIds,
+                                               PINs,
+                                               response,
+                                               Runtime.Elapsed,
+                                               RequestTimeout);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnEVSEReserved));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReservedEVSEResponse));
             }
 
             #endregion
@@ -1751,15 +1752,13 @@ namespace org.GraphDefined.WWCP.EMSP
         #endregion
 
 
-        #region RemoteStart(...EVSEId, ChargingProductId = null, ReservationId = null, SessionId = null, eMAId = null, ...)
+        #region RemoteStart(...EVSEId, ChargingProduct = null, ReservationId = null, SessionId = null, eMAId = null, ...)
 
         /// <summary>
         /// Start a charging session at the given EVSE.
         /// </summary>
         /// <param name="EVSEId">The unique identification of the EVSE to be started.</param>
-        /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
-        /// <param name="PlannedDuration">An optional maximum time span to charge. When it is reached, the charging process will stop automatically.</param>
-        /// <param name="PlannedEnergy">An optional maximum amount of energy to charge. When it is reached, the charging process will stop automatically.</param>
+        /// <param name="ChargingProduct">The choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="eMAId">The unique identification of the e-mobility account.</param>
@@ -1771,9 +1770,7 @@ namespace org.GraphDefined.WWCP.EMSP
         public async Task<RemoteStartEVSEResult>
 
             RemoteStart(EVSE_Id                  EVSEId,
-                        ChargingProduct_Id?      ChargingProductId   = null,
-                        TimeSpan?                PlannedDuration     = null,
-                        Single?                  PlannedEnergy       = null,
+                        ChargingProduct          ChargingProduct     = null,
                         ChargingReservation_Id?  ReservationId       = null,
                         ChargingSession_Id?      SessionId           = null,
                         eMobilityAccount_Id?     eMAId               = null,
@@ -1795,80 +1792,75 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            #region Send OnRemoteEVSEStart event
+            #region Send OnRemoteEVSEStartRequest event
 
             var Runtime = Stopwatch.StartNew();
 
             try
             {
 
-                OnRemoteEVSEStart?.Invoke(DateTime.Now,
-                                          Timestamp.Value,
-                                          this,
-                                          EventTrackingId,
-                                          RoamingNetwork.Id,
-                                          EVSEId,
-                                          ChargingProductId,
-                                          PlannedDuration,
-                                          PlannedEnergy,
-                                          ReservationId,
-                                          SessionId,
-                                          Id,
-                                          eMAId,
-                                          RequestTimeout);
+                OnRemoteEVSEStartRequest?.Invoke(DateTime.Now,
+                                                 Timestamp.Value,
+                                                 this,
+                                                 EventTrackingId,
+                                                 RoamingNetwork.Id,
+                                                 EVSEId,
+                                                 ChargingProduct,
+                                                 ReservationId,
+                                                 SessionId,
+                                                 Id,
+                                                 eMAId,
+                                                 RequestTimeout);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStart));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStartRequest));
             }
 
             #endregion
 
 
-            var response = await RoamingNetwork.RemoteStart(EVSEId,
-                                                            ChargingProductId,
-                                                            PlannedDuration,
-                                                            PlannedEnergy,
-                                                            ReservationId,
-                                                            SessionId,
-                                                            Id,
-                                                            eMAId,
+            var response = await RoamingNetwork.
+                                     RemoteStart(EVSEId,
+                                                 ChargingProduct,
+                                                 ReservationId,
+                                                 SessionId,
+                                                 Id,
+                                                 eMAId,
 
-                                                            Timestamp,
-                                                            CancellationToken,
-                                                            EventTrackingId,
-                                                            RequestTimeout);
+                                                 Timestamp,
+                                                 CancellationToken,
+                                                 EventTrackingId,
+                                                 RequestTimeout);
 
 
-            #region Send OnRemoteEVSEStarted event
+            #region Send OnRemoteEVSEStartResponse event
 
             Runtime.Stop();
 
             try
             {
 
-                OnRemoteEVSEStarted?.Invoke(DateTime.Now,
-                                            Timestamp.Value,
-                                            this,
-                                            EventTrackingId,
-                                            RoamingNetwork.Id,
-                                            EVSEId,
-                                            ChargingProductId,
-                                            PlannedDuration,
-                                            PlannedEnergy,
-                                            ReservationId,
-                                            SessionId,
-                                            Id,
-                                            eMAId,
-                                            RequestTimeout,
-                                            response,
-                                            Runtime.Elapsed);
+                OnRemoteEVSEStartResponse?.Invoke(DateTime.Now,
+                                                  Timestamp.Value,
+                                                  this,
+                                                  EventTrackingId,
+                                                  RoamingNetwork.Id,
+                                                  EVSEId,
+                                                  ChargingProduct,
+                                                  ReservationId,
+                                                  SessionId,
+                                                  Id,
+                                                  eMAId,
+                                                  RequestTimeout,
+                                                  response,
+                                                  Runtime.Elapsed);
 
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStarted));
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteEVSEStartResponse));
             }
 
             #endregion

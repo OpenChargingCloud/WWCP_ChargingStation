@@ -915,7 +915,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
         /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
-        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
@@ -931,7 +931,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
-                    ChargingProduct_Id?               ChargingProductId   = null,
+                    ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
                     IEnumerable<UInt32>               PINs                = null,
@@ -970,7 +970,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                            ReservationId,
                                            ProviderId,
                                            eMAId,
-                                           ChargingProductId,
+                                           ChargingProduct,
                                            AuthTokens,
                                            eMAIds,
                                            PINs,
@@ -1009,7 +1009,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
         /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
-        /// <param name="ChargingProductId">An optional unique identification of the charging product to be reserved.</param>
+        /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
         /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
@@ -1026,7 +1026,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
                     eMobilityAccount_Id?              eMAId               = null,
-                    ChargingProduct_Id?               ChargingProductId   = null,
+                    ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
                     IEnumerable<UInt32>               PINs                = null,
@@ -1073,7 +1073,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                         ReservationId,
                                                         ProviderId,
                                                         eMAId,
-                                                        ChargingProductId,
+                                                        ChargingProduct,
                                                         AuthTokens,
                                                         eMAIds,
                                                         PINs,
@@ -1302,15 +1302,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region RemoteStart/-Stop and Sessions
 
-        #region RemoteStart(...EVSEId, ChargingProductId = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
+        #region RemoteStart(...EVSEId, ChargingProduct = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Start a charging session at the given EVSE.
         /// </summary>
         /// <param name="EVSEId">The unique identification of the EVSE to be started.</param>
-        /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
-        /// <param name="PlannedDuration">An optional maximum time span to charge. When it is reached, the charging process will stop automatically.</param>
-        /// <param name="PlannedEnergy">An optional maximum amount of energy to charge. When it is reached, the charging process will stop automatically.</param>
+        /// <param name="ChargingProduct">The choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
@@ -1323,9 +1321,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public async Task<RemoteStartEVSEResult>
 
             RemoteStart(EVSE_Id                  EVSEId,
-                        ChargingProduct_Id?      ChargingProductId   = null,
-                        TimeSpan?                PlannedDuration     = null,
-                        Single?                  PlannedEnergy       = null,
+                        ChargingProduct          ChargingProduct     = null,
                         ChargingReservation_Id?  ReservationId       = null,
                         ChargingSession_Id?      SessionId           = null,
                         eMobilityProvider_Id?    ProviderId          = null,
@@ -1338,9 +1334,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             #region Initial checks
-
-            if (EVSEId == null)
-                throw new ArgumentNullException(nameof(EVSEId),  "The given EVSE identification must not be null!");
 
             RemoteStartEVSEResult result = null;
 
@@ -1371,18 +1364,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     result = RemoteStartEVSEResult.UnknownEVSE;
 
 
-                return await _VirtualEVSE.RemoteStart(ChargingProductId,
-                                                      PlannedDuration,
-                                                      PlannedEnergy,
-                                                      ReservationId,
-                                                      SessionId,
-                                                      ProviderId,
-                                                      eMAId,
+                return await _VirtualEVSE.
+                                 RemoteStart(ChargingProduct,
+                                             ReservationId,
+                                             SessionId,
+                                             ProviderId,
+                                             eMAId,
 
-                                                      Timestamp,
-                                                      CancellationToken,
-                                                      EventTrackingId,
-                                                      RequestTimeout);
+                                             Timestamp,
+                                             CancellationToken,
+                                             EventTrackingId,
+                                             RequestTimeout);
 
             }
             else
@@ -1402,12 +1394,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStart(...ChargingProductId = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
+        #region RemoteStart(...ChargingProduct = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Start a charging session at the given charging station.
         /// </summary>
-        /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
+        /// <param name="ChargingProduct">The choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ProviderId">The unique identification of the e-mobility service provider for the case it is different from the current message sender.</param>
@@ -1419,7 +1411,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<RemoteStartChargingStationResult>
 
-            RemoteStart(ChargingProduct_Id?      ChargingProductId   = null,
+            RemoteStart(ChargingProduct          ChargingProduct     = null,
                         ChargingReservation_Id?  ReservationId       = null,
                         ChargingSession_Id?      SessionId           = null,
                         eMobilityProvider_Id?    ProviderId          = null,
@@ -1461,18 +1453,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     return RemoteStartChargingStationResult.NoEVSEsAvailable;
 
 
-                var result = await _VirtualEVSE.RemoteStart(ChargingProductId,
-                                                            null,
-                                                            null,
-                                                            ReservationId,
-                                                            SessionId,
-                                                            ProviderId,
-                                                            eMAId,
+                var result = await _VirtualEVSE.
+                                       RemoteStart(ChargingProduct,
+                                                   ReservationId,
+                                                   SessionId,
+                                                   ProviderId,
+                                                   eMAId,
 
-                                                            Timestamp,
-                                                            CancellationToken,
-                                                            EventTrackingId,
-                                                            RequestTimeout);
+                                                   Timestamp,
+                                                   CancellationToken,
+                                                   EventTrackingId,
+                                                   RequestTimeout);
 
 
                 switch (result.Result)

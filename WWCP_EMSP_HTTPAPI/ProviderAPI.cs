@@ -878,7 +878,9 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                              Duration,
                                                                              ReservationId,
                                                                              eMAId,
-                                                                             ChargingProductId, // of IntendedCharging
+                                                                             ChargingProductId.HasValue    // of IntendedCharging
+                                                                                 ? new ChargingProduct(ChargingProductId.Value)
+                                                                                 : null,
                                                                              AuthTokens,
                                                                              eMAIds,
                                                                              PINs,
@@ -1233,9 +1235,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
 
                                              var response = await EMSP.RemoteStart(EVSEId,
-                                                                                   ChargingProductId,
-                                                                                   null,
-                                                                                   null,
+                                                                                   ChargingProductId.HasValue
+                                                                                       ? new ChargingProduct(ChargingProductId.Value)
+                                                                                       : null,
                                                                                    ReservationId,
                                                                                    SessionId,
                                                                                    eMAId,

@@ -862,11 +862,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      ChargingReservation_Id            ReservationId,
                                                      DateTime?                         StartTime,
                                                      TimeSpan?                         Duration,
-                                                     ChargingProduct_Id?               ChargingProductId  = null,
-                                                     IEnumerable<Auth_Token>           AuthTokens         = null,
-                                                     IEnumerable<eMobilityAccount_Id>  eMAIds             = null,
-                                                     IEnumerable<UInt32>               PINs               = null,
-                                                     TimeSpan?                         RequestTimeout     = null)
+                                                     ChargingProduct                   ChargingProduct  = null,
+                                                     IEnumerable<Auth_Token>           AuthTokens       = null,
+                                                     IEnumerable<eMobilityAccount_Id>  eMAIds           = null,
+                                                     IEnumerable<UInt32>               PINs             = null,
+                                                     TimeSpan?                         RequestTimeout   = null)
         {
 
             #region Try to remove an existing reservation if this is an update!
@@ -909,7 +909,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,
                                                                 Id,
-                                                                ChargingProductId,
+                                                                ChargingProduct,
                                                                 AuthTokens,
                                                                 eMAIds,
                                                                 PINs);
