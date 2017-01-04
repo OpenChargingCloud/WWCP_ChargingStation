@@ -905,7 +905,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reservations...
 
-        #region Reserve(...StartTime, Duration, ReservationId = null, ProviderId = null, eMAId = null,...)
+        #region Reserve(...        StartTime, Duration, ReservationId = null, ProviderId = null, eMAId = null,...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
@@ -942,6 +942,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         RequestTimeout      = null)
 
         {
+
+            #region Initial checks
+
+            if (!Timestamp.HasValue)
+                Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
+
+            if (EventTrackingId == null)
+                EventTrackingId = EventTracking_Id.New;
+
+            #endregion
 
             if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
                 AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
@@ -1040,16 +1053,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (EVSEId == null)
-                throw new ArgumentNullException(nameof(EVSEId),  "The given EVSE identification must not be null!");
+            if (!Timestamp.HasValue)
+                Timestamp = DateTime.Now;
 
-            ReservationResult result = null;
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
 
-            #endregion
 
+            ReservationResult result = null;
+
+            #endregion
 
             if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
                 AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
@@ -1196,8 +1212,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (ReservationId == null)
-                throw new ArgumentNullException(nameof(ReservationId), "The given charging reservation identification must not be null!");
+            if (!Timestamp.HasValue)
+                Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
+
+            if (EventTrackingId == null)
+                EventTrackingId = EventTracking_Id.New;
+
 
             CancelReservationResult result = null;
 
@@ -1335,16 +1358,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            RemoteStartEVSEResult result = null;
-
             if (!Timestamp.HasValue)
                 Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
 
-            #endregion
 
+            RemoteStartEVSEResult result = null;
+
+            #endregion
 
             if (AdminStatus.Value == ChargingStationAdminStatusTypes.Operational ||
                 AdminStatus.Value == ChargingStationAdminStatusTypes.InternalUse)
@@ -1394,7 +1420,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStart(...ChargingProduct = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
+        #region RemoteStart(...        ChargingProduct = null, ReservationId = null, SessionId = null, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Start a charging session at the given charging station.
@@ -1428,6 +1454,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             if (!Timestamp.HasValue)
                 Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
@@ -1561,7 +1590,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region RemoteStop(...SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
+        #region RemoteStop(...                   SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session.
@@ -1591,11 +1620,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (SessionId == null)
-                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
-
             if (!Timestamp.HasValue)
                 Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
@@ -1687,7 +1716,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region RemoteStop(...EVSEId, SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
+        #region RemoteStop(...EVSEId,            SessionId, ReservationHandling, ProviderId = null, eMAId = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -1719,19 +1748,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (EVSEId == null)
-                throw new ArgumentNullException(nameof(EVSEId),     "The given EVSE identification must not be null!");
-
-            if (SessionId == null)
-                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
-
-            RemoteStopEVSEResult result = null;
-
             if (!Timestamp.HasValue)
                 Timestamp = DateTime.Now;
 
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
+
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
+
+
+            RemoteStopEVSEResult result = null;
 
             #endregion
 
@@ -1821,11 +1848,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Initial checks
 
-            if (SessionId == null)
-                throw new ArgumentNullException(nameof(SessionId), "The given charging session identification must not be null!");
-
             if (!Timestamp.HasValue)
                 Timestamp = DateTime.Now;
+
+            if (!CancellationToken.HasValue)
+                CancellationToken = new CancellationTokenSource().Token;
 
             if (EventTrackingId == null)
                 EventTrackingId = EventTracking_Id.New;
