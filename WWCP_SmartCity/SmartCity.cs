@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2017 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -61,9 +61,9 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #region SmartCityStub
 
-        private readonly SmartCityStub _SmartCityStub;
+        private readonly SmartCity _SmartCityStub;
 
-        public SmartCityStub SmartCityStub
+        public SmartCity SmartCityStub
             => _SmartCityStub;
 
         #endregion
@@ -189,7 +189,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         }
 
-        internal SmartCity(SmartCityStub  SmartCity)
+        internal SmartCity(SmartCity  SmartCity)
         {
 
             this.Id                          = SmartCity.Id;

@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2017 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -38,11 +38,11 @@ namespace org.GraphDefined.WWCP
                                               //Authorizator_Id                               AuthorizatorId,
                                               I18NString                                    Name,
                                               I18NString                                    Description   = null,
-                                              Action<eMobilityProviderStub>                     Configurator  = null,
+                                              Action<eMobilityProvider>                     Configurator  = null,
                                               eMobilityProviderPriority                     Priority      = null,
                                               eMobilityProviderAdminStatusType              AdminStatus   = eMobilityProviderAdminStatusType.Available,
                                               eMobilityProviderStatusType                   Status        = eMobilityProviderStatusType.Available,
-                                              Action<eMobilityProviderStub>                     OnSuccess     = null,
+                                              Action<eMobilityProvider>                     OnSuccess     = null,
                                               Action<RoamingNetwork, eMobilityProvider_Id>  OnError       = null)
 
         {

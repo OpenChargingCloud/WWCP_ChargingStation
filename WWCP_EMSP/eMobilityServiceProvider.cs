@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2016 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2017 GraphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP Cloud <https://git.graphdefined.com/OpenChargingCloud/WWCP_Cloud>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
@@ -59,9 +59,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region EVSP
 
-        private readonly eMobilityProviderStub _EVSP;
+        private readonly eMobilityProvider _EVSP;
 
-        public eMobilityProviderStub EVSP
+        public eMobilityProvider EVSP
             => _EVSP;
 
         #endregion
@@ -202,7 +202,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         }
 
-        internal eMobilityServiceProvider(eMobilityProviderStub  EVSP)
+        internal eMobilityServiceProvider(eMobilityProvider  EVSP)
                                          // Authorizator_Id    AuthorizatorId = null)
         {
 
