@@ -31,83 +31,77 @@ namespace org.GraphDefined.WWCP.ChargingStations
 {
 
     /// <summary>
-    /// A remote Charging Station Operator.
+    /// A remote charging station operator.
     /// </summary>
-    public class RemoteEVSEOperator : IRemoteChargingStationOperator
+    public class RemoteChargingStationOperator : IRemoteChargingStationOperator
     {
 
         #region Properties
 
-        #region ChargingReservations
-
         private readonly Dictionary<ChargingReservation_Id, ChargingReservation> _ChargingReservations;
 
+        /// <summary>
+        /// All current charging reservations.
+        /// </summary>
         public IEnumerable<ChargingReservation> ChargingReservations
-        {
-            get
-            {
-                return _ChargingReservations.Select(_ => _.Value);
-            }
-        }
+            => _ChargingReservations.Select(_ => _.Value);
 
-        #endregion
-
-        #region ChargingSessions
 
         private readonly Dictionary<ChargingSession_Id, ChargingSession> _ChargingSessions;
 
+        /// <summary>
+        /// All current charging sessions.
+        /// </summary>
         public IEnumerable<ChargingSession> ChargingSessions
-        {
-            get
-            {
-                return _ChargingSessions.Select(_ => _.Value);
-            }
-        }
-
-        #endregion
+            => _ChargingSessions.Select(_ => _.Value);
 
         #endregion
 
         #region Events
 
-        // Events towards the remote Charging Station Operator
-
         /// <summary>
         /// An event fired whenever an EVSE is being reserved.
         /// </summary>
-        public event OnReserveEVSEDelegate                 OnReserveEVSE;
+        public event OnReserveEVSEDelegate      OnReserveEVSE;
 
         /// <summary>
         /// An event sent whenever an EVSE should start charging.
         /// </summary>
-        public event OnRemoteStartEVSEDelegate             OnRemoteStartEVSE;
+        public event OnRemoteStartEVSEDelegate  OnRemoteStartEVSE;
 
         /// <summary>
         /// An event sent whenever a charging session should stop.
         /// </summary>
-        public event OnRemoteStopEVSEDelegate              OnRemoteStopEVSE;
+        public event OnRemoteStopEVSEDelegate   OnRemoteStopEVSE;
 
         #endregion
 
         #region Constructor(s)
 
-        public RemoteEVSEOperator(OnReserveEVSEDelegate      OnReserveEVSE,
-                                  OnRemoteStartEVSEDelegate  OnRemoteStartEVSE,
-                                  OnRemoteStopEVSEDelegate   OnRemoteStopEVSE)
+        /// <summary>
+        /// Create a new remote charging station operator.
+        /// </summary>
+        /// <param name="OnReserveEVSE"></param>
+        /// <param name="OnRemoteStartEVSE"></param>
+        /// <param name="OnRemoteStopEVSE"></param>
+        public RemoteChargingStationOperator(OnReserveEVSEDelegate      OnReserveEVSE,
+                                             OnRemoteStartEVSEDelegate  OnRemoteStartEVSE,
+                                             OnRemoteStopEVSEDelegate   OnRemoteStopEVSE)
         {
 
             this.OnReserveEVSE     += OnReserveEVSE;
             this.OnRemoteStartEVSE += OnRemoteStartEVSE;
             this.OnRemoteStopEVSE  += OnRemoteStopEVSE;
 
-            this._ChargingSessions = new Dictionary<ChargingSession_Id, ChargingSession>();
+            this._ChargingReservations  = new Dictionary<ChargingReservation_Id, ChargingReservation>();
+            this._ChargingSessions      = new Dictionary<ChargingSession_Id, ChargingSession>();
 
         }
 
         #endregion
 
 
-        #region Reserve(...)
+        #region Reserve(EVSEId, ...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given EVSE.
@@ -126,7 +120,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<ReservationResult>
+        public Task<ReservationResult>
 
             Reserve(EVSE_Id                           EVSEId,
                     DateTime?                         StartTime,
@@ -144,8 +138,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     EventTracking_Id                  EventTrackingId     = null,
                     TimeSpan?                         RequestTimeout      = null)
 
-            => ReservationResult.UnknownEVSE;
+            => Task.FromResult(ReservationResult.OutOfService);
 
+        #endregion
+
+        #region Reserve(ChargingStationId, ...)
 
         /// <summary>
         /// Reserve the possibility to charge at the given charging station.
@@ -165,7 +162,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<ReservationResult>
+        public Task<ReservationResult>
 
             Reserve(ChargingStation_Id                ChargingStationId,
                     DateTime?                         StartTime,
@@ -183,8 +180,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     EventTracking_Id                  EventTrackingId     = null,
                     TimeSpan?                         RequestTimeout      = null)
 
-            => ReservationResult.UnknownChargingStation;
+            => Task.FromResult(ReservationResult.OutOfService);
 
+        #endregion
+
+        #region Reserve(ChargingPoolId, ...)
 
         /// <summary>
         /// Reserve the possibility to charge within the given charging pool.
@@ -204,7 +204,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<ReservationResult>
+        public Task<ReservationResult>
 
             Reserve(ChargingPool_Id                   ChargingPoolId,
                     DateTime?                         StartTime,
@@ -222,8 +222,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     EventTracking_Id                  EventTrackingId     = null,
                     TimeSpan?                         RequestTimeout      = null)
 
-            => ReservationResult.UnknownChargingPool;
+            => Task.FromResult(ReservationResult.OutOfService);
 
+        #endregion
+
+
+        #region CancelReservation(...)
 
         /// <summary>
         /// Try to remove the given charging reservation.
@@ -237,7 +241,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        public async Task<CancelReservationResult>
+        public Task<CancelReservationResult>
 
             CancelReservation(ChargingReservation_Id                 ReservationId,
                               ChargingReservationCancellationReason  Reason,
@@ -249,13 +253,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               EventTracking_Id                       EventTrackingId     = null,
                               TimeSpan?                              RequestTimeout      = null)
 
-            => CancelReservationResult.UnknownReservationId(ReservationId,
-                                                            Reason);
-
+            => Task.FromResult(CancelReservationResult.OutOfService(ReservationId,
+                                                                    Reason));
 
         #endregion
 
-        #region RemoteStart(...)
+
+
+        #region RemoteStart(EVSEId, ...)
 
         /// <summary>
         /// Start a charging session at the given EVSE.
@@ -306,8 +311,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       eMAId,
                                                       RequestTimeout)));
 
-            var result = results.
-                             FirstOrDefault(_result => _result.Result != RemoteStartEVSEResultType.Unspecified);
+            var result = results.FirstOrDefault(_result => _result.Result != RemoteStartEVSEResultType.Unspecified);
 
             if (result        != null &&
                 result.Result == RemoteStartEVSEResultType.Success)
@@ -321,6 +325,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
+        #endregion
+
+        #region RemoteStart(ChargingStationId, ...)
 
         /// <summary>
         /// Start a charging session at the given charging stations.
@@ -350,11 +357,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         EventTracking_Id         EventTrackingId    = null,
                         TimeSpan?                RequestTimeout     = null)
 
-            => RemoteStartChargingStationResult.UnknownChargingStation;
+            => RemoteStartChargingStationResult.OutOfService;
 
         #endregion
 
-        #region RemoteStop(...)
+
+        #region RemoteStop(SessionId, ...)
 
         /// <summary>
         /// Stop the given charging session.
@@ -381,6 +389,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        TimeSpan?              RequestTimeout      = null)
 
             => Task.FromResult(RemoteStopResult.OutOfService(SessionId));
+
+        #endregion
+
+        #region RemoteStop(EVSEId, SessionId, ...)
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -443,7 +455,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         }
 
-        public async Task<RemoteStopChargingStationResult>
+        #endregion
+
+        #region RemoteStop(ChargingStationId, SessionId, ...)
+
+        public Task<RemoteStopChargingStationResult>
 
             RemoteStop(ChargingStation_Id     ChargingStationId,
                        ChargingSession_Id     SessionId,
@@ -456,13 +472,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                        EventTracking_Id       EventTrackingId    = null,
                        TimeSpan?              RequestTimeout     = null)
 
-        {
-
-            throw new NotImplementedException();
-
-        }
+            => Task.FromResult(RemoteStopChargingStationResult.OutOfService(SessionId));
 
         #endregion
+
 
     }
 
