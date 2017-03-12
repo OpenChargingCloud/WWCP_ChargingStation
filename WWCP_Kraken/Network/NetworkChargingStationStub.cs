@@ -948,7 +948,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                          TimeSpan?          RequestTimeout = null)
 
             => new EVSEStatus[] {
-                   new EVSEStatus(EVSE_Id.Parse("DE*822*E222*1"), EVSEStatusType.Charging, DateTime.Now)
+                   new EVSEStatus(EVSE_Id.Parse("DE*822*E222*1"), EVSEStatusTypes.Charging, DateTime.Now)
                };
 
         #region Reservations

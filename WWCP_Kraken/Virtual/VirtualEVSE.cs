@@ -40,7 +40,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public class VirtualEVSE : AEMobilityEntity<EVSE_Id>,
                                IEquatable<VirtualEVSE>, IComparable<VirtualEVSE>, IComparable,
                                IEnumerable<SocketOutlet>,
-                               IStatus<EVSEStatusType>,
+                               IStatus<EVSEStatusTypes>,
                                IRemoteEVSE
     {
 
@@ -359,7 +359,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The current EVSE status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<EVSEStatusType> Status
+        public Timestamped<EVSEStatusTypes> Status
         {
 
             get
@@ -378,7 +378,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     {
 
                         default:
-                            return new Timestamped<EVSEStatusType>(AdminStatus.Timestamp, EVSEStatusType.OutOfService);
+                            return new Timestamped<EVSEStatusTypes>(AdminStatus.Timestamp, EVSEStatusTypes.OutOfService);
 
                     }
 
@@ -403,12 +403,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region StatusSchedule
 
-        private StatusSchedule<EVSEStatusType> _StatusSchedule;
+        private StatusSchedule<EVSEStatusTypes> _StatusSchedule;
 
         /// <summary>
         /// The EVSE status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<EVSEStatusType>> StatusSchedule
+        public IEnumerable<Timestamped<EVSEStatusTypes>> StatusSchedule
         {
             get
             {
@@ -565,8 +565,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._ChargingModes         = new ReactiveSet<ChargingModes>();
             this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
 
-            this._StatusSchedule        = new StatusSchedule<EVSEStatusType>(MaxStatusListSize);
-            this._StatusSchedule.     Insert(EVSEStatusType.OutOfService);
+            this._StatusSchedule        = new StatusSchedule<EVSEStatusTypes>(MaxStatusListSize);
+            this._StatusSchedule.     Insert(EVSEStatusTypes.OutOfService);
 
             this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusType>(MaxStatusListSize);
             this._AdminStatusSchedule.Insert(EVSEAdminStatusType.OutOfService);
@@ -636,7 +636,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
-        public void SetStatus(EVSEStatusType  NewStatus)
+        public void SetStatus(EVSEStatusTypes  NewStatus)
         {
             _StatusSchedule.Insert(NewStatus);
         }
@@ -649,7 +649,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewTimestampedStatus">A new timestamped status.</param>
-        public void SetStatus(Timestamped<EVSEStatusType> NewTimestampedStatus)
+        public void SetStatus(Timestamped<EVSEStatusTypes> NewTimestampedStatus)
         {
             _StatusSchedule.Insert(NewTimestampedStatus);
         }
@@ -663,7 +663,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        public void SetStatus(EVSEStatusType  NewStatus,
+        public void SetStatus(EVSEStatusTypes  NewStatus,
                               DateTime        Timestamp)
         {
             _StatusSchedule.Insert(NewStatus, Timestamp);
@@ -678,7 +678,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatusList">A list of new timestamped status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetStatus(IEnumerable<Timestamped<EVSEStatusType>>  NewStatusList,
+        public void SetStatus(IEnumerable<Timestamped<EVSEStatusTypes>>  NewStatusList,
                               ChangeMethods                             ChangeMethod = ChangeMethods.Replace)
         {
             _StatusSchedule.Insert(NewStatusList, ChangeMethod);
@@ -782,8 +782,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="NewStatus">The new EVSE status.</param>
         internal async Task UpdateStatus(DateTime                     Timestamp,
                                          EventTracking_Id             EventTrackingId,
-                                         Timestamped<EVSEStatusType>  OldStatus,
-                                         Timestamped<EVSEStatusType>  NewStatus)
+                                         Timestamped<EVSEStatusTypes>  OldStatus,
+                                         Timestamped<EVSEStatusTypes>  NewStatus)
         {
 
             var OnStatusChangedLocal = OnStatusChanged;
@@ -892,16 +892,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 switch (Status.Value)
                 {
 
-                    case EVSEStatusType.OutOfService:
+                    case EVSEStatusTypes.OutOfService:
                         return ReservationResult.OutOfService;
 
-                    case EVSEStatusType.Charging:
+                    case EVSEStatusTypes.Charging:
                         return ReservationResult.AlreadyInUse;
 
-                    case EVSEStatusType.Reserved:
+                    case EVSEStatusTypes.Reserved:
                         return ReservationResult.AlreadyReserved;
 
-                    case EVSEStatusType.Available:
+                    case EVSEStatusTypes.Available:
 
                         // Will do: Status = EVSEStatusType.Reserved
                         // Will do: Send OnNewReservation event!
@@ -1030,7 +1030,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         _Reservation = value;
 
-                        SetStatus(EVSEStatusType.Reserved);
+                        SetStatus(EVSEStatusTypes.Reserved);
 
                         OnNewReservation?.Invoke(DateTime.Now,
                                                  this,
@@ -1043,7 +1043,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         _Reservation = null;
 
-                        SetStatus(EVSEStatusType.Available);
+                        SetStatus(EVSEStatusTypes.Available);
 
                         //OnReservationCancelled?.Invoke(DateTime.Now,
                         //                               DateTime.Now,
@@ -1083,7 +1083,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
 
             if (_Reservation != null &&
-                Status.Value == EVSEStatusType.Reserved &&
+                Status.Value == EVSEStatusTypes.Reserved &&
                 _Reservation.IsExpired())
             {
 
@@ -1150,7 +1150,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                            RequestTimeout);
 
             // Will send events!
-            SetStatus(EVSEStatusType.Available);
+            SetStatus(EVSEStatusTypes.Available);
 
             return result;
 
@@ -1269,8 +1269,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     #region Available
 
-                    case EVSEStatusType.Available:
-                    case EVSEStatusType.DoorNotClosed:
+                    case EVSEStatusTypes.Available:
+                    case EVSEStatusTypes.DoorNotClosed:
 
                         // Will also set the status -> EVSEStatusType.Charging!
                         ChargingSession = new ChargingSession(SessionId.Value) {
@@ -1289,7 +1289,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     #region Reserved
 
-                    case EVSEStatusType.Reserved:
+                    case EVSEStatusTypes.Reserved:
 
                         #region Not matching reservation identifications...
 
@@ -1332,21 +1332,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     #region Charging
 
-                    case EVSEStatusType.Charging:
+                    case EVSEStatusTypes.Charging:
                         return RemoteStartEVSEResult.AlreadyInUse;
 
                     #endregion
 
                     #region OutOfService
 
-                    case EVSEStatusType.OutOfService:
+                    case EVSEStatusTypes.OutOfService:
                         return RemoteStartEVSEResult.OutOfService;
 
                     #endregion
 
                     #region Offline
 
-                    case EVSEStatusType.Offline:
+                    case EVSEStatusTypes.Offline:
                         return RemoteStartEVSEResult.Offline;
 
                     #endregion
@@ -1401,14 +1401,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     if (_ChargingSession != null)
                     {
 
-                        SetStatus(EVSEStatusType.Charging);
+                        SetStatus(EVSEStatusTypes.Charging);
 
                         OnNewChargingSession?.Invoke(DateTime.Now, this, _ChargingSession);
 
                     }
 
                     else
-                        SetStatus(EVSEStatusType.Available);
+                        SetStatus(EVSEStatusTypes.Available);
 
                 }
 
@@ -1464,21 +1464,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     #region Available
 
-                    case EVSEStatusType.Available:
+                    case EVSEStatusTypes.Available:
                         return RemoteStopEVSEResult.InvalidSessionId(SessionId);
 
                     #endregion
 
                     #region Reserved
 
-                    case EVSEStatusType.Reserved:
+                    case EVSEStatusTypes.Reserved:
                         return RemoteStopEVSEResult.InvalidSessionId(SessionId);
 
                     #endregion
 
                     #region Charging
 
-                    case EVSEStatusType.Charging:
+                    case EVSEStatusTypes.Charging:
 
                         #region Matching session identification...
 
@@ -1552,14 +1552,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     #region OutOfService
 
-                    case EVSEStatusType.OutOfService:
+                    case EVSEStatusTypes.OutOfService:
                         return RemoteStopEVSEResult.OutOfService(SessionId);
 
                     #endregion
 
                     #region Offline
 
-                    case EVSEStatusType.Offline:
+                    case EVSEStatusTypes.Offline:
                         return RemoteStopEVSEResult.Offline(SessionId);
 
                     #endregion

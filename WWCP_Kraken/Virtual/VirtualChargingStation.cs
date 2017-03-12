@@ -819,8 +819,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         internal async Task UpdateEVSEStatus(DateTime                     Timestamp,
                                              EventTracking_Id             EventTrackingId,
                                              IRemoteEVSE                  RemoteEVSE,
-                                             Timestamped<EVSEStatusType>  OldStatus,
-                                             Timestamped<EVSEStatusType>  NewStatus)
+                                             Timestamped<EVSEStatusTypes>  OldStatus,
+                                             Timestamped<EVSEStatusTypes>  NewStatus)
         {
 
             var OnEVSEStatusChangedLocal = OnEVSEStatusChanged;
@@ -971,7 +971,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 // ReserveNow!
                 // Later this could also be a delayed reservation!
 
-                var _EVSE = _EVSEs.FirstOrDefault(evse => evse.Status.Value == EVSEStatusType.Available);
+                var _EVSE = _EVSEs.FirstOrDefault(evse => evse.Status.Value == EVSEStatusTypes.Available);
 
                 if (_EVSE == null)
                     return ReservationResult.NoEVSEsAvailable;
@@ -1476,7 +1476,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 #endregion
 
-                var _VirtualEVSE = _EVSEs.FirstOrDefault(evse => evse.Status.Value == EVSEStatusType.Available);
+                var _VirtualEVSE = _EVSEs.FirstOrDefault(evse => evse.Status.Value == EVSEStatusTypes.Available);
 
                 if (_VirtualEVSE == null)
                     return RemoteStartChargingStationResult.NoEVSEsAvailable;

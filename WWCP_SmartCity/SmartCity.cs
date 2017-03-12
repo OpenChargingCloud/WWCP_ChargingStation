@@ -692,12 +692,16 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateStaticData(ChargingStation, ...)
+        #region UpdateStaticData(ChargingStation, PropertyName = null, OldValue = null, NewValue = null, TransmissionType = Enqueued, ...)
 
         /// <summary>
         /// Update the EVSE data of the given charging station within the static EVSE data at the OICP server.
         /// </summary>
         /// <param name="ChargingStation">A charging station.</param>
+        /// <param name="PropertyName">The name of the charging station property to update.</param>
+        /// <param name="OldValue">The old value of the charging station property to update.</param>
+        /// <param name="NewValue">The new value of the charging station property to update.</param>
+        /// <param name="TransmissionType">Whether to send the charging station update directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -706,6 +710,10 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.UpdateStaticData(ChargingStation     ChargingStation,
+                                             String              PropertyName,
+                                             Object              OldValue,
+                                             Object              NewValue,
+                                             TransmissionTypes   TransmissionType,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1038,12 +1046,16 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateStaticData(ChargingPool, ...)
+        #region UpdateStaticData(ChargingPool, PropertyName = null, OldValue = null, NewValue = null, TransmissionType = Enqueued, ...)
 
         /// <summary>
         /// Update the EVSE data of the given charging pool within the static EVSE data at the OICP server.
         /// </summary>
         /// <param name="ChargingPool">A charging pool.</param>
+        /// <param name="PropertyName">The name of the charging pool property to update.</param>
+        /// <param name="OldValue">The old value of the charging pool property to update.</param>
+        /// <param name="NewValue">The new value of the charging pool property to update.</param>
+        /// <param name="TransmissionType">Whether to send the charging pool update directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1052,6 +1064,10 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.UpdateStaticData(ChargingPool        ChargingPool,
+                                             String              PropertyName,
+                                             Object              OldValue,
+                                             Object              NewValue,
+                                             TransmissionTypes   TransmissionType,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1879,8 +1895,8 @@ namespace org.GraphDefined.WWCP.SmartCity
         public Task<WWCP.Acknowledgement>
 
             EnqueueEVSEStatusUpdate(EVSE                         EVSE,
-                                    Timestamped<EVSEStatusType>  OldStatus,
-                                    Timestamped<EVSEStatusType>  NewStatus)
+                                    Timestamped<EVSEStatusTypes>  OldStatus,
+                                    Timestamped<EVSEStatusTypes>  NewStatus)
 
         {
 
