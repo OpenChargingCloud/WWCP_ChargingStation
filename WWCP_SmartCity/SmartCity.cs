@@ -636,6 +636,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.SetStaticData(ChargingStation     ChargingStation,
+                                          TransmissionTypes   TransmissionType,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -671,6 +672,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.AddStaticData(ChargingStation     ChargingStation,
+                                          TransmissionTypes   TransmissionType,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -990,6 +992,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.SetStaticData(ChargingPool        ChargingPool,
+                                          TransmissionTypes   TransmissionType,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1025,6 +1028,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         async Task<Acknowledgement>
 
             IRemotePushData.AddStaticData(ChargingPool        ChargingPool,
+                                          TransmissionTypes   TransmissionType,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
