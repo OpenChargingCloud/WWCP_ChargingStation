@@ -379,14 +379,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public Task<RemoteStopResult>
 
             RemoteStop(ChargingSession_Id     SessionId,
-                       ReservationHandling    ReservationHandling,
-                       eMobilityProvider_Id?  ProviderId          = null,
-                       eMobilityAccount_Id?   eMAId               = null,
+                       ReservationHandling?   ReservationHandling   = null,
+                       eMobilityProvider_Id?  ProviderId            = null,
+                       eMobilityAccount_Id?   eMAId                 = null,
 
-                       DateTime?              Timestamp           = null,
-                       CancellationToken?     CancellationToken   = null,
-                       EventTracking_Id       EventTrackingId     = null,
-                       TimeSpan?              RequestTimeout      = null)
+                       DateTime?              Timestamp             = null,
+                       CancellationToken?     CancellationToken     = null,
+                       EventTracking_Id       EventTrackingId       = null,
+                       TimeSpan?              RequestTimeout        = null)
 
             => Task.FromResult(RemoteStopResult.OutOfService(SessionId));
 
@@ -411,14 +411,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStop(EVSE_Id                EVSEId,
                        ChargingSession_Id     SessionId,
-                       ReservationHandling    ReservationHandling,
-                       eMobilityProvider_Id?  ProviderId          = null,
-                       eMobilityAccount_Id?   eMAId               = null,
+                       ReservationHandling?   ReservationHandling   = null,
+                       eMobilityProvider_Id?  ProviderId            = null,
+                       eMobilityAccount_Id?   eMAId                 = null,
 
-                       DateTime?              Timestamp           = null,
-                       CancellationToken?     CancellationToken   = null,
-                       EventTracking_Id       EventTrackingId     = null,
-                       TimeSpan?              RequestTimeout      = null)
+                       DateTime?              Timestamp             = null,
+                       CancellationToken?     CancellationToken     = null,
+                       EventTracking_Id       EventTrackingId       = null,
+                       TimeSpan?              RequestTimeout        = null)
 
         {
 
@@ -463,14 +463,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStop(ChargingStation_Id     ChargingStationId,
                        ChargingSession_Id     SessionId,
-                       ReservationHandling    ReservationHandling,
-                       eMobilityProvider_Id?  ProviderId         = null,
-                       eMobilityAccount_Id?   eMAId              = null,
+                       ReservationHandling?   ReservationHandling   = null,
+                       eMobilityProvider_Id?  ProviderId            = null,
+                       eMobilityAccount_Id?   eMAId                 = null,
 
-                       DateTime?              Timestamp          = null,
-                       CancellationToken?     CancellationToken  = null,
-                       EventTracking_Id       EventTrackingId    = null,
-                       TimeSpan?              RequestTimeout     = null)
+                       DateTime?              Timestamp             = null,
+                       CancellationToken?     CancellationToken     = null,
+                       EventTracking_Id       EventTrackingId       = null,
+                       TimeSpan?              RequestTimeout        = null)
 
             => Task.FromResult(RemoteStopChargingStationResult.OutOfService(SessionId));
 

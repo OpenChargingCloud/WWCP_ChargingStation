@@ -1300,14 +1300,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             RemoteStop(EVSE_Id                EVSEId,
                        ChargingSession_Id     SessionId,
-                       ReservationHandling    ReservationHandling,
-                       eMobilityProvider_Id?  ProviderId          = null,
-                       eMobilityAccount_Id?   eMAId               = null,
+                       ReservationHandling?   ReservationHandling   = null,
+                       eMobilityProvider_Id?  ProviderId            = null,
+                       eMobilityAccount_Id?   eMAId                 = null,
 
-                       DateTime?              Timestamp           = null,
-                       CancellationToken?     CancellationToken   = null,
-                       EventTracking_Id       EventTrackingId     = null,
-                       TimeSpan?              RequestTimeout      = null)
+                       DateTime?              Timestamp             = null,
+                       CancellationToken?     CancellationToken     = null,
+                       EventTracking_Id       EventTrackingId       = null,
+                       TimeSpan?              RequestTimeout        = null)
 
 
         {
@@ -1320,10 +1320,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 throw new ArgumentNullException(nameof(EVSEId),     "The given unique EVSE identification must not be null!");
 
             if (SessionId == null)
-                throw new ArgumentNullException("SessionId",  "The given unique charging session identification must not be null!");
-
-            if (ReservationHandling == null)
-                ReservationHandling = ReservationHandling.Close;
+                throw new ArgumentNullException(nameof(SessionId),  "The given unique charging session identification must not be null!");
 
             #endregion
 
@@ -1344,10 +1341,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                        requestbuilder.Content        = JSONObject.Create(
                                                                                                            new JProperty("eMAId",                      eMAId.    ToString()),
                                                                                                            new JProperty("SessionId",                  SessionId.ToString()),
-                                                                                                           ReservationHandling.IsKeepAlive == true
-                                                                                                               ? new JProperty("ReservationHandling",  ReservationHandling.KeepAliveTime.Value.TotalSeconds)
+                                                                                                           ReservationHandling.HasValue && ReservationHandling.Value.IsKeepAlive
+                                                                                                               ? new JProperty("ReservationHandling",  ReservationHandling.Value.KeepAliveTime.Value.TotalSeconds)
                                                                                                                : null,
-                                                                                                           ReservationHandling.IsKeepAlive == false
+                                                                                                           ReservationHandling.HasValue && !ReservationHandling.Value.IsKeepAlive
                                                                                                                ? new JProperty("ReservationHandling",  "close")
                                                                                                                : null,
                                                                                                            ProviderId != null
