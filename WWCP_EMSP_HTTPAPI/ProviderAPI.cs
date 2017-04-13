@@ -1513,8 +1513,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStopEVSEResultType.Success:
 
-                                                     if (response.ReservationHandling             == null ||
-                                                         response.ReservationHandling.IsKeepAlive == false)
+                                                     if (response.ReservationHandling.IsKeepAlive == false)
                                                          return SendEVSERemoteStopped(
                                                              new HTTPResponseBuilder(Request) {
                                                                  HTTPStatusCode             = HTTPStatusCode.NoContent,
