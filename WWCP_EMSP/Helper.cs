@@ -35,32 +35,30 @@ namespace org.GraphDefined.WWCP
 
             CreateNewEMobilityServiceProvider(this RoamingNetwork                           RoamingNetwork,
                                               eMobilityProvider_Id                          Id,
-                                              //Authorizator_Id                               AuthorizatorId,
                                               I18NString                                    Name,
                                               I18NString                                    Description   = null,
-                                              Action<eMobilityProvider>                     Configurator  = null,
+                                              Action<eMobilityProviderProxy>                     Configurator  = null,
                                               eMobilityProviderPriority                     Priority      = null,
                                               eMobilityProviderAdminStatusType              AdminStatus   = eMobilityProviderAdminStatusType.Operational,
                                               eMobilityProviderStatusType                   Status        = eMobilityProviderStatusType.Available,
-                                              Action<eMobilityProvider>                     OnSuccess     = null,
+                                              Action<eMobilityProviderProxy>                     OnSuccess     = null,
                                               Action<RoamingNetwork, eMobilityProvider_Id>  OnError       = null)
 
         {
 
-            var a = RoamingNetwork.CreateNewEMobilityProvider(Id,
-                                                              Name,
-                                                              Description,
-                                                              Priority,
-                                                              Configurator,
-                                                              EMobilityProvider => new eMobilityServiceProvider(EMobilityProvider.Id,
-                                                                                                                EMobilityProvider.RoamingNetwork),
-                                                         //                                                       AuthorizatorId),
-                                                              AdminStatus,
-                                                              Status,
-                                                              OnSuccess,
-                                                              OnError);
+            var _Provider = RoamingNetwork.CreateNewEMobilityProvider(Id,
+                                                                      Name,
+                                                                      Description,
+                                                                      Priority,
+                                                                      Configurator,
+                                                                      EMobilityProvider => new eMobilityServiceProvider(EMobilityProvider.Id,
+                                                                                                                        EMobilityProvider.RoamingNetwork),
+                                                                      AdminStatus,
+                                                                      Status,
+                                                                      OnSuccess,
+                                                                      OnError);
 
-            return a.RemoteEMobilityProvider as eMobilityServiceProvider;
+            return _Provider.RemoteEMobilityProvider as eMobilityServiceProvider;
 
         }
 

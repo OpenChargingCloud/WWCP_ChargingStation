@@ -41,6 +41,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Data
 
+        private readonly ConcurrentDictionary<ChargingPool_Id,    ChargingPool>                  ChargingPools;
+
         private readonly ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>  AuthorizationDatabase;
         private readonly ConcurrentDictionary<ChargingSession_Id, SessionInfo>                   SessionDatabase;
         private readonly ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>            ChargeDetailRecordDatabase;
@@ -54,17 +56,11 @@ namespace org.GraphDefined.WWCP.EMSP
         /// </summary>
         public eMobilityProvider_Id  Id                 { get; }
 
-        //public Authorizator_Id       AuthorizatorId     { get; }
+        IId IReceiveAuthorizeStartStop.AuthId
+            => Id;
 
-
-        #region EVSP
-
-        private readonly eMobilityProvider _EVSP;
-
-        public eMobilityProvider EVSP
-            => _EVSP;
-
-        #endregion
+        public Boolean DisableAuthentication           { get; set; }
+        public Boolean DisableSendChargeDetailRecords  { get; set; }
 
 
         #region AllTokens
@@ -151,6 +147,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
+        // CancelReservation
+
         #region OnRemote...Start / OnRemote...Started
 
         /// <summary>
@@ -179,7 +177,28 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        // CancelReservation
+
+
+        // Incoming events from the roaming network
+
+        public event OnAuthorizeStartRequestDelegate                  OnAuthorizeStartRequest;
+        public event OnAuthorizeStartResponseDelegate                 OnAuthorizeStartResponse;
+
+        public event OnAuthorizeEVSEStartRequestDelegate              OnAuthorizeEVSEStartRequest;
+        public event OnAuthorizeEVSEStartResponseDelegate             OnAuthorizeEVSEStartResponse;
+
+        public event OnAuthorizeChargingStationStartRequestDelegate   OnAuthorizeChargingStationStartRequest;
+        public event OnAuthorizeChargingStationStartResponseDelegate  OnAuthorizeChargingStationStartResponse;
+
+
+        public event OnAuthorizeStopRequestDelegate                   OnAuthorizeStopRequest;
+        public event OnAuthorizeStopResponseDelegate                  OnAuthorizeStopResponse;
+
+        public event OnAuthorizeEVSEStopRequestDelegate               OnAuthorizeEVSEStopRequest;
+        public event OnAuthorizeEVSEStopResponseDelegate              OnAuthorizeEVSEStopResponse;
+
+        public event OnAuthorizeChargingStationStopRequestDelegate    OnAuthorizeChargingStationStopRequest;
+        public event OnAuthorizeChargingStationStopResponseDelegate   OnAuthorizeChargingStationStopResponse;
 
         #endregion
 
@@ -187,35 +206,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
         internal eMobilityServiceProvider(eMobilityProvider_Id  Id,
                                           RoamingNetwork        RoamingNetwork)
-                                          //Authorizator_Id       AuthorizatorId = null)
         {
 
             this.Id                          = Id;
             this.RoamingNetwork              = RoamingNetwork;
-            //this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
+
+            this.ChargingPools               = new ConcurrentDictionary<ChargingPool_Id,    ChargingPool>();
 
             this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
             this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
             this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
-
-            //EVSP.RemoteEMobilityProvider = this;
-
-        }
-
-        internal eMobilityServiceProvider(eMobilityProvider  EVSP)
-                                         // Authorizator_Id    AuthorizatorId = null)
-        {
-
-            this.Id                          = EVSP.Id;
-            this.RoamingNetwork              = EVSP.RoamingNetwork;
-            this._EVSP                       = EVSP;
-            //this.AuthorizatorId              = AuthorizatorId ?? Authorizator_Id.Parse("GraphDefined WWCP E-Mobility Database");
-
-            this.AuthorizationDatabase       = new ConcurrentDictionary<Auth_Token,         TokenAuthorizationResultType>();
-            this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
-            this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
-
-            //EVSP.RemoteEMobilityProvider = this;
 
         }
 
@@ -257,1304 +257,2727 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Incoming requests from the roaming network
 
-        #region Receive incoming EVSEData
+        #region Receive incoming Data/Status
 
-        //private IRemotePushData AsIPushData  => this;
+        #region (Set/Add/Update/Delete) EVSE(s)...
 
-        //#region UpdateEVSEData                   (EVSE,             ActionType, ...)
+        #region SetStaticData   (EVSE, ...)
 
-        ///// <summary>
-        ///// Upload the EVSE data of the given EVSE.
-        ///// </summary>
-        ///// <param name="EVSE">An EVSE.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
+        /// <summary>
+        /// Set the given EVSE as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSE">An EVSE to upload.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //    IRemotePushData.UpdateEVSEData(EVSE                 EVSE,
-        //                                    ActionType           ActionType,
+            IReceiveData.SetStaticData(EVSE                EVSE,
 
-        //                                    DateTime?            Timestamp          = null,
-        //                                    CancellationToken?   CancellationToken  = null,
-        //                                    EventTracking_Id     EventTrackingId    = null,
-        //                                    TimeSpan?            RequestTimeout     = null)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
-        //{
+        {
 
-        //    #region Initial checks
+            #region Initial checks
 
-        //    if (EVSE == null)
-        //        throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
+            if (EVSE == null)
+                throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
 
-        //    #endregion
+            #endregion
 
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //}
-
-        //#endregion
-
-        //#region UpdateEVSEData                   (EVSEs,            ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given enumeration of EVSEs.
-        ///// </summary>
-        ///// <param name="EVSEs">An enumeration of EVSEs.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateEVSEData(IEnumerable<EVSE>    EVSEs,
-        //                                    ActionType           ActionType,
-
-        //                                    DateTime?            Timestamp          = null,
-        //                                    CancellationToken?   CancellationToken  = null,
-        //                                    EventTracking_Id     EventTrackingId    = null,
-        //                                    TimeSpan?            RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (EVSEs == null)
-        //        throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingStationData        (ChargingStation,  ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given charging station.
-        ///// </summary>
-        ///// <param name="ChargingStation">A charging station.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingStationData(ChargingStation      ChargingStation,
-        //                                              ActionType           ActionType,
-
-        //                                              DateTime?            Timestamp          = null,
-        //                                              CancellationToken?   CancellationToken  = null,
-        //                                              EventTracking_Id     EventTrackingId    = null,
-        //                                              TimeSpan?            RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStation == null)
-        //        throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingStationData        (ChargingStations, ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given charging stations.
-        ///// </summary>
-        ///// <param name="ChargingStations">An enumeration of charging stations.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingStationData(IEnumerable<ChargingStation>  ChargingStations,
-        //                                              ActionType                    ActionType,
-
-        //                                              DateTime?                     Timestamp          = null,
-        //                                              CancellationToken?            CancellationToken  = null,
-        //                                              EventTracking_Id              EventTrackingId    = null,
-        //                                              TimeSpan?                     RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStations == null)
-        //        throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingPoolData           (ChargingPool,     ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given charging pool.
-        ///// </summary>
-        ///// <param name="ChargingPool">A charging pool.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingPoolData(ChargingPool         ChargingPool,
-        //                                            ActionType           ActionType,
-
-        //                                            DateTime?            Timestamp          = null,
-        //                                            CancellationToken?   CancellationToken  = null,
-        //                                            EventTracking_Id     EventTrackingId    = null,
-        //                                            TimeSpan?            RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingPool == null)
-        //        throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingPoolData           (ChargingPools,    ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given charging pools.
-        ///// </summary>
-        ///// <param name="ChargingPools">An enumeration of charging pools.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingPoolData(IEnumerable<ChargingPool>  ChargingPools,
-        //                                            ActionType                 ActionType,
-
-        //                                            DateTime?                  Timestamp          = null,
-        //                                            CancellationToken?         CancellationToken  = null,
-        //                                            EventTracking_Id           EventTrackingId    = null,
-        //                                            TimeSpan?                  RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingPools == null)
-        //        throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingStationOperatorData(EVSEOperator,     ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given Charging Station Operator.
-        ///// </summary>
-        ///// <param name="ChargingStationOperator">An Charging Station Operator.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingStationOperatorData(ChargingStationOperator  ChargingStationOperator,
-        //                                                       ActionType               ActionType,
-
-        //                                                       DateTime?                Timestamp          = null,
-        //                                                       CancellationToken?       CancellationToken  = null,
-        //                                                       EventTracking_Id         EventTrackingId    = null,
-        //                                                       TimeSpan?                RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStationOperator == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperator), "The given charging station operator must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateChargingStationOperatorData(EVSEOperators,    ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given Charging Station Operators.
-        ///// </summary>
-        ///// <param name="ChargingStationOperators">An enumeration of Charging Station Operators.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateChargingStationOperatorData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
-        //                                                       ActionType                            ActionType,
-
-        //                                                       DateTime?                             Timestamp          = null,
-        //                                                       CancellationToken?                    CancellationToken  = null,
-        //                                                       EventTracking_Id                      EventTrackingId    = null,
-        //                                                       TimeSpan?                             RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStationOperators == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperators),  "The given enumeration of charging station operators must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //#region UpdateRoamingNetworkData         (RoamingNetwork,   ActionType, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE data of the given roaming network.
-        ///// </summary>
-        ///// <param name="RoamingNetwork">A roaming network.</param>
-        ///// <param name="ActionType">The server-side data management operation.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //Task<Acknowledgement>
-
-        //    IRemotePushData.UpdateRoamingNetworkData(RoamingNetwork       RoamingNetwork,
-        //                                              ActionType           ActionType,
-
-        //                                              DateTime?            Timestamp          = null,
-        //                                              CancellationToken?   CancellationToken  = null,
-        //                                              EventTracking_Id     EventTrackingId    = null,
-        //                                              TimeSpan?            RequestTimeout     = null)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (RoamingNetwork == null)
-        //        throw new ArgumentNullException(nameof(SmartCityStub), "The given roaming network must not be null!");
-
-        //    #endregion
-
-        //    return Task.FromResult(new Acknowledgement(ResultType.True));
-
-        //}
-
-        //#endregion
-
-        //public void RemoveChargingStations(DateTime                      Timestamp,
-        //                                   IEnumerable<ChargingStation>  ChargingStations)
-        //{
-
-        //    foreach (var _ChargingStation in ChargingStations)
-        //        Console.WriteLine(DateTime.Now + " LocalEMobilityService says: " + _ChargingStation.Id + " was removed!");
-
-        //}
+        }
 
         #endregion
 
-        #region Receive incoming EVSEStatus
+        #region AddStaticData   (EVSE, ...)
 
-        //private IRemotePushStatus AsIPushStatus2Remote  => this;
+        /// <summary>
+        /// Add the given EVSE to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSE">An EVSE to upload.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //#region UpdateEVSEStatus(EVSEStatus, ...)
+            IReceiveData.AddStaticData(EVSE                EVSE,
 
-        ///// <summary>
-        ///// Upload the given EVSE status.
-        ///// </summary>
-        ///// <param name="EVSEStatus">An EVSE status.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<Acknowledgement>
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
-        //    IRemotePushStatus.UpdateEVSEStatus(EVSEStatus          EVSEStatus,
+        {
 
-        //                                        DateTime?           Timestamp,
-        //                                        CancellationToken?  CancellationToken,
-        //                                        EventTracking_Id    EventTrackingId,
-        //                                        TimeSpan?           RequestTimeout)
+            #region Initial checks
 
-        //{
+            if (EVSE == null)
+                throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
 
-        //    #region Initial checks
+            #endregion
 
-        //    if (EVSEStatus == null)
-        //        throw new ArgumentNullException(nameof(EVSEStatus), "The given EVSE status must not be null!");
+            return new Acknowledgement(ResultType.NoOperation);
 
-
-        //    Acknowledgement result;
-
-        //    #endregion
-
-        //    #region Send OnUpdateEVSEStatusRequest event
-
-        //    //   OnPushEVSEStatusRequest?.Invoke(DateTime.Now,
-        //    //                                   Timestamp.Value,
-        //    //                                   this,
-        //    //                                   this.Id.ToString(),
-        //    //                                   EventTrackingId,
-        //    //                                   this.RoamingNetwork.Id,
-        //    //                                   ActionType,
-        //    //                                   GroupedEVSEStatus,
-        //    //                                   (UInt32) _NumberOfEVSEStatus,
-        //    //                                   RequestTimeout);
-
-        //    #endregion
-
-
-        //    result = new Acknowledgement(ResultType.NoOperation);
-
-
-        //    #region Send OnUpdateEVSEStatusResponse event
-
-        //    // OnUpdateEVSEStatusResponse?.Invoke(DateTime.Now,
-        //    //                                    Timestamp.Value,
-        //    //                                    this,
-        //    //                                    this.Id.ToString(),
-        //    //                                    EventTrackingId,
-        //    //                                    this.RoamingNetwork.Id,
-        //    //                                    ActionType,
-        //    //                                    GroupedEVSEStatus,
-        //    //                                    (UInt32) _NumberOfEVSEStatus,
-        //    //                                    RequestTimeout,
-        //    //                                    result,
-        //    //                                    DateTime.Now - Timestamp.Value);
-
-        //    #endregion
-
-        //    return result;
-
-        //}
-
-        //#endregion
-
-        //#region UpdateEVSEStatus(EVSEStatus, ...)
-
-        ///// <summary>
-        ///// Upload the given enumeration of EVSE status.
-        ///// </summary>
-        ///// <param name="EVSEStatus">An enumeration of EVSE status.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<Acknowledgement>
-
-        //    IRemotePushStatus.UpdateEVSEStatus(IEnumerable<EVSEStatus>  EVSEStatus,
-
-        //                                        DateTime?                Timestamp,
-        //                                        CancellationToken?       CancellationToken,
-        //                                        EventTracking_Id         EventTrackingId,
-        //                                        TimeSpan?                RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (EVSEStatus == null)
-        //        throw new ArgumentNullException(nameof(EVSEStatus),  "The given enumeration of EVSE status must not be null!");
-
-
-        //    Acknowledgement result;
-
-        //    #endregion
-
-        //    #region Send OnUpdateEVSEStatusRequest event
-
-        //    //   OnPushEVSEStatusRequest?.Invoke(DateTime.Now,
-        //    //                                   Timestamp.Value,
-        //    //                                   this,
-        //    //                                   this.Id.ToString(),
-        //    //                                   EventTrackingId,
-        //    //                                   this.RoamingNetwork.Id,
-        //    //                                   ActionType,
-        //    //                                   GroupedEVSEStatus,
-        //    //                                   (UInt32) _NumberOfEVSEStatus,
-        //    //                                   RequestTimeout);
-
-        //    #endregion
-
-
-        //    result = new Acknowledgement(ResultType.NoOperation);
-
-
-        //    #region Send OnUpdateEVSEStatusResponse event
-
-        //    // OnUpdateEVSEStatusResponse?.Invoke(DateTime.Now,
-        //    //                                    Timestamp.Value,
-        //    //                                    this,
-        //    //                                    this.Id.ToString(),
-        //    //                                    EventTrackingId,
-        //    //                                    this.RoamingNetwork.Id,
-        //    //                                    ActionType,
-        //    //                                    GroupedEVSEStatus,
-        //    //                                    (UInt32) _NumberOfEVSEStatus,
-        //    //                                    RequestTimeout,
-        //    //                                    result,
-        //    //                                    DateTime.Now - Timestamp.Value);
-
-        //    #endregion
-
-        //    return result;
-
-        //}
-
-        //#endregion
-
-        //#region UpdateEVSEStatus(EVSE, ...)
-
-        ///// <summary>
-        ///// Upload the EVSE status of the given EVSE.
-        ///// </summary>
-        ///// <param name="EVSE">An EVSE.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<Acknowledgement>
-
-        //    IRemotePushStatus.UpdateEVSEStatus(EVSE                 EVSE,
-
-        //                                        DateTime?            Timestamp,
-        //                                        CancellationToken?   CancellationToken,
-        //                                        EventTracking_Id     EventTrackingId,
-        //                                        TimeSpan?            RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (EVSE == null)
-        //        throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
-
-
-        //    Acknowledgement result;
-
-        //    #endregion
-
-        //    #region Send OnUpdateEVSEStatusRequest event
-
-        //    //   OnPushEVSEStatusRequest?.Invoke(DateTime.Now,
-        //    //                                   Timestamp.Value,
-        //    //                                   this,
-        //    //                                   this.Id.ToString(),
-        //    //                                   EventTrackingId,
-        //    //                                   this.RoamingNetwork.Id,
-        //    //                                   ActionType,
-        //    //                                   GroupedEVSEStatus,
-        //    //                                   (UInt32) _NumberOfEVSEStatus,
-        //    //                                   RequestTimeout);
-
-        //    #endregion
-
-
-        //    result = new Acknowledgement(ResultType.NoOperation);
-
-
-        //    #region Send OnUpdateEVSEStatusResponse event
-
-        //    // OnUpdateEVSEStatusResponse?.Invoke(DateTime.Now,
-        //    //                                    Timestamp.Value,
-        //    //                                    this,
-        //    //                                    this.Id.ToString(),
-        //    //                                    EventTrackingId,
-        //    //                                    this.RoamingNetwork.Id,
-        //    //                                    ActionType,
-        //    //                                    GroupedEVSEStatus,
-        //    //                                    (UInt32) _NumberOfEVSEStatus,
-        //    //                                    RequestTimeout,
-        //    //                                    result,
-        //    //                                    DateTime.Now - Timestamp.Value);
-
-        //    #endregion
-
-        //    return result;
-
-        //}
-
-        //#endregion
-
-        //#region UpdateEVSEStatus(EVSEs, ...)
-
-        ///// <summary>
-        ///// Upload all EVSE status of the given enumeration of EVSEs.
-        ///// </summary>
-        ///// <param name="EVSEs">An enumeration of EVSEs.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<Acknowledgement>
-
-        //    IRemotePushStatus.UpdateEVSEStatus(IEnumerable<EVSE>    EVSEs,
-
-        //                                        DateTime?            Timestamp,
-        //                                        CancellationToken?   CancellationToken,
-        //                                        EventTracking_Id     EventTrackingId,
-        //                                        TimeSpan?            RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (EVSEs == null)
-        //        throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
-
-
-        //    Acknowledgement result;
-
-        //    #endregion
-
-        //    #region Send OnUpdateEVSEStatusRequest event
-
-        //    //   OnPushEVSEStatusRequest?.Invoke(DateTime.Now,
-        //    //                                   Timestamp.Value,
-        //    //                                   this,
-        //    //                                   this.Id.ToString(),
-        //    //                                   EventTrackingId,
-        //    //                                   this.RoamingNetwork.Id,
-        //    //                                   ActionType,
-        //    //                                   GroupedEVSEStatus,
-        //    //                                   (UInt32) _NumberOfEVSEStatus,
-        //    //                                   RequestTimeout);
-
-        //    #endregion
-
-
-        //    result = new Acknowledgement(ResultType.NoOperation);
-
-
-        //    #region Send OnUpdateEVSEStatusResponse event
-
-        //    // OnUpdateEVSEStatusResponse?.Invoke(DateTime.Now,
-        //    //                                    Timestamp.Value,
-        //    //                                    this,
-        //    //                                    this.Id.ToString(),
-        //    //                                    EventTrackingId,
-        //    //                                    this.RoamingNetwork.Id,
-        //    //                                    ActionType,
-        //    //                                    GroupedEVSEStatus,
-        //    //                                    (UInt32) _NumberOfEVSEStatus,
-        //    //                                    RequestTimeout,
-        //    //                                    result,
-        //    //                                    DateTime.Now - Timestamp.Value);
-
-        //    #endregion
-
-        //    return result;
-
-        //}
-
-        //#endregion
-
-
-        //#region PushEVSEStatus(EVSEStatusDiff, ...)
-
-        ///// <summary>
-        ///// Send EVSE status updates.
-        ///// </summary>
-        ///// <param name="EVSEStatusDiff">An EVSE status diff.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        ////async Task
-
-        ////    IPushStatus2Remote.PushEVSEStatus(EVSEStatusDiff      EVSEStatusDiff,
-
-        ////                               DateTime?           Timestamp,
-        ////                               CancellationToken?  CancellationToken,
-        ////                               EventTracking_Id    EventTrackingId,
-        ////                               TimeSpan?           RequestTimeout)
-
-        ////{
-
-        ////    await Task.FromResult("");
-
-        ////}
-
-        //#endregion
+        }
 
         #endregion
 
-        #region Receive incoming AuthStart/-Stop
+        #region UpdateStaticData(EVSE, PropertyName = null, OldValue = null, NewValue = null, ...)
 
-        //#region AuthorizeStart(ChargingStationOperatorId, AuthToken, ChargingProductId, SessionId, ...)
+        /// <summary>
+        /// Update the static data of the given EVSE.
+        /// The EVSE can be uploaded as a whole, or just a single property of the EVSE.
+        /// </summary>
+        /// <param name="EVSE">An EVSE to update.</param>
+        /// <param name="PropertyName">The name of the EVSE property to update.</param>
+        /// <param name="OldValue">The old value of the EVSE property to update.</param>
+        /// <param name="NewValue">The new value of the EVSE property to update.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        ///// <summary>
-        ///// Create an authorize start request.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// <param name="ChargingProductId">An optional charging product identification.</param>
-        ///// <param name="SessionId">An optional session identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStartResult>
+            IReceiveData.UpdateStaticData(EVSE                EVSE,
+                                             String              PropertyName,
+                                             Object              OldValue,
+                                             Object              NewValue,
 
-        //    IRemoteAuthorizeStartStop.AuthorizeStart(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                             Auth_Token                  AuthToken,
-        //                                             ChargingProduct_Id?         ChargingProductId,
-        //                                             ChargingSession_Id?         SessionId,
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
 
-        //                                             DateTime?                   Timestamp,
-        //                                             CancellationToken?          CancellationToken,
-        //                                             EventTracking_Id            EventTrackingId,
-        //                                             TimeSpan?                   RequestTimeout)
+        {
 
-        //{
+            #region Initial checks
 
-        //    #region Initial checks
+            if (EVSE == null)
+                throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
 
-        //    if (ChargingStationOperatorId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId), "The given parameter must not be null!");
+            #endregion
 
-        //    if (AuthToken  == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //    #endregion
+        }
 
-        //    TokenAuthorizationResultType AuthenticationResult;
+        #endregion
 
-        //    if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
-        //    {
+        #region DeleteStaticData(EVSE, ...)
 
-        //        #region Authorized
+        /// <summary>
+        /// Delete the static data of the given EVSE.
+        /// </summary>
+        /// <param name="EVSE">An EVSE to delete.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //        if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
-        //        {
+            IReceiveData.DeleteStaticData(EVSE                EVSE,
 
-        //            var _SessionId = ChargingSession_Id.New;
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
 
-        //            SessionDatabase.TryAdd(_SessionId, new SessionInfo(AuthToken));
+        {
 
-        //            return AuthStartResult.Authorized(AuthorizatorId,
-        //                                              _SessionId,
-        //                                              EVSP.Id);
+            #region Initial checks
 
-        //        }
+            if (EVSE == null)
+                throw new ArgumentNullException(nameof(EVSE), "The given EVSE must not be null!");
 
-        //        #endregion
+            #endregion
 
-        //        #region Token is blocked!
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //        else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-        //            return AuthStartResult.Blocked(AuthorizatorId,
-        //                                           EVSP.Id,
-        //                                           "Token is blocked!");
+        }
 
-        //        #endregion
+        #endregion
 
-        //        #region ...fall through!
 
-        //        else
-        //            return AuthStartResult.Unspecified(AuthorizatorId);
+        #region SetStaticData   (EVSEs, ...)
 
-        //        #endregion
+        /// <summary>
+        /// Set the given enumeration of EVSEs as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSEs">An enumeration of EVSEs.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //    }
+            IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
-        //    #region Unkown Token!
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
-        //    return AuthStartResult.NotAuthorized(AuthorizatorId,
-        //                                         EVSP.Id,
-        //                                         "Unkown token!");
+        {
 
-        //    #endregion
+            #region Initial checks
 
-        //}
+            if (EVSEs == null)
+                throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
 
-        //#endregion
+            #endregion
 
-        //#region AuthorizeStart(ChargingStationOperatorId, AuthToken, EVSEId, ChargingProductId, SessionId, ...)
+            return new Acknowledgement(ResultType.NoOperation);
 
-        ///// <summary>
-        ///// Create an authorize start request at the given EVSE.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// <param name="EVSEId">The unique identification of an EVSE.</param>
-        ///// <param name="ChargingProductId">An optional charging product identification.</param>
-        ///// <param name="SessionId">An optional session identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStartEVSEResult>
+        }
 
-        //    IRemoteAuthorizeStartStop.AuthorizeStart(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                             Auth_Token                  AuthToken,
-        //                                             EVSE_Id                     EVSEId,
-        //                                             ChargingProduct_Id?         ChargingProductId,
-        //                                             ChargingSession_Id?         SessionId,
+        #endregion
 
-        //                                             DateTime?                   Timestamp,
-        //                                             CancellationToken?          CancellationToken,
-        //                                             EventTracking_Id            EventTrackingId,
-        //                                             TimeSpan?                   RequestTimeout)
+        #region AddStaticData   (EVSEs, ...)
 
-        //{
+        /// <summary>
+        /// Add the given enumeration of EVSEs to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSEs">An enumeration of EVSEs.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //    #region Initial checks
+            IReceiveData.AddStaticData(IEnumerable<EVSE>   EVSEs,
 
-        //    if (ChargingStationOperatorId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId), "The given parameter must not be null!");
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
-        //    if (AuthToken  == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
+        {
 
-        //    #endregion
+            #region Initial checks
 
-        //    TokenAuthorizationResultType AuthenticationResult;
+            if (EVSEs == null)
+                throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
 
-        //    if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
-        //    {
+            #endregion
 
-        //        #region Authorized
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //        if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
-        //        {
+        }
 
-        //            var _SessionId = ChargingSession_Id.New;
+        #endregion
 
-        //            SessionDatabase.TryAdd(_SessionId, new SessionInfo(AuthToken));
+        #region UpdateStaticData(EVSEs, ...)
 
-        //            return AuthStartEVSEResult.Authorized(AuthorizatorId,
-        //                                                  _SessionId,
-        //                                                  EVSP.Id);
+        /// <summary>
+        /// Update the given enumeration of EVSEs within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSEs">An enumeration of EVSEs.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //        }
+            IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
-        //        #endregion
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
 
-        //        #region Token is blocked!
+        {
 
-        //        else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-        //            return AuthStartEVSEResult.Blocked(AuthorizatorId,
-        //                                               EVSP.Id,
-        //                                               "Token is blocked!");
+            #region Initial checks
 
-        //        #endregion
+            if (EVSEs == null)
+                throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
 
-        //        #region ...fall through!
+            #endregion
 
-        //        else
-        //            return AuthStartEVSEResult.Unspecified(AuthorizatorId);
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //        #endregion
+        }
 
-        //    }
+        #endregion
 
-        //    #region Unkown Token!
+        #region DeleteStaticData(EVSEs, ...)
 
-        //    return AuthStartEVSEResult.NotAuthorized(AuthorizatorId,
-        //                                             EVSP.Id,
-        //                                             "Unkown token!");
+        /// <summary>
+        /// Delete the given enumeration of EVSEs from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="EVSEs">An enumeration of EVSEs.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //    #endregion
+            IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
-        //}
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
 
-        //#endregion
+        {
 
-        //#region AuthorizeStart(ChargingStationOperatorId, AuthToken, ChargingStationId, ChargingProductId, SessionId, ...)
+            #region Initial checks
 
-        ///// <summary>
-        ///// Create an AuthorizeStart request at the given charging station.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// <param name="ChargingStationId">The unique identification of a charging station.</param>
-        ///// <param name="ChargingProductId">An optional charging product identification.</param>
-        ///// <param name="SessionId">An optional session identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStartChargingStationResult>
+            if (EVSEs == null)
+                throw new ArgumentNullException(nameof(EVSEs), "The given enumeration of EVSEs must not be null!");
 
-        //    IRemoteAuthorizeStartStop.AuthorizeStart(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                             Auth_Token                  AuthToken,
-        //                                             ChargingStation_Id          ChargingStationId,
-        //                                             ChargingProduct_Id?         ChargingProductId,
-        //                                             ChargingSession_Id?         SessionId,
+            #endregion
 
-        //                                             DateTime?                   Timestamp,
-        //                                             CancellationToken?          CancellationToken,
-        //                                             EventTracking_Id            EventTrackingId,
-        //                                             TimeSpan?                   RequestTimeout)
+            return new Acknowledgement(ResultType.NoOperation);
 
-        //{
+        }
 
-        //    #region Initial checks
+        #endregion
 
-        //    if (ChargingStationOperatorId        == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId),         "The given parameter must not be null!");
 
-        //    if (AuthToken         == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),          "The given parameter must not be null!");
+        #region UpdateEVSEAdminStatus(AdminStatusUpdates, ...)
 
-        //    if (ChargingStationId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationId),  "The given parameter must not be null!");
+        /// <summary>
+        /// Update the given enumeration of EVSE admin status updates.
+        /// </summary>
+        /// <param name="AdminStatusUpdates">An enumeration of EVSE admin status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //    #endregion
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
 
-        //    TokenAuthorizationResultType AuthenticationResult;
+                                                DateTime?                           Timestamp,
+                                                CancellationToken?                  CancellationToken,
+                                                EventTracking_Id                    EventTrackingId,
+                                                TimeSpan?                           RequestTimeout)
 
-        //    if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
-        //    {
+        {
 
-        //        #region Authorized
+            #region Initial checks
 
-        //        if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
-        //        {
+            if (AdminStatusUpdates == null)
+                throw new ArgumentNullException(nameof(AdminStatusUpdates), "The given enumeration of EVSE admin status updates must not be null!");
 
-        //            var _SessionId = ChargingSession_Id.New;
 
-        //            SessionDatabase.TryAdd(_SessionId, new SessionInfo(AuthToken));
+            Acknowledgement result;
 
-        //            return AuthStartChargingStationResult.Authorized(AuthorizatorId,
-        //                                                             _SessionId,
-        //                                                             EVSP.Id);
+            #endregion
 
-        //        }
+            result = new Acknowledgement(ResultType.NoOperation);
 
-        //        #endregion
+            return result;
 
-        //        #region Token is blocked!
+        }
 
-        //        else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-        //            return AuthStartChargingStationResult.Blocked(AuthorizatorId,
-        //                                                          EVSP.Id,
-        //                                                          "Token is blocked!");
+        #endregion
 
-        //        #endregion
+        #region UpdateEVSEStatus     (StatusUpdates, ...)
 
-        //        #region ...fall through!
+        /// <summary>
+        /// Update the given enumeration of EVSE status updates.
+        /// </summary>
+        /// <param name="StatusUpdates">An enumeration of EVSE status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
 
-        //        else
-        //            return AuthStartChargingStationResult.Unspecified(AuthorizatorId);
+            IReceiveStatus.UpdateStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
 
-        //        #endregion
+                                           DateTime?                      Timestamp,
+                                           CancellationToken?             CancellationToken,
+                                           EventTracking_Id               EventTrackingId,
+                                           TimeSpan?                      RequestTimeout)
 
-        //    }
+        {
 
-        //    #region Unkown Token!
+            #region Initial checks
 
-        //    return AuthStartChargingStationResult.NotAuthorized(AuthorizatorId,
-        //                                                        EVSP.Id,
-        //                                                        "Unkown token!");
+            if (StatusUpdates == null)
+                throw new ArgumentNullException(nameof(StatusUpdates), "The given enumeration of evse status updates must not be null!");
 
-        //    #endregion
 
-        //}
+            Acknowledgement result;
 
-        //#endregion
+            #endregion
 
+            result = new Acknowledgement(ResultType.NoOperation);
 
-        //#region AuthorizeStop(ChargingStationOperatorId, SessionId, AuthToken, ...)
+            return result;
 
-        ///// <summary>
-        ///// Create an authorize stop request.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStopResult>
-
-        //    IRemoteAuthorizeStartStop.AuthorizeStop(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                            ChargingSession_Id          SessionId,
-        //                                            Auth_Token                  AuthToken,
-
-        //                                            DateTime?                   Timestamp,
-        //                                            CancellationToken?          CancellationToken,
-        //                                            EventTracking_Id            EventTrackingId,
-        //                                            TimeSpan?                   RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStationOperatorId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId), "The given parameter must not be null!");
-
-        //    if (SessionId  == null)
-        //        throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
-
-        //    if (AuthToken  == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
-
-        //    #endregion
-
-        //    #region Check session identification
-
-        //    SessionInfo SessionInfo = null;
-
-        //    if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
-        //        return AuthStopResult.InvalidSessionId(AuthorizatorId);
-
-        //    #endregion
-
-        //    TokenAuthorizationResultType AuthenticationResult;
-
-        //    if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
-        //    {
-
-        //        #region Token is authorized
-
-        //        if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
-        //        {
-
-        //            // Authorized
-        //            if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
-        //                return AuthStopResult.Authorized(AuthorizatorId,
-        //                                                 EVSP.Id);
-
-        //            // Invalid Token for SessionId!
-        //            else
-        //                return AuthStopResult.NotAuthorized(AuthorizatorId,
-        //                                                    EVSP.Id,
-        //                                                    "Invalid token for given session identification!");
-
-        //        }
-
-        //        #endregion
-
-        //        #region Token is blocked
-
-        //        else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-        //            return AuthStopResult.Blocked(AuthorizatorId,
-        //                                          EVSP.Id,
-        //                                          "Token is blocked!");
-
-        //        #endregion
-
-        //        #region ...fall through!
-
-        //        else
-        //            return AuthStopResult.Unspecified(AuthorizatorId);
-
-        //        #endregion
-
-        //    }
-
-        //    // Unkown Token!
-        //    return AuthStopResult.NotAuthorized(AuthorizatorId,
-        //                                        EVSP.Id,
-        //                                        "Unkown token!");
-
-        //}
-
-        //#endregion
-
-        //#region AuthorizeStop(ChargingStationOperatorId, EVSEId, SessionId, AuthToken, ...)
-
-        ///// <summary>
-        ///// Create an authorize stop request at the given EVSE.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="EVSEId">The unique identification of an EVSE.</param>
-        ///// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStopEVSEResult>
-
-        //    IRemoteAuthorizeStartStop.AuthorizeStop(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                            EVSE_Id                     EVSEId,
-        //                                            ChargingSession_Id          SessionId,
-        //                                            Auth_Token                  AuthToken,
-
-        //                                            DateTime?                   Timestamp,
-        //                                            CancellationToken?          CancellationToken,
-        //                                            EventTracking_Id            EventTrackingId,
-        //                                            TimeSpan?                   RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStationOperatorId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId), "The given parameter must not be null!");
-
-        //    if (SessionId  == null)
-        //        throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
-
-        //    if (AuthToken  == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
-
-        //    if (EVSEId == null)
-        //        throw new ArgumentNullException(nameof(EVSEId),     "The given parameter must not be null!");
-
-        //    #endregion
-
-        //    #region Check session identification
-
-        //    SessionInfo SessionInfo = null;
-
-        //    if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
-        //        return AuthStopEVSEResult.InvalidSessionId(AuthorizatorId);
-
-        //    #endregion
-
-        //    TokenAuthorizationResultType AuthenticationResult;
-
-        //    if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
-        //    {
-
-        //        #region Token is authorized
-
-        //        if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
-        //        {
-
-        //            // Authorized
-        //            if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
-        //                return AuthStopEVSEResult.Authorized(AuthorizatorId,
-        //                                                     EVSP.Id);
-
-        //            // Invalid Token for SessionId!
-        //            else
-        //                return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
-        //                                                        EVSP.Id,
-        //                                                        "Invalid token for given session identification!");
-
-        //        }
-
-        //        #endregion
-
-        //        #region Token is blocked
-
-        //        else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
-        //            return AuthStopEVSEResult.Blocked(AuthorizatorId,
-        //                                              EVSP.Id,
-        //                                              "Token is blocked!");
-
-        //        #endregion
-
-        //        #region ...fall through!
-
-        //        else
-        //            return AuthStopEVSEResult.Unspecified(AuthorizatorId);
-
-        //        #endregion
-
-        //    }
-
-        //    // Unkown Token!
-        //    return AuthStopEVSEResult.NotAuthorized(AuthorizatorId,
-        //                                            EVSP.Id,
-        //                                            "Unkown token!");
-
-        //}
-
-        //#endregion
-
-        //#region AuthorizeStop(ChargingStationOperatorId, ChargingStationId, SessionId, AuthToken, ...)
-
-        ///// <summary>
-        ///// Create an authorize stop request at the given charging station.
-        ///// </summary>
-        ///// <param name="ChargingStationOperatorId">An Charging Station Operator identification.</param>
-        ///// <param name="ChargingStationId">A charging station identification.</param>
-        ///// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        ///// <param name="AuthToken">A (RFID) user identification.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<AuthStopChargingStationResult>
-
-        //    IRemoteAuthorizeStartStop.AuthorizeStop(ChargingStationOperator_Id  ChargingStationOperatorId,
-        //                                            ChargingStation_Id          ChargingStationId,
-        //                                            ChargingSession_Id          SessionId,
-        //                                            Auth_Token                  AuthToken,
-
-        //                                            DateTime?                   Timestamp,
-        //                                            CancellationToken?          CancellationToken,
-        //                                            EventTracking_Id            EventTrackingId,
-        //                                            TimeSpan?                   RequestTimeout)
-
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargingStationOperatorId == null)
-        //        throw new ArgumentNullException(nameof(ChargingStationOperatorId), "The given parameter must not be null!");
-
-        //    if (SessionId  == null)
-        //        throw new ArgumentNullException(nameof(SessionId),  "The given parameter must not be null!");
-
-        //    if (AuthToken  == null)
-        //        throw new ArgumentNullException(nameof(AuthToken),  "The given parameter must not be null!");
-
-        //    #endregion
-
-        //    return AuthStopChargingStationResult.Error(AuthorizatorId);
-
-        //}
-
-        //#endregion
-
-        //#endregion
-
-        #region Receive incoming ChargeDetailRecords
-
-        //#region SendChargeDetailRecord(ChargeDetailRecord, ...)
-
-        ///// <summary>
-        ///// Send a charge detail record.
-        ///// </summary>
-        ///// <param name="ChargeDetailRecord">A charge detail record.</param>
-        ///// 
-        ///// <param name="Timestamp">The optional timestamp of the request.</param>
-        ///// <param name="CancellationToken">An optional token to cancel this request.</param>
-        ///// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
-        ///// <param name="RequestTimeout">An optional timeout for this request.</param>
-        //async Task<SendCDRResult>
-
-        //    IRemoteSendChargeDetailRecord.SendChargeDetailRecord(ChargeDetailRecord  ChargeDetailRecord,
-
-        //                                                         DateTime?           Timestamp,
-        //                                                         CancellationToken?  CancellationToken,
-        //                                                         EventTracking_Id    EventTrackingId,
-        //                                                         TimeSpan?           RequestTimeout)
-        //{
-
-        //    #region Initial checks
-
-        //    if (ChargeDetailRecord == null)
-        //        throw new ArgumentNullException(nameof(ChargeDetailRecord),  "The given charge detail record must not be null!");
-
-        //    #endregion
-
-        //    SessionInfo _SessionInfo = null;
-
-        //    //ToDo: Add events!
-
-
-        //    Debug.WriteLine("Received a CDR: " + ChargeDetailRecord.SessionId.ToString());
-
-
-        //    if (ChargeDetailRecordDatabase.ContainsKey(ChargeDetailRecord.SessionId))
-        //        return SendCDRResult.InvalidSessionId(AuthorizatorId);
-
-
-        //    if (ChargeDetailRecordDatabase.TryAdd(ChargeDetailRecord.SessionId, ChargeDetailRecord))
-        //    {
-
-        //        SessionDatabase.TryRemove(ChargeDetailRecord.SessionId, out _SessionInfo);
-
-        //        return SendCDRResult.Forwarded(AuthorizatorId);
-
-        //    }
-
-        //    //roamingprovider.OnEVSEStatusPush   += (Timestamp, Sender, SenderId, RoamingNetworkId, ActionType, GroupedEVSEs, NumberOfEVSEs) => {
-        //    //    Console.WriteLine("[" + Timestamp + "] " + RoamingNetworkId.ToString() + ": Pushing " + NumberOfEVSEs + " EVSE status towards " + SenderId + "(" + ActionType + ")");
-        //    //};
-
-        //    //    Console.WriteLine("[" + Timestamp + "] " + RoamingNetworkId.ToString() + ": Pushed "  + NumberOfEVSEs + " EVSE status towards " + SenderId + "(" + ActionType + ") => " + Result.Result + " (" + Duration.TotalSeconds + " sec)");
-
-        //    //    if (Result.Result == false)
-        //    //    {
-
-        //    //        var EMailTask = API_SMTPClient.Send(HubjectEVSEStatusPushFailedEMailProvider(Timestamp,
-        //    //                                                                                       Sender,
-        //    //                                                                                       SenderId,
-        //    //                                                                                       RoamingNetworkId,
-        //    //                                                                                       ActionType,
-        //    //                                                                                       GroupedEVSEs,
-        //    //                                                                                       NumberOfEVSEs,
-        //    //                                                                                       Result,
-        //    //                                                                                       Duration));
-
-        //    //        EMailTask.Wait(TimeSpan.FromSeconds(30));
-
-        //    //    }
-
-        //    //};
-
-        //    return SendCDRResult.InvalidSessionId(AuthorizatorId);
-
-        //}
+        }
 
         #endregion
 
         #endregion
 
+        #region (Set/Add/Update/Delete) Charging station(s)...
+
+        #region SetStaticData   (ChargingStation, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given charging station as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(ChargingStation     ChargingStation,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
         #endregion
+
+        #region AddStaticData   (ChargingStation, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given charging station to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(ChargingStation     ChargingStation,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingStation, PropertyName = null, OldValue = null, NewValue = null, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given charging station within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// <param name="PropertyName">The name of the charging station property to update.</param>
+        /// <param name="OldValue">The old value of the charging station property to update.</param>
+        /// <param name="NewValue">The new value of the charging station property to update.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
+                                             String              PropertyName,
+                                             Object              OldValue,
+                                             Object              NewValue,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingStation, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given charging station from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region SetStaticData   (ChargingStations, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given enumeration of charging stations as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStations">An enumeration of charging stations.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
+
+                                          DateTime?                     Timestamp,
+                                          CancellationToken?            CancellationToken,
+                                          EventTracking_Id              EventTrackingId,
+                                          TimeSpan?                     RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStations == null)
+                throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (ChargingStations, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given enumeration of charging stations to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStations">An enumeration of charging stations.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
+
+                                          DateTime?                     Timestamp,
+                                          CancellationToken?            CancellationToken,
+                                          EventTracking_Id              EventTrackingId,
+                                          TimeSpan?                     RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStations == null)
+                throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingStations, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given enumeration of charging stations within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStations">An enumeration of charging stations.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
+
+                                             DateTime?                     Timestamp,
+                                             CancellationToken?            CancellationToken,
+                                             EventTracking_Id              EventTrackingId,
+                                             TimeSpan?                     RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStations == null)
+                throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingStations, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given enumeration of charging stations from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStations">An enumeration of charging stations.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
+
+                                             DateTime?                     Timestamp,
+                                             CancellationToken?            CancellationToken,
+                                             EventTracking_Id              EventTrackingId,
+                                             TimeSpan?                     RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStations == null)
+                throw new ArgumentNullException(nameof(ChargingStations), "The given enumeration of charging stations must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region UpdateChargingStationAdminStatus(AdminStatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging station admin status updates.
+        /// </summary>
+        /// <param name="AdminStatusUpdates">An enumeration of charging station admin status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
+
+                                                DateTime?                                      Timestamp,
+                                                CancellationToken?                             CancellationToken,
+                                                EventTracking_Id                               EventTrackingId,
+                                                TimeSpan?                                      RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateChargingStationStatus     (StatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging station status updates.
+        /// </summary>
+        /// <param name="StatusUpdates">An enumeration of charging station status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
+
+                                           DateTime?                                 Timestamp,
+                                           CancellationToken?                        CancellationToken,
+                                           EventTracking_Id                          EventTrackingId,
+                                           TimeSpan?                                 RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region (Set/Add/Update/Delete) Charging pool(s)...
+
+        #region SetStaticData   (ChargingPool, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given charging pool as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPool">A charging pool.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(ChargingPool        ChargingPool,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPool == null)
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (ChargingPool, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given charging pool to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPool">A charging pool.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(ChargingPool        ChargingPool,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPool == null)
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingPool, PropertyName = null, OldValue = null, NewValue = null, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given charging pool within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPool">A charging pool.</param>
+        /// <param name="PropertyName">The name of the charging pool property to update.</param>
+        /// <param name="OldValue">The old value of the charging pool property to update.</param>
+        /// <param name="NewValue">The new value of the charging pool property to update.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(ChargingPool        ChargingPool,
+                                             String              PropertyName,
+                                             Object              OldValue,
+                                             Object              NewValue,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPool == null)
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingPool, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given charging pool from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPool">A charging pool.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(ChargingPool        ChargingPool,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPool == null)
+                throw new ArgumentNullException(nameof(ChargingPool), "The given charging pool must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region SetStaticData   (ChargingPools, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given enumeration of charging pools as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPools">An enumeration of charging pools.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
+
+                                          DateTime?                  Timestamp,
+                                          CancellationToken?         CancellationToken,
+                                          EventTracking_Id           EventTrackingId,
+                                          TimeSpan?                  RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPools == null)
+                throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (ChargingPools, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given enumeration of charging pools to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPools">An enumeration of charging pools.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
+
+                                          DateTime?                  Timestamp,
+                                          CancellationToken?         CancellationToken,
+                                          EventTracking_Id           EventTrackingId,
+                                          TimeSpan?                  RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPools == null)
+                throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingPools, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given enumeration of charging pools within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPools">An enumeration of charging pools.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
+
+                                             DateTime?                  Timestamp,
+                                             CancellationToken?         CancellationToken,
+                                             EventTracking_Id           EventTrackingId,
+                                             TimeSpan?                  RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPools == null)
+                throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingPools, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given enumeration of charging pools from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingPools">An enumeration of charging pools.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
+
+                                             DateTime?                  Timestamp,
+                                             CancellationToken?         CancellationToken,
+                                             EventTracking_Id           EventTrackingId,
+                                             TimeSpan?                  RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingPools == null)
+                throw new ArgumentNullException(nameof(ChargingPools), "The given enumeration of charging pools must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region UpdateChargingPoolAdminStatus(AdminStatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging pool admin status updates.
+        /// </summary>
+        /// <param name="AdminStatusUpdates">An enumeration of charging pool admin status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
+
+                                                DateTime?                                   Timestamp,
+                                                CancellationToken?                          CancellationToken,
+                                                EventTracking_Id                            EventTrackingId,
+                                                TimeSpan?                                   RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateChargingPoolStatus     (StatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging pool status updates.
+        /// </summary>
+        /// <param name="StatusUpdates">An enumeration of charging pool status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingPoolStatusUpdate>  StatusUpdates,
+
+                                           DateTime?                              Timestamp,
+                                           CancellationToken?                     CancellationToken,
+                                           EventTracking_Id                       EventTrackingId,
+                                           TimeSpan?                              RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region (Set/Add/Update/Delete) Charging station operator(s)...
+
+        #region SetStaticData   (ChargingStationOperator, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given charging station operator as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperator">A charging station operator.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+
+                                          DateTime?                Timestamp,
+                                          CancellationToken?       CancellationToken,
+                                          EventTracking_Id         EventTrackingId,
+                                          TimeSpan?                RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperator == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperator), "The given charging station operator must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (ChargingStationOperator, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given charging station operator to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperator">A charging station operator.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+
+                                          DateTime?                Timestamp,
+                                          CancellationToken?       CancellationToken,
+                                          EventTracking_Id         EventTrackingId,
+                                          TimeSpan?                RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperator == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperator), "The given charging station operator must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingStationOperator, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given charging station operator within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperator">A charging station operator.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+
+                                             DateTime?                Timestamp,
+                                             CancellationToken?       CancellationToken,
+                                             EventTracking_Id         EventTrackingId,
+                                             TimeSpan?                RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperator == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperator), "The given charging station operator must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingStationOperator, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given charging station operator from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperator">A charging station operator.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+
+                                             DateTime?                Timestamp,
+                                             CancellationToken?       CancellationToken,
+                                             EventTracking_Id         EventTrackingId,
+                                             TimeSpan?                RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperator == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperator), "The given charging station operator must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region SetStaticData   (ChargingStationOperators, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given enumeration of charging station operators as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperators">An enumeration of charging station operators.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+
+                                          DateTime?                             Timestamp,
+                                          CancellationToken?                    CancellationToken,
+                                          EventTracking_Id                      EventTrackingId,
+                                          TimeSpan?                             RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperators == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperators), "The given enumeration of charging station operators must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (ChargingStationOperators, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given enumeration of charging station operators to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperators">An enumeration of charging station operators.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+
+                                          DateTime?                             Timestamp,
+                                          CancellationToken?                    CancellationToken,
+                                          EventTracking_Id                      EventTrackingId,
+                                          TimeSpan?                             RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperators == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperators), "The given enumeration of charging station operators must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(ChargingStationOperators, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given enumeration of charging station operators within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperators">An enumeration of charging station operators.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+
+                                             DateTime?                             Timestamp,
+                                             CancellationToken?                    CancellationToken,
+                                             EventTracking_Id                      EventTrackingId,
+                                             TimeSpan?                             RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperators == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperators), "The given enumeration of charging station operators must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(ChargingStationOperators, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given enumeration of charging station operators from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="ChargingStationOperators">An enumeration of charging station operators.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+
+                                             DateTime?                             Timestamp,
+                                             CancellationToken?                    CancellationToken,
+                                             EventTracking_Id                      EventTrackingId,
+                                             TimeSpan?                             RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (ChargingStationOperators == null)
+                throw new ArgumentNullException(nameof(ChargingStationOperators), "The given enumeration of charging station operators must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region UpdateChargingStationOperatorAdminStatus(AdminStatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging station operator admin status updates.
+        /// </summary>
+        /// <param name="AdminStatusUpdates">An enumeration of charging station operator admin status updates.</param>
+        /// <param name="TransmissionType">Whether to send the charging station operator admin status updates directly or enqueue it for a while.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
+
+                                                DateTime?                                              Timestamp,
+                                                CancellationToken?                                     CancellationToken,
+                                                EventTracking_Id                                       EventTrackingId,
+                                                TimeSpan?                                              RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateChargingStationOperatorStatus     (StatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of charging station operator status updates.
+        /// </summary>
+        /// <param name="StatusUpdates">An enumeration of charging station operator status updates.</param>
+        /// <param name="TransmissionType">Whether to send the charging station operator status updates directly or enqueue it for a while.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationOperatorStatusUpdate>  StatusUpdates,
+
+                                           DateTime?                                         Timestamp,
+                                           CancellationToken?                                CancellationToken,
+                                           EventTracking_Id                                  EventTrackingId,
+                                           TimeSpan?                                         RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region (Set/Add/Update/Delete) Roaming network...
+
+        #region SetStaticData   (RoamingNetwork, ...)
+
+        /// <summary>
+        /// Set the EVSE data of the given roaming network as new static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="RoamingNetwork">A roaming network.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.SetStaticData(RoamingNetwork      RoamingNetwork,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (RoamingNetwork == null)
+                throw new ArgumentNullException(nameof(RoamingNetwork), "The given roaming network must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region AddStaticData   (RoamingNetwork, ...)
+
+        /// <summary>
+        /// Add the EVSE data of the given roaming network to the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="RoamingNetwork">A roaming network.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.AddStaticData(RoamingNetwork      RoamingNetwork,
+
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (RoamingNetwork == null)
+                throw new ArgumentNullException(nameof(RoamingNetwork), "The given roaming network must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateStaticData(RoamingNetwork, ...)
+
+        /// <summary>
+        /// Update the EVSE data of the given roaming network within the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="RoamingNetwork">A roaming network.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (RoamingNetwork == null)
+                throw new ArgumentNullException(nameof(RoamingNetwork), "The given roaming network must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region DeleteStaticData(RoamingNetwork, ...)
+
+        /// <summary>
+        /// Delete the EVSE data of the given roaming network from the static EVSE data at the OICP server.
+        /// </summary>
+        /// <param name="RoamingNetwork">A roaming network to upload.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
+
+                                             DateTime?           Timestamp,
+                                             CancellationToken?  CancellationToken,
+                                             EventTracking_Id    EventTrackingId,
+                                             TimeSpan?           RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (RoamingNetwork == null)
+                throw new ArgumentNullException(nameof(RoamingNetwork), "The given roaming network must not be null!");
+
+            #endregion
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+
+        #region UpdateRoamingNetworkAdminStatus(AdminStatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of roaming network admin status updates.
+        /// </summary>
+        /// <param name="AdminStatusUpdates">An enumeration of roaming network admin status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
+
+                                                DateTime?                                     Timestamp,
+                                                CancellationToken?                            CancellationToken,
+                                                EventTracking_Id                              EventTrackingId,
+                                                TimeSpan?                                     RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #region UpdateRoamingNetworkStatus     (StatusUpdates, ...)
+
+        /// <summary>
+        /// Update the given enumeration of roaming network status updates.
+        /// </summary>
+        /// <param name="StatusUpdates">An enumeration of roaming network status updates.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<Acknowledgement>
+
+            IReceiveStatus.UpdateStatus(IEnumerable<RoamingNetworkStatusUpdate>  StatusUpdates,
+
+                                           DateTime?                                Timestamp,
+                                           CancellationToken?                       CancellationToken,
+                                           EventTracking_Id                         EventTrackingId,
+                                           TimeSpan?                                RequestTimeout)
+
+        {
+
+            return new Acknowledgement(ResultType.NoOperation);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #endregion
+
+        #region Receive AuthorizeStarts/-Stops
+
+        #region AuthorizeStart(AuthToken,                    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an AuthorizeStart request.
+        /// </summary>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingProduct">An optional charging product.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStartResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStart(Auth_Token                   AuthToken,
+                                                      ChargingProduct              ChargingProduct,
+                                                      ChargingSession_Id?          SessionId,
+                                                      ChargingStationOperator_Id?  OperatorId,
+
+                                                      DateTime?                    Timestamp,
+                                                      CancellationToken?           CancellationToken,
+                                                      EventTracking_Id             EventTrackingId,
+                                                      TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            TokenAuthorizationResultType AuthenticationResult;
+            AuthStartResult              result;
+
+            #endregion
+
+            #region Send OnAuthorizeStartRequest event
+
+            var StartTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeStartRequest != null)
+                    await Task.WhenAll(OnAuthorizeStartRequest.GetInvocationList().
+                                       Cast<OnAuthorizeStartRequestDelegate>().
+                                       Select(e => e(StartTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartRequest));
+            }
+
+            #endregion
+
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    if (!SessionId.HasValue)
+                        SessionId = ChargingSession_Id.New;
+
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthToken));
+
+                    result = AuthStartResult.Authorized(Id,
+                                                                  SessionId,
+                                                                  ProviderId: Id);
+
+                }
+
+                #endregion
+
+                #region Token is blocked!
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    result = AuthStartResult.Blocked(Id,
+                                                               ProviderId:   Id,
+                                                               SessionId:    SessionId,
+                                                               Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    result = AuthStartResult.Unspecified(Id,
+                                                                   SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            result = AuthStartResult.NotAuthorized(Id,
+                                                             ProviderId:   Id,
+                                                             SessionId:    SessionId,
+                                                             Description:  "Unkown token!");
+
+            #endregion
+
+
+            #region Send OnAuthorizeStartRequest event
+
+            var EndTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeStartResponse != null)
+                    await Task.WhenAll(OnAuthorizeStartResponse.GetInvocationList().
+                                       Cast<OnAuthorizeStartResponseDelegate>().
+                                       Select(e => e(EndTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value,
+                                                     result,
+                                                     EndTime - StartTime))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartRequest));
+            }
+
+            #endregion
+
+            return result;
+
+        }
+
+        #endregion
+
+        #region AuthorizeStart(AuthToken, EVSEId,            ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an AuthorizeStart request at the given EVSE.
+        /// </summary>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ChargingProduct">An optional charging product.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStartEVSEResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStart(Auth_Token                   AuthToken,
+                                                      EVSE_Id                      EVSEId,
+                                                      ChargingProduct              ChargingProduct,
+                                                      ChargingSession_Id?          SessionId,
+                                                      ChargingStationOperator_Id?  OperatorId,
+
+                                                      DateTime?                    Timestamp,
+                                                      CancellationToken?           CancellationToken,
+                                                      EventTracking_Id             EventTrackingId,
+                                                      TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            TokenAuthorizationResultType AuthenticationResult;
+            AuthStartEVSEResult          result;
+
+            #endregion
+
+            #region Send OnAuthorizeEVSEStartRequest event
+
+            var StartTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeEVSEStartRequest != null)
+                    await Task.WhenAll(OnAuthorizeEVSEStartRequest.GetInvocationList().
+                                       Cast<OnAuthorizeEVSEStartRequestDelegate>().
+                                       Select(e => e(StartTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     EVSEId,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartRequest));
+            }
+
+            #endregion
+
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    if (!SessionId.HasValue)
+                        SessionId = ChargingSession_Id.New;
+
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthToken));
+
+                    result = AuthStartEVSEResult.Authorized(Id,
+                                                            SessionId,
+                                                            ProviderId: Id);
+
+                }
+
+                #endregion
+
+                #region Token is blocked!
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    result = AuthStartEVSEResult.Blocked(Id,
+                                                         ProviderId:   Id,
+                                                         SessionId:    SessionId,
+                                                         Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    result = AuthStartEVSEResult.Unspecified(Id,
+                                                             SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            result = AuthStartEVSEResult.NotAuthorized(Id,
+                                                       ProviderId:   Id,
+                                                       SessionId:    SessionId,
+                                                       Description:  "Unkown token!");
+
+            #endregion
+
+
+            #region Send OnAuthorizeEVSEStartResponse event
+
+            var EndTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeEVSEStartResponse != null)
+                    await Task.WhenAll(OnAuthorizeEVSEStartResponse.GetInvocationList().
+                                       Cast<OnAuthorizeEVSEStartResponseDelegate>().
+                                       Select(e => e(EndTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     EVSEId,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value,
+                                                     result,
+                                                     EndTime - StartTime))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartResponse));
+            }
+
+            #endregion
+
+            return result;
+
+        }
+
+        #endregion
+
+        #region AuthorizeStart(AuthToken, ChargingStationId, ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an AuthorizeStart request at the given charging station.
+        /// </summary>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingStationId">The unique identification of a charging station.</param>
+        /// <param name="ChargingProduct">An optional charging product.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStartChargingStationResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStart(Auth_Token                   AuthToken,
+                                                      ChargingStation_Id           ChargingStationId,
+                                                      ChargingProduct              ChargingProduct,
+                                                      ChargingSession_Id?          SessionId,
+                                                      ChargingStationOperator_Id?  OperatorId,
+
+                                                      DateTime?                    Timestamp,
+                                                      CancellationToken?           CancellationToken,
+                                                      EventTracking_Id             EventTrackingId,
+                                                      TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            TokenAuthorizationResultType AuthenticationResult;
+            AuthStartChargingStationResult          result;
+
+            #endregion
+
+            #region Send OnAuthorizeChargingStationStartRequest event
+
+            var StartTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeChargingStationStartRequest != null)
+                    await Task.WhenAll(OnAuthorizeChargingStationStartRequest.GetInvocationList().
+                                       Cast<OnAuthorizeChargingStationStartRequestDelegate>().
+                                       Select(e => e(StartTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     ChargingStationId,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeChargingStationStartRequest));
+            }
+
+            #endregion
+
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    if (!SessionId.HasValue)
+                        SessionId = ChargingSession_Id.New;
+
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthToken));
+
+                    result = AuthStartChargingStationResult.Authorized(Id,
+                                                            SessionId,
+                                                            ProviderId: Id);
+
+                }
+
+                #endregion
+
+                #region Token is blocked!
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    result = AuthStartChargingStationResult.Blocked(Id,
+                                                         ProviderId:   Id,
+                                                         SessionId:    SessionId,
+                                                         Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    result = AuthStartChargingStationResult.Unspecified(Id,
+                                                             SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            result = AuthStartChargingStationResult.NotAuthorized(Id,
+                                                       ProviderId:   Id,
+                                                       SessionId:    SessionId,
+                                                       Description:  "Unkown token!");
+
+            #endregion
+
+
+            #region Send OnAuthorizeChargingStationStartResponse event
+
+            var EndTime = DateTime.Now;
+
+            try
+            {
+
+                if (OnAuthorizeChargingStationStartResponse != null)
+                    await Task.WhenAll(OnAuthorizeChargingStationStartResponse.GetInvocationList().
+                                       Cast<OnAuthorizeChargingStationStartResponseDelegate>().
+                                       Select(e => e(EndTime,
+                                                     Timestamp.Value,
+                                                     this,
+                                                     Id.ToString(),
+                                                     EventTrackingId,
+                                                     RoamingNetwork.Id,
+                                                     OperatorId,
+                                                     AuthToken,
+                                                     ChargingStationId,
+                                                     ChargingProduct,
+                                                     SessionId,
+                                                     RequestTimeout ?? RequestTimeout.Value,
+                                                     result,
+                                                     EndTime - StartTime))).
+                                       ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeChargingStationStartResponse));
+            }
+
+            #endregion
+
+            return result;
+
+        }
+
+        #endregion
+
+        #region AuthorizeStart(AuthToken, ChargingPoolId,    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an AuthorizeStart request at the given charging pool.
+        /// </summary>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingPoolId">The unique identification of a charging pool.</param>
+        /// <param name="ChargingProduct">An optional charging product.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStartChargingPoolResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStart(Auth_Token                   AuthToken,
+                                                      ChargingPool_Id              ChargingPoolId,
+                                                      ChargingProduct              ChargingProduct,
+                                                      ChargingSession_Id?          SessionId,
+                                                      ChargingStationOperator_Id?  OperatorId,
+
+                                                      DateTime?                    Timestamp,
+                                                      CancellationToken?           CancellationToken,
+                                                      EventTracking_Id             EventTrackingId,
+                                                      TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            #endregion
+
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    if (!SessionId.HasValue)
+                        SessionId = ChargingSession_Id.New;
+
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthToken));
+
+                    return AuthStartChargingPoolResult.Authorized(Id,
+                                                                  SessionId,
+                                                                  ProviderId: Id);
+
+                }
+
+                #endregion
+
+                #region Token is blocked!
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStartChargingPoolResult.Blocked(Id,
+                                                               ProviderId:   Id,
+                                                               SessionId:    SessionId,
+                                                               Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStartChargingPoolResult.Unspecified(Id,
+                                                                   SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStartChargingPoolResult.NotAuthorized(Id,
+                                                             ProviderId:   Id,
+                                                             SessionId:    SessionId,
+                                                             Description:  "Unkown token!");
+
+            #endregion
+
+        }
+
+        #endregion
+
+
+        // UID => Not everybody can stop any session, but maybe another
+        //        UID than the UID which started the session!
+        //        (e.g. car sharing)
+
+        #region AuthorizeStop (SessionId, AuthToken,                    OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an authorize stop request at the given EVSE.
+        /// </summary>
+        /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStopResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
+                                                     Auth_Token                   AuthToken,
+                                                     ChargingStationOperator_Id?  OperatorId,
+
+                                                     DateTime?                    Timestamp,
+                                                     CancellationToken?           CancellationToken,
+                                                     EventTracking_Id             EventTrackingId,
+                                                     TimeSpan?                    RequestTimeout)
+        {
+
+            #region Initial checks
+
+            if (SessionId  == null)
+                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            #endregion
+
+            #region Check session identification
+
+            SessionInfo SessionInfo = null;
+
+            if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
+                return AuthStopResult.InvalidSessionId(Id,
+                                                       SessionId);
+
+            #endregion
+
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Token is authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    // Authorized
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
+                        return AuthStopResult.Authorized(Id,
+                                                         SessionId:   SessionId,
+                                                         ProviderId:  Id);
+
+                    // Invalid Token for SessionId!
+                    else
+                        return AuthStopResult.NotAuthorized(Id,
+                                                            SessionId:    SessionId,
+                                                            ProviderId:   Id,
+                                                            Description:  "Invalid token for given session identification!");
+
+                }
+
+                #endregion
+
+                #region Token is blocked
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStopResult.Blocked(Id,
+                                                  SessionId:    SessionId,
+                                                  ProviderId:   Id,
+                                                  Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStopResult.Unspecified(Id,
+                                                      SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStopResult.NotAuthorized(Id,
+                                                SessionId:    SessionId,
+                                                ProviderId:   Id,
+                                                Description:  "Unkown token!");
+
+            #endregion
+
+        }
+
+        #endregion
+
+        #region AuthorizeStop (SessionId, AuthToken, EVSEId,            OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an authorize stop request at the given EVSE.
+        /// </summary>
+        /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="EVSEId">An EVSE identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStopEVSEResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
+                                                     Auth_Token                   AuthToken,
+                                                     EVSE_Id                      EVSEId,
+                                                     ChargingStationOperator_Id?  OperatorId,
+
+                                                     DateTime?                    Timestamp,
+                                                     CancellationToken?           CancellationToken,
+                                                     EventTracking_Id             EventTrackingId,
+                                                     TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (SessionId  == null)
+                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            #endregion
+
+            #region Check session identification
+
+            SessionInfo SessionInfo = null;
+
+            if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
+                return AuthStopEVSEResult.InvalidSessionId(Id,
+                                                           SessionId);
+
+            #endregion
+
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Token is authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    // Authorized
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
+                        return AuthStopEVSEResult.Authorized(Id,
+                                                             SessionId:   SessionId,
+                                                             ProviderId:  Id);
+
+                    // Invalid Token for SessionId!
+                    else
+                        return AuthStopEVSEResult.NotAuthorized(Id,
+                                                                SessionId:    SessionId,
+                                                                ProviderId:   Id,
+                                                                Description:  "Invalid token for given session identification!");
+
+                }
+
+                #endregion
+
+                #region Token is blocked
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStopEVSEResult.Blocked(Id,
+                                                      SessionId:    SessionId,
+                                                      ProviderId:   Id,
+                                                      Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStopEVSEResult.Unspecified(Id,
+                                                          SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStopEVSEResult.NotAuthorized(Id,
+                                                    SessionId:    SessionId,
+                                                    ProviderId:   Id,
+                                                    Description:  "Unkown token!");
+
+            #endregion
+
+        }
+
+        #endregion
+
+        #region AuthorizeStop (SessionId, AuthToken, ChargingStationId, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an authorize stop request at the given EVSE.
+        /// </summary>
+        /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingStationId">An charging station identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStopChargingStationResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
+                                                     Auth_Token                   AuthToken,
+                                                     ChargingStation_Id           ChargingStationId,
+                                                     ChargingStationOperator_Id?  OperatorId,
+
+                                                     DateTime?                    Timestamp,
+                                                     CancellationToken?           CancellationToken,
+                                                     EventTracking_Id             EventTrackingId,
+                                                     TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (SessionId  == null)
+                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            #endregion
+
+            #region Check session identification
+
+            SessionInfo SessionInfo = null;
+
+            if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
+                return AuthStopChargingStationResult.InvalidSessionId(Id,
+                                                                      SessionId);
+
+            #endregion
+
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Token is authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    // Authorized
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
+                        return AuthStopChargingStationResult.Authorized(Id,
+                                                                        SessionId:   SessionId,
+                                                                        ProviderId:  Id);
+
+                    // Invalid Token for SessionId!
+                    else
+                        return AuthStopChargingStationResult.NotAuthorized(Id,
+                                                                           SessionId:    SessionId,
+                                                                           ProviderId:   Id,
+                                                                           Description:  "Invalid token for given session identification!");
+
+                }
+
+                #endregion
+
+                #region Token is blocked
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStopChargingStationResult.Blocked(Id,
+                                                                 SessionId:    SessionId,
+                                                                 ProviderId:   Id,
+                                                                 Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStopChargingStationResult.Unspecified(Id,
+                                                                     SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStopChargingStationResult.NotAuthorized(Id,
+                                                               SessionId:    SessionId,
+                                                               ProviderId:   Id,
+                                                               Description:  "Unkown token!");
+
+            #endregion
+
+        }
+
+        #endregion
+
+        #region AuthorizeStop (SessionId, AuthToken, ChargingPoolId,    OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an authorize stop request at the given EVSE.
+        /// </summary>
+        /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="ChargingPoolId">An charging station identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStopChargingPoolResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
+                                                     Auth_Token                   AuthToken,
+                                                     ChargingPool_Id              ChargingPoolId,
+                                                     ChargingStationOperator_Id?  OperatorId,
+
+                                                     DateTime?                    Timestamp,
+                                                     CancellationToken?           CancellationToken,
+                                                     EventTracking_Id             EventTrackingId,
+                                                     TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (SessionId  == null)
+                throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            #endregion
+
+            #region Check session identification
+
+            SessionInfo SessionInfo = null;
+
+            if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
+                return AuthStopChargingPoolResult.InvalidSessionId(Id,
+                                                                   SessionId);
+
+            #endregion
+
+            TokenAuthorizationResultType AuthenticationResult;
+
+            if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            {
+
+                #region Token is authorized
+
+                if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+                {
+
+                    // Authorized
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(AuthToken))
+                        return AuthStopChargingPoolResult.Authorized(Id,
+                                                                     SessionId:   SessionId,
+                                                                     ProviderId:  Id);
+
+                    // Invalid Token for SessionId!
+                    else
+                        return AuthStopChargingPoolResult.NotAuthorized(Id,
+                                                                        SessionId:    SessionId,
+                                                                        ProviderId:   Id,
+                                                                        Description:  "Invalid token for given session identification!");
+
+                }
+
+                #endregion
+
+                #region Token is blocked
+
+                else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+                    return AuthStopChargingPoolResult.Blocked(Id,
+                                                              SessionId:    SessionId,
+                                                              ProviderId:   Id,
+                                                              Description:  "Token is blocked!");
+
+                #endregion
+
+                #region ...fall through!
+
+                else
+                    return AuthStopChargingPoolResult.Unspecified(Id,
+                                                                  SessionId);
+
+                #endregion
+
+            }
+
+            #region Unkown Token!
+
+            return AuthStopChargingPoolResult.NotAuthorized(Id,
+                                                            SessionId:    SessionId,
+                                                            ProviderId:   Id,
+                                                            Description:  "Unkown token!");
+
+            #endregion
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region SendChargeDetailRecord(ChargeDetailRecords, ...)
+
+        /// <summary>
+        /// Send a charge detail record.
+        /// </summary>
+        /// <param name="ChargeDetailRecords">An enumeration of charge detail records.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<SendCDRsResult>
+
+            IRemoteSendChargeDetailRecords.SendChargeDetailRecords(IEnumerable<ChargeDetailRecord>  ChargeDetailRecords,
+
+                                                                   DateTime?                        Timestamp,
+                                                                   CancellationToken?               CancellationToken,
+                                                                   EventTracking_Id                 EventTrackingId,
+                                                                   TimeSpan?                        RequestTimeout)
+        {
+
+            #region Initial checks
+
+            if (ChargeDetailRecords == null)
+                throw new ArgumentNullException(nameof(ChargeDetailRecords),  "The given charge detail records must not be null!");
+
+            #endregion
+
+            SessionInfo _SessionInfo = null;
+
+
+            //Debug.WriteLine("Received a CDR: " + ChargeDetailRecord.SessionId.ToString());
+
+
+            //if (ChargeDetailRecordDatabase.ContainsKey(ChargeDetailRecord.SessionId))
+            //    return SendCDRResult.InvalidSessionId(AuthorizatorId);
+
+
+            //if (ChargeDetailRecordDatabase.TryAdd(ChargeDetailRecord.SessionId, ChargeDetailRecord))
+            //{
+
+            //    SessionDatabase.TryRemove(ChargeDetailRecord.SessionId, out _SessionInfo);
+
+            //    return SendCDRResult.Forwarded(AuthorizatorId);
+
+            //}
+
+
+
+
+            //roamingprovider.OnEVSEStatusPush   += (Timestamp, Sender, SenderId, RoamingNetworkId, ActionType, GroupedEVSEs, NumberOfEVSEs) => {
+            //    Console.WriteLine("[" + Timestamp + "] " + RoamingNetworkId.ToString() + ": Pushing " + NumberOfEVSEs + " EVSE status towards " + SenderId + "(" + ActionType + ")");
+            //};
+
+            //    Console.WriteLine("[" + Timestamp + "] " + RoamingNetworkId.ToString() + ": Pushed "  + NumberOfEVSEs + " EVSE status towards " + SenderId + "(" + ActionType + ") => " + Result.Result + " (" + Duration.TotalSeconds + " sec)");
+
+            //    if (Result.Result == false)
+            //    {
+
+            //        var EMailTask = API_SMTPClient.Send(HubjectEVSEStatusPushFailedEMailProvider(Timestamp,
+            //                                                                                       Sender,
+            //                                                                                       SenderId,
+            //                                                                                       RoamingNetworkId,
+            //                                                                                       ActionType,
+            //                                                                                       GroupedEVSEs,
+            //                                                                                       NumberOfEVSEs,
+            //                                                                                       Result,
+            //                                                                                       Duration));
+
+            //        EMailTask.Wait(TimeSpan.FromSeconds(30));
+
+            //    }
+
+            //};
+
+            return SendCDRsResult.InvalidSessionId(Id);
+
+        }
+
+        #endregion
+
+        #endregion
+
 
         #region Outgoing requests towards the roaming network
 

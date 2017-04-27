@@ -261,13 +261,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #region (Set/Add/Update/Delete) EVSE(s)...
 
-        #region SetStaticData   (EVSE, TransmissionType = Enqueued, ...)
+        #region SetStaticData   (EVSE, ...)
 
         /// <summary>
         /// Set the given EVSE as new static EVSE data at the OICP server.
         /// </summary>
         /// <param name="EVSE">An EVSE to upload.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -275,8 +274,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(EVSE                EVSE,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.SetStaticData(EVSE                EVSE,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -298,13 +296,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region AddStaticData   (EVSE, TransmissionType = Enqueued, ...)
+        #region AddStaticData   (EVSE, ...)
 
         /// <summary>
         /// Add the given EVSE to the static EVSE data at the OICP server.
         /// </summary>
         /// <param name="EVSE">An EVSE to upload.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -312,8 +309,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(EVSE                EVSE,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.AddStaticData(EVSE                EVSE,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -335,7 +331,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateStaticData(EVSE, PropertyName = null, OldValue = null, NewValue = null, TransmissionType = Enqueued, ...)
+        #region UpdateStaticData(EVSE, PropertyName = null, OldValue = null, NewValue = null, ...)
 
         /// <summary>
         /// Update the static data of the given EVSE.
@@ -345,7 +341,6 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="PropertyName">The name of the EVSE property to update.</param>
         /// <param name="OldValue">The old value of the EVSE property to update.</param>
         /// <param name="NewValue">The new value of the EVSE property to update.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE update directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -353,11 +348,10 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(EVSE                EVSE,
+            IReceiveData.UpdateStaticData(EVSE                EVSE,
                                              String              PropertyName,
                                              Object              OldValue,
                                              Object              NewValue,
-                                             TransmissionTypes   TransmissionType,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -379,13 +373,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region DeleteStaticData(EVSE, TransmissionType = Enqueued, ...)
+        #region DeleteStaticData(EVSE, ...)
 
         /// <summary>
         /// Delete the static data of the given EVSE.
         /// </summary>
         /// <param name="EVSE">An EVSE to delete.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE deletion directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -393,8 +386,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(EVSE                EVSE,
-                                             TransmissionTypes   TransmissionType,
+            IReceiveData.DeleteStaticData(EVSE                EVSE,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -430,7 +422,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -465,7 +457,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceiveData.AddStaticData(IEnumerable<EVSE>   EVSEs,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -500,7 +492,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -535,7 +527,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -558,13 +550,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         #endregion
 
 
-        #region UpdateEVSEAdminStatus(AdminStatusUpdates, TransmissionType = Enqueued, ...)
+        #region UpdateEVSEAdminStatus(AdminStatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of EVSE admin status updates.
         /// </summary>
         /// <param name="AdminStatusUpdates">An enumeration of EVSE admin status updates.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE admin status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -572,29 +563,39 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateEVSEAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
-                                                    TransmissionTypes                   TransmissionType,
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                    DateTime?                           Timestamp,
-                                                    CancellationToken?                  CancellationToken,
-                                                    EventTracking_Id                    EventTrackingId,
-                                                    TimeSpan?                           RequestTimeout)
+                                                DateTime?                           Timestamp,
+                                                CancellationToken?                  CancellationToken,
+                                                EventTracking_Id                    EventTrackingId,
+                                                TimeSpan?                           RequestTimeout)
 
         {
 
-            return new Acknowledgement(ResultType.NoOperation);
+            #region Initial checks
+
+            if (AdminStatusUpdates == null)
+                throw new ArgumentNullException(nameof(AdminStatusUpdates), "The given enumeration of EVSE admin status updates must not be null!");
+
+
+            Acknowledgement result;
+
+            #endregion
+
+            result = new Acknowledgement(ResultType.NoOperation);
+
+            return result;
 
         }
 
         #endregion
 
-        #region UpdateEVSEStatus     (StatusUpdates,      TransmissionType = Enqueued, ...)
+        #region UpdateEVSEStatus     (StatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of EVSE status updates.
         /// </summary>
         /// <param name="StatusUpdates">An enumeration of EVSE status updates.</param>
-        /// <param name="TransmissionType">Whether to send the EVSE status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -602,17 +603,28 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateEVSEStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
-                                               TransmissionTypes              TransmissionType,
+            IReceiveStatus.UpdateStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
 
-                                               DateTime?                      Timestamp,
-                                               CancellationToken?             CancellationToken,
-                                               EventTracking_Id               EventTrackingId,
-                                               TimeSpan?                      RequestTimeout)
+                                           DateTime?                      Timestamp,
+                                           CancellationToken?             CancellationToken,
+                                           EventTracking_Id               EventTrackingId,
+                                           TimeSpan?                      RequestTimeout)
 
         {
 
-            return new Acknowledgement(ResultType.NoOperation);
+            #region Initial checks
+
+            if (StatusUpdates == null)
+                throw new ArgumentNullException(nameof(StatusUpdates), "The given enumeration of evse status updates must not be null!");
+
+
+            Acknowledgement result;
+
+            #endregion
+
+            result = new Acknowledgement(ResultType.NoOperation);
+
+            return result;
 
         }
 
@@ -635,8 +647,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(ChargingStation     ChargingStation,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.SetStaticData(ChargingStation     ChargingStation,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -671,8 +682,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(ChargingStation     ChargingStation,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.AddStaticData(ChargingStation     ChargingStation,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -694,7 +704,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateStaticData(ChargingStation, PropertyName = null, OldValue = null, NewValue = null, TransmissionType = Enqueued, ...)
+        #region UpdateStaticData(ChargingStation, PropertyName = null, OldValue = null, NewValue = null, ...)
 
         /// <summary>
         /// Update the EVSE data of the given charging station within the static EVSE data at the OICP server.
@@ -703,7 +713,6 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="PropertyName">The name of the charging station property to update.</param>
         /// <param name="OldValue">The old value of the charging station property to update.</param>
         /// <param name="NewValue">The new value of the charging station property to update.</param>
-        /// <param name="TransmissionType">Whether to send the charging station update directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -711,11 +720,10 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(ChargingStation     ChargingStation,
+            IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
                                              String              PropertyName,
                                              Object              OldValue,
                                              Object              NewValue,
-                                             TransmissionTypes   TransmissionType,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -750,7 +758,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(ChargingStation     ChargingStation,
+            IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -786,7 +794,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceiveData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                           DateTime?                     Timestamp,
                                           CancellationToken?            CancellationToken,
@@ -821,7 +829,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceiveData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                           DateTime?                     Timestamp,
                                           CancellationToken?            CancellationToken,
@@ -856,7 +864,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                              DateTime?                     Timestamp,
                                              CancellationToken?            CancellationToken,
@@ -891,7 +899,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                              DateTime?                     Timestamp,
                                              CancellationToken?            CancellationToken,
@@ -914,13 +922,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         #endregion
 
 
-        #region UpdateChargingStationAdminStatus(AdminStatusUpdates, TransmissionType = Enqueued, ...)
+        #region UpdateChargingStationAdminStatus(AdminStatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging station admin status updates.
         /// </summary>
         /// <param name="AdminStatusUpdates">An enumeration of charging station admin status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging station admin status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -928,13 +935,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingStationAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
-                                                               TransmissionTypes                              TransmissionType,
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                               DateTime?                                      Timestamp,
-                                                               CancellationToken?                             CancellationToken,
-                                                               EventTracking_Id                               EventTrackingId,
-                                                               TimeSpan?                                      RequestTimeout)
+                                                DateTime?                                      Timestamp,
+                                                CancellationToken?                             CancellationToken,
+                                                EventTracking_Id                               EventTrackingId,
+                                                TimeSpan?                                      RequestTimeout)
 
         {
 
@@ -944,13 +950,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateChargingStationStatus     (StatusUpdates,      TransmissionType = Enqueued, ...)
+        #region UpdateChargingStationStatus     (StatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging station status updates.
         /// </summary>
         /// <param name="StatusUpdates">An enumeration of charging station status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging station status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -958,13 +963,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingStationStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
-                                                          TransmissionTypes                         TransmissionType,
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
 
-                                                          DateTime?                                 Timestamp,
-                                                          CancellationToken?                        CancellationToken,
-                                                          EventTracking_Id                          EventTrackingId,
-                                                          TimeSpan?                                 RequestTimeout)
+                                           DateTime?                                 Timestamp,
+                                           CancellationToken?                        CancellationToken,
+                                           EventTracking_Id                          EventTrackingId,
+                                           TimeSpan?                                 RequestTimeout)
 
         {
 
@@ -991,8 +995,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(ChargingPool        ChargingPool,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.SetStaticData(ChargingPool        ChargingPool,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1027,8 +1030,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(ChargingPool        ChargingPool,
-                                          TransmissionTypes   TransmissionType,
+            IReceiveData.AddStaticData(ChargingPool        ChargingPool,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1050,7 +1052,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateStaticData(ChargingPool, PropertyName = null, OldValue = null, NewValue = null, TransmissionType = Enqueued, ...)
+        #region UpdateStaticData(ChargingPool, PropertyName = null, OldValue = null, NewValue = null, ...)
 
         /// <summary>
         /// Update the EVSE data of the given charging pool within the static EVSE data at the OICP server.
@@ -1059,7 +1061,6 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="PropertyName">The name of the charging pool property to update.</param>
         /// <param name="OldValue">The old value of the charging pool property to update.</param>
         /// <param name="NewValue">The new value of the charging pool property to update.</param>
-        /// <param name="TransmissionType">Whether to send the charging pool update directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1067,11 +1068,10 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(ChargingPool        ChargingPool,
+            IReceiveData.UpdateStaticData(ChargingPool        ChargingPool,
                                              String              PropertyName,
                                              Object              OldValue,
                                              Object              NewValue,
-                                             TransmissionTypes   TransmissionType,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1106,7 +1106,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(ChargingPool        ChargingPool,
+            IReceiveData.DeleteStaticData(ChargingPool        ChargingPool,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1142,7 +1142,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceiveData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                           DateTime?                  Timestamp,
                                           CancellationToken?         CancellationToken,
@@ -1177,7 +1177,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceiveData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                           DateTime?                  Timestamp,
                                           CancellationToken?         CancellationToken,
@@ -1212,7 +1212,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                              DateTime?                  Timestamp,
                                              CancellationToken?         CancellationToken,
@@ -1247,7 +1247,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                              DateTime?                  Timestamp,
                                              CancellationToken?         CancellationToken,
@@ -1270,13 +1270,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         #endregion
 
 
-        #region UpdateChargingPoolAdminStatus(AdminStatusUpdates, TransmissionType = Enqueued, ...)
+        #region UpdateChargingPoolAdminStatus(AdminStatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging pool admin status updates.
         /// </summary>
         /// <param name="AdminStatusUpdates">An enumeration of charging pool admin status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging pool admin status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1284,13 +1283,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingPoolAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
-                                                            TransmissionTypes                           TransmissionType,
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                            DateTime?                                   Timestamp,
-                                                            CancellationToken?                          CancellationToken,
-                                                            EventTracking_Id                            EventTrackingId,
-                                                            TimeSpan?                                   RequestTimeout)
+                                                DateTime?                                   Timestamp,
+                                                CancellationToken?                          CancellationToken,
+                                                EventTracking_Id                            EventTrackingId,
+                                                TimeSpan?                                   RequestTimeout)
 
         {
 
@@ -1300,13 +1298,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateChargingPoolStatus     (StatusUpdates,      TransmissionType = Enqueued, ...)
+        #region UpdateChargingPoolStatus     (StatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging pool status updates.
         /// </summary>
         /// <param name="StatusUpdates">An enumeration of charging pool status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging pool status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1314,13 +1311,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingPoolStatus(IEnumerable<ChargingPoolStatusUpdate>  StatusUpdates,
-                                                       TransmissionTypes                      TransmissionType,
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingPoolStatusUpdate>  StatusUpdates,
 
-                                                       DateTime?                              Timestamp,
-                                                       CancellationToken?                     CancellationToken,
-                                                       EventTracking_Id                       EventTrackingId,
-                                                       TimeSpan?                              RequestTimeout)
+                                           DateTime?                              Timestamp,
+                                           CancellationToken?                     CancellationToken,
+                                           EventTracking_Id                       EventTrackingId,
+                                           TimeSpan?                              RequestTimeout)
 
         {
 
@@ -1347,7 +1343,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceiveData.SetStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1382,7 +1378,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceiveData.AddStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1417,7 +1413,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceiveData.UpdateStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1452,7 +1448,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceiveData.DeleteStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1488,7 +1484,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceiveData.SetStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1523,7 +1519,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceiveData.AddStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1559,7 +1555,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
@@ -1594,7 +1590,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
@@ -1617,7 +1613,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         #endregion
 
 
-        #region UpdateChargingStationOperatorAdminStatus(AdminStatusUpdates, TransmissionType = Enqueued, ...)
+        #region UpdateChargingStationOperatorAdminStatus(AdminStatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging station operator admin status updates.
@@ -1631,13 +1627,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingStationOperatorAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
-                                                                       TransmissionTypes                                      TransmissionType,
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                                       DateTime?                                              Timestamp,
-                                                                       CancellationToken?                                     CancellationToken,
-                                                                       EventTracking_Id                                       EventTrackingId,
-                                                                       TimeSpan?                                              RequestTimeout)
+                                                DateTime?                                              Timestamp,
+                                                CancellationToken?                                     CancellationToken,
+                                                EventTracking_Id                                       EventTrackingId,
+                                                TimeSpan?                                              RequestTimeout)
 
         {
 
@@ -1647,7 +1642,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateChargingStationOperatorStatus     (StatusUpdates,      TransmissionType = Enqueued, ...)
+        #region UpdateChargingStationOperatorStatus     (StatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of charging station operator status updates.
@@ -1661,13 +1656,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateChargingStationOperatorStatus(IEnumerable<ChargingStationOperatorStatusUpdate>  StatusUpdates,
-                                                                  TransmissionTypes                                 TransmissionType,
+            IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationOperatorStatusUpdate>  StatusUpdates,
 
-                                                                  DateTime?                                         Timestamp,
-                                                                  CancellationToken?                                CancellationToken,
-                                                                  EventTracking_Id                                  EventTrackingId,
-                                                                  TimeSpan?                                         RequestTimeout)
+                                           DateTime?                                         Timestamp,
+                                           CancellationToken?                                CancellationToken,
+                                           EventTracking_Id                                  EventTrackingId,
+                                           TimeSpan?                                         RequestTimeout)
 
         {
 
@@ -1694,7 +1688,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.SetStaticData(RoamingNetwork      RoamingNetwork,
+            IReceiveData.SetStaticData(RoamingNetwork      RoamingNetwork,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1729,7 +1723,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.AddStaticData(RoamingNetwork      RoamingNetwork,
+            IReceiveData.AddStaticData(RoamingNetwork      RoamingNetwork,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1764,7 +1758,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
+            IReceiveData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1799,7 +1793,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
+            IReceiveData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1822,13 +1816,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         #endregion
 
 
-        #region UpdateRoamingNetworkAdminStatus(AdminStatusUpdates, TransmissionType = Enqueued, ...)
+        #region UpdateRoamingNetworkAdminStatus(AdminStatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of roaming network admin status updates.
         /// </summary>
         /// <param name="AdminStatusUpdates">An enumeration of roaming network admin status updates.</param>
-        /// <param name="TransmissionType">Whether to send the roaming network admin status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1836,13 +1829,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateRoamingNetworkAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
-                                                              TransmissionTypes                             TransmissionType,
+            IReceiveStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                              DateTime?                                     Timestamp,
-                                                              CancellationToken?                            CancellationToken,
-                                                              EventTracking_Id                              EventTrackingId,
-                                                              TimeSpan?                                     RequestTimeout)
+                                                DateTime?                                     Timestamp,
+                                                CancellationToken?                            CancellationToken,
+                                                EventTracking_Id                              EventTrackingId,
+                                                TimeSpan?                                     RequestTimeout)
 
         {
 
@@ -1852,13 +1844,12 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #endregion
 
-        #region UpdateRoamingNetworkStatus     (StatusUpdates,      TransmissionType = Enqueued, ...)
+        #region UpdateRoamingNetworkStatus     (StatusUpdates, ...)
 
         /// <summary>
         /// Update the given enumeration of roaming network status updates.
         /// </summary>
         /// <param name="StatusUpdates">An enumeration of roaming network status updates.</param>
-        /// <param name="TransmissionType">Whether to send the roaming network status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -1866,13 +1857,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IRemotePushStatus.UpdateRoamingNetworkStatus(IEnumerable<RoamingNetworkStatusUpdate>  StatusUpdates,
-                                                         TransmissionTypes                        TransmissionType,
+            IReceiveStatus.UpdateStatus(IEnumerable<RoamingNetworkStatusUpdate>  StatusUpdates,
 
-                                                         DateTime?                                Timestamp,
-                                                         CancellationToken?                       CancellationToken,
-                                                         EventTracking_Id                         EventTrackingId,
-                                                         TimeSpan?                                RequestTimeout)
+                                           DateTime?                                Timestamp,
+                                           CancellationToken?                       CancellationToken,
+                                           EventTracking_Id                         EventTrackingId,
+                                           TimeSpan?                                RequestTimeout)
 
         {
 
