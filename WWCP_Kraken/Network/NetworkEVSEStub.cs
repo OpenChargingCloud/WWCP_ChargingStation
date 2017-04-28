@@ -397,7 +397,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The current EVSE admin status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<EVSEAdminStatusType> AdminStatus
+        public Timestamped<EVSEAdminStatusTypes> AdminStatus
         {
 
             get
@@ -416,12 +416,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region AdminStatusSchedule
 
-        private StatusSchedule<EVSEAdminStatusType> _AdminStatusSchedule;
+        private StatusSchedule<EVSEAdminStatusTypes> _AdminStatusSchedule;
 
         /// <summary>
         /// The EVSE admin status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<EVSEAdminStatusType>> AdminStatusSchedule
+        public IEnumerable<Timestamped<EVSEAdminStatusTypes>> AdminStatusSchedule
         {
             get
             {
@@ -535,8 +535,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._StatusSchedule        = new StatusSchedule<EVSEStatusTypes>(MaxStatusListSize);
             this._StatusSchedule.Insert(EVSEStatusTypes.OutOfService);
 
-            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusType>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.OutOfService);
+            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxStatusListSize);
+            this._AdminStatusSchedule.Insert(EVSEAdminStatusTypes.OutOfService);
 
             #endregion
 
@@ -679,7 +679,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewAdminStatus">A new admin status.</param>
-        public void SetAdminStatus(EVSEAdminStatusType NewAdminStatus)
+        public void SetAdminStatus(EVSEAdminStatusTypes NewAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus);
         }
@@ -692,7 +692,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(Timestamped<EVSEAdminStatusType> NewTimestampedAdminStatus)
+        public void SetAdminStatus(Timestamped<EVSEAdminStatusTypes> NewTimestampedAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
         }
@@ -706,7 +706,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
         /// <param name="NewAdminStatus">A new admin status.</param>
-        public void SetAdminStatus(EVSEAdminStatusType  NewAdminStatus,
+        public void SetAdminStatus(EVSEAdminStatusTypes  NewAdminStatus,
                                    DateTime             Timestamp)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
@@ -721,7 +721,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetAdminStatus(IEnumerable<Timestamped<EVSEAdminStatusType>>  NewAdminStatusList,
+        public void SetAdminStatus(IEnumerable<Timestamped<EVSEAdminStatusTypes>>  NewAdminStatusList,
                                    ChangeMethods                                  ChangeMethod = ChangeMethods.Replace)
         {
             _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
@@ -741,8 +741,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="NewStatus">The new EVSE admin status.</param>
         internal async Task UpdateAdminStatus(DateTime                          Timestamp,
                                               EventTracking_Id                  EventTrackingId,
-                                              Timestamped<EVSEAdminStatusType>  OldStatus,
-                                              Timestamped<EVSEAdminStatusType>  NewStatus)
+                                              Timestamped<EVSEAdminStatusTypes>  OldStatus,
+                                              Timestamped<EVSEAdminStatusTypes>  NewStatus)
         {
 
             var OnAdminStatusChangedLocal = OnAdminStatusChanged;
