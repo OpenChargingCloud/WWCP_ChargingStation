@@ -790,8 +790,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         internal async Task UpdateEVSEAdminStatus(DateTime                          Timestamp,
                                                   EventTracking_Id                  EventTrackingId,
                                                   IRemoteEVSE                       RemoteEVSE,
-                                                  Timestamped<EVSEAdminStatusType>  OldStatus,
-                                                  Timestamped<EVSEAdminStatusType>  NewStatus)
+                                                  Timestamped<EVSEAdminStatusTypes>  OldStatus,
+                                                  Timestamped<EVSEAdminStatusTypes>  NewStatus)
         {
 
             var OnEVSEAdminStatusChangedLocal = OnEVSEAdminStatusChanged;
