@@ -1343,7 +1343,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.SetStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+            IReceiveData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1378,7 +1378,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.AddStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+            IReceiveData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1413,7 +1413,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.UpdateStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+            IReceiveData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1448,7 +1448,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.DeleteStaticData(ChargingStationOperatorProxy  ChargingStationOperator,
+            IReceiveData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1484,7 +1484,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.SetStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+            IReceiveData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1519,7 +1519,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.AddStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+            IReceiveData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1555,7 +1555,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+            IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
@@ -1590,7 +1590,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<Acknowledgement>
 
-            IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperatorProxy>  ChargingStationOperators,
+            IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
