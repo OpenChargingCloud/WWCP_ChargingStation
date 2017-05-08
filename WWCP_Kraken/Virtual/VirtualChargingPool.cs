@@ -108,9 +108,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Status
 
-        private ChargingPoolStatusType _Status;
+        private ChargingPoolStatusTypes _Status;
 
-        public ChargingPoolStatusType Status
+        public ChargingPoolStatusTypes Status
         {
             get
             {
@@ -164,7 +164,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             this._Id            = ChargingPool.Id;
             this._ChargingPool  = ChargingPool;
-            this._Status        = ChargingPoolStatusType.Available;
+            this._Status        = ChargingPoolStatusTypes.Available;
             this._Stations      = new HashSet<VirtualChargingStation>();
 
         }
