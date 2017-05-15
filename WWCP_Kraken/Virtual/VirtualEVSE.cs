@@ -496,40 +496,6 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Events
 
-        #region SocketOutletAddition
-
-        internal readonly IVotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean> SocketOutletAddition;
-
-        /// <summary>
-        /// Called whenever a socket outlet will be or was added.
-        /// </summary>
-        public IVotingSender<DateTime, IRemoteEVSE, SocketOutlet, Boolean> OnSocketOutletAddition
-        {
-            get
-            {
-                return SocketOutletAddition;
-            }
-        }
-
-        #endregion
-
-        #region SocketOutletRemoval
-
-        internal readonly IVotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean> SocketOutletRemoval;
-
-        /// <summary>
-        /// Called whenever a socket outlet will be or was removed.
-        /// </summary>
-        public IVotingSender<DateTime, IRemoteEVSE, SocketOutlet, Boolean> OnSocketOutletRemoval
-        {
-            get
-            {
-                return SocketOutletRemoval;
-            }
-        }
-
-        #endregion
-
         #endregion
 
         #region Constructor(s)
@@ -539,12 +505,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         /// <param name="Id">The unique identification of this EVSE.</param>
         /// <param name="ChargingStation">The parent charging station.</param>
-        /// <param name="MaxStatusListSize">The maximum size of the EVSE status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the EVSE admin status list.</param>
+        /// <param name="MaxStatusListSize">The maximum size of the EVSE status list.</param>
         internal VirtualEVSE(EVSE_Id                 Id,
                              VirtualChargingStation  ChargingStation,
-                             UInt16                  MaxStatusListSize       = DefaultMaxStatusListSize,
-                             UInt16                  MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+                             EVSEAdminStatusTypes    InitialAdminStatus      = EVSEAdminStatusTypes.Operational,
+                             EVSEStatusTypes         InitialStatus           = EVSEStatusTypes.Available,
+                             UInt16                  MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize,
+                             UInt16                  MaxStatusListSize       = DefaultMaxStatusListSize)
 
             : base(Id)
 
@@ -565,41 +533,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._ChargingModes         = new ReactiveSet<ChargingModes>();
             this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
 
+            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxAdminStatusListSize);
+            this._AdminStatusSchedule.Insert(InitialAdminStatus);
+
             this._StatusSchedule        = new StatusSchedule<EVSEStatusTypes>(MaxStatusListSize);
-            this._StatusSchedule.     Insert(EVSEStatusTypes.OutOfService);
-
-            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(EVSEAdminStatusTypes.OutOfService);
-
-            #endregion
-
-            #region Init events
-
-            this.SocketOutletAddition   = new VotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
-            this.SocketOutletRemoval    = new VotingNotificator<DateTime, IRemoteEVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+            this._StatusSchedule.     Insert(InitialStatus);
 
             #endregion
 
             #region Link events
 
-            this._StatusSchedule.     OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
-                                                          => UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
-
             this._AdminStatusSchedule.OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
                                                           => UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
 
-
-            //this.SocketOutletAddition.OnVoting        += (timestamp, evse, outlet, vote)
-            //                                              => ChargingStation.SocketOutletAddition.SendVoting      (timestamp, evse, outlet, vote);
-            //
-            //this.SocketOutletAddition.OnNotification  += (timestamp, evse, outlet)
-            //                                              => ChargingStation.SocketOutletAddition.SendNotification(timestamp, evse, outlet);
-            //
-            //this.SocketOutletRemoval. OnVoting        += (timestamp, evse, outlet, vote)
-            //                                              => ChargingStation.SocketOutletRemoval. SendVoting      (timestamp, evse, outlet, vote);
-            //
-            //this.SocketOutletRemoval. OnNotification  += (timestamp, evse, outlet)
-            //                                              => ChargingStation.SocketOutletRemoval. SendNotification(timestamp, evse, outlet);
+            this._StatusSchedule.     OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
+                                                          => UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
 
             #endregion
 
@@ -753,8 +701,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="EventTrackingId">An event tracking identification for correlating this request with other events.</param>
         /// <param name="OldStatus">The old EVSE admin status.</param>
         /// <param name="NewStatus">The new EVSE admin status.</param>
-        internal async Task UpdateAdminStatus(DateTime                          Timestamp,
-                                              EventTracking_Id                  EventTrackingId,
+        internal async Task UpdateAdminStatus(DateTime                           Timestamp,
+                                              EventTracking_Id                   EventTrackingId,
                                               Timestamped<EVSEAdminStatusTypes>  OldStatus,
                                               Timestamped<EVSEAdminStatusTypes>  NewStatus)
         {
@@ -780,8 +728,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="EventTrackingId">An event tracking identification for correlating this request with other events.</param>
         /// <param name="OldStatus">The old EVSE status.</param>
         /// <param name="NewStatus">The new EVSE status.</param>
-        internal async Task UpdateStatus(DateTime                     Timestamp,
-                                         EventTracking_Id             EventTrackingId,
+        internal async Task UpdateStatus(DateTime                      Timestamp,
+                                         EventTracking_Id              EventTrackingId,
                                          Timestamped<EVSEStatusTypes>  OldStatus,
                                          Timestamped<EVSEStatusTypes>  NewStatus)
         {

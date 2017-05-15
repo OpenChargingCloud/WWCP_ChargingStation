@@ -780,28 +780,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region (internal) UpdateStatus(Timestamp, OldStatus, NewStatus)
-
-        /// <summary>
-        /// Update the current status.
-        /// </summary>
-        /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        /// <param name="OldStatus">The old EVSE status.</param>
-        /// <param name="NewStatus">The new EVSE status.</param>
-        internal void UpdateStatus(DateTime                                Timestamp,
-                                   Timestamped<ChargingStationStatusTypes>  OldStatus,
-                                   Timestamped<ChargingStationStatusTypes>  NewStatus)
-        {
-
-            var OnStatusChangedLocal = OnStatusChanged;
-            if (OnStatusChangedLocal != null)
-                OnStatusChangedLocal(Timestamp, this, OldStatus, NewStatus);
-
-        }
-
-        #endregion
-
-        #region (internal) UpdateAdminStatus(Timestamp, OldStatus, NewStatus)
+        #region (internal) UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus)
 
         /// <summary>
         /// Update the current status.
@@ -810,11 +789,40 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OldStatus">The old EVSE admin status.</param>
         /// <param name="NewStatus">The new EVSE admin status.</param>
         internal void UpdateAdminStatus(DateTime                                      Timestamp,
+                                        EventTracking_Id                              EventTrackingId,
                                         Timestamped<ChargingStationAdminStatusTypes>  OldStatus,
                                         Timestamped<ChargingStationAdminStatusTypes>  NewStatus)
         {
 
-            OnAdminStatusChanged?.Invoke(Timestamp, this, OldStatus, NewStatus);
+            OnAdminStatusChanged?.Invoke(Timestamp,
+                                         EventTrackingId,
+                                         this,
+                                         OldStatus,
+                                         NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal void UpdateStatus(DateTime                                 Timestamp,
+                                   EventTracking_Id                         EventTrackingId,
+                                   Timestamped<ChargingStationStatusTypes>  OldStatus,
+                                   Timestamped<ChargingStationStatusTypes>  NewStatus)
+        {
+
+            OnStatusChanged?.Invoke(Timestamp,
+                                    EventTrackingId,
+                                    this,
+                                    OldStatus,
+                                    NewStatus);
 
         }
 
