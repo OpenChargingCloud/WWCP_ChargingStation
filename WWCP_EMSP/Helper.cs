@@ -33,30 +33,33 @@ namespace org.GraphDefined.WWCP
 
         public static eMobilityServiceProvider
 
-            CreateNewEMobilityServiceProvider(this RoamingNetwork                           RoamingNetwork,
-                                              eMobilityProvider_Id                          Id,
-                                              I18NString                                    Name,
-                                              I18NString                                    Description   = null,
-                                              Action<eMobilityProviderProxy>                     Configurator  = null,
-                                              eMobilityProviderPriority                     Priority      = null,
-                                              eMobilityProviderAdminStatusType              AdminStatus   = eMobilityProviderAdminStatusType.Operational,
-                                              eMobilityProviderStatusType                   Status        = eMobilityProviderStatusType.Available,
-                                              Action<eMobilityProviderProxy>                     OnSuccess     = null,
-                                              Action<RoamingNetwork, eMobilityProvider_Id>  OnError       = null)
+            CreateEMobilityServiceProvider(this RoamingNetwork                           RoamingNetwork,
+                                           eMobilityProvider_Id                          Id,
+                                           I18NString                                    Name,
+                                           I18NString                                    Description    = null,
+                                           Action<eMobilityProvider>                     Configurator   = null,
+                                           eMobilityProviderPriority                     Priority       = null,
+                                           eMobilityProviderAdminStatusType              AdminStatus    = eMobilityProviderAdminStatusType.Operational,
+                                           eMobilityProviderStatusType                   Status         = eMobilityProviderStatusType.Available,
+                                           Action<eMobilityProvider>                     OnSuccess      = null,
+                                           Action<RoamingNetwork, eMobilityProvider_Id>  OnError        = null)
 
         {
 
-            var _Provider = RoamingNetwork.CreateNewEMobilityProvider(Id,
-                                                                      Name,
-                                                                      Description,
-                                                                      Priority,
-                                                                      Configurator,
-                                                                      EMobilityProvider => new eMobilityServiceProvider(EMobilityProvider.Id,
-                                                                                                                        EMobilityProvider.RoamingNetwork),
-                                                                      AdminStatus,
-                                                                      Status,
-                                                                      OnSuccess,
-                                                                      OnError);
+            var _Provider = RoamingNetwork.CreateEMobilityProvider(Id,
+                                                                   Name,
+                                                                   Description,
+                                                                   Priority,
+                                                                   Configurator,
+
+                                                                   // Remote EMP...
+                                                                   emp => new eMobilityServiceProvider(emp.Id,
+                                                                                                       emp.RoamingNetwork),
+
+                                                                   AdminStatus,
+                                                                   Status,
+                                                                   OnSuccess,
+                                                                   OnError);
 
             return _Provider.RemoteEMobilityProvider as eMobilityServiceProvider;
 
