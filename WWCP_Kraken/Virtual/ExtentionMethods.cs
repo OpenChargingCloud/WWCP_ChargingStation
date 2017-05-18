@@ -75,6 +75,60 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        #region CreateVirtualEVSE(this ChargingStation, EVSEId = null, EVSEConfigurator = null, VirtualEVSEConfigurator = null, OnSuccess = null, OnError = null)
+
+        /// <summary>
+        /// Create a new virtual charging station.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// <param name="EVSEId">The EVSE identification for the EVSE to be created.</param>
+        /// <param name="EVSEConfigurator">An optional delegate to configure the new (local) EVSE.</param>
+        /// <param name="VirtualEVSEConfigurator">An optional delegate to configure the new EVSE.</param>
+        /// <param name="OnSuccess">An optional delegate for reporting success.</param>
+        /// <param name="OnError">An optional delegate for reporting an error.</param>
+        public static EVSE CreateVirtualEVSE(this ChargingStation              ChargingStation,
+                                             EVSE_Id                           EVSEId,
+                                             EVSEAdminStatusTypes              InitialAdminStatus        = EVSEAdminStatusTypes.Operational,
+                                             EVSEStatusTypes                   InitialStatus             = EVSEStatusTypes.Available,
+                                             UInt16                            MaxAdminStatusListSize    = VirtualEVSE.DefaultMaxAdminStatusListSize,
+                                             UInt16                            MaxStatusListSize         = VirtualEVSE.DefaultMaxStatusListSize,
+                                             Action<EVSE>                      EVSEConfigurator          = null,
+                                             Action<VirtualEVSE>               VirtualEVSEConfigurator   = null,
+                                             Action<EVSE>                      OnSuccess                 = null,
+                                             Action<ChargingStation, EVSE_Id>  OnError                   = null)
+        {
+
+            #region Initial checks
+
+            if (ChargingStation == null)
+                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
+
+            #endregion
+
+            return ChargingStation.CreateEVSE(EVSEId,
+                                              EVSEConfigurator,
+                                              newevse => {
+
+                                                  var virtualevse = new VirtualEVSE(newevse.Id,
+                                                                                    ChargingStation.RemoteChargingStation as VirtualChargingStation,
+                                                                                    InitialAdminStatus,
+                                                                                    InitialStatus,
+                                                                                    MaxAdminStatusListSize,
+                                                                                    MaxStatusListSize);
+
+                                                  VirtualEVSEConfigurator?.Invoke(virtualevse);
+
+                                                  return virtualevse;
+
+                                              },
+
+                                              OnSuccess: OnSuccess,
+                                              OnError:   OnError);
+
+        }
+
+        #endregion
+
     }
 
 }

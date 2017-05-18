@@ -2154,10 +2154,11 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Unkown Token!
 
-            result = AuthStartEVSEResult.NotAuthorized(Id,
-                                                       ProviderId:   Id,
-                                                       SessionId:    SessionId,
-                                                       Description:  "Unkown token!");
+            else
+                result = AuthStartEVSEResult.NotAuthorized(Id,
+                                                           ProviderId:   Id,
+                                                           SessionId:    SessionId,
+                                                           Description:  "Unkown token!");
 
             #endregion
 
@@ -2193,6 +2194,170 @@ namespace org.GraphDefined.WWCP.EMSP
             {
                 e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartResponse));
             }
+
+            #endregion
+
+            return result;
+
+        }
+
+        #endregion
+
+        #region AuthorizeStart(AuthToken, EVSEId,            ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+
+        /// <summary>
+        /// Create an AuthorizeStart request at the given EVSE.
+        /// </summary>
+        /// <param name="AuthToken">A (RFID) user identification.</param>
+        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ChargingProduct">An optional charging product.</param>
+        /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="OperatorId">An optional charging station operator identification.</param>
+        /// 
+        /// <param name="Timestamp">The optional timestamp of the request.</param>
+        /// <param name="CancellationToken">An optional token to cancel this request.</param>
+        /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
+        async Task<AuthStartEVSEResult>
+
+            IReceiveAuthorizeStartStop.AuthorizeStart(eMAIdWithPIN2                AuthToken,
+                                                      EVSE_Id                      EVSEId,
+                                                      ChargingProduct              ChargingProduct,
+                                                      ChargingSession_Id?          SessionId,
+                                                      ChargingStationOperator_Id?  OperatorId,
+
+                                                      DateTime?                    Timestamp,
+                                                      CancellationToken?           CancellationToken,
+                                                      EventTracking_Id             EventTrackingId,
+                                                      TimeSpan?                    RequestTimeout)
+
+        {
+
+            #region Initial checks
+
+            if (AuthToken  == null)
+                throw new ArgumentNullException(nameof(AuthToken),  "The given authentication token must not be null!");
+
+            TokenAuthorizationResultType AuthenticationResult;
+            AuthStartEVSEResult          result;
+
+            #endregion
+
+            #region Send OnAuthorizeEVSEStartRequest event
+
+            //var StartTime = DateTime.Now;
+
+            //try
+            //{
+
+            //    if (OnAuthorizeEVSEStartRequest != null)
+            //        await Task.WhenAll(OnAuthorizeEVSEStartRequest.GetInvocationList().
+            //                           Cast<OnAuthorizeEVSEStartRequestDelegate>().
+            //                           Select(e => e(StartTime,
+            //                                         Timestamp.Value,
+            //                                         this,
+            //                                         Id.ToString(),
+            //                                         EventTrackingId,
+            //                                         RoamingNetwork.Id,
+            //                                         OperatorId,
+            //                                         AuthToken,
+            //                                         EVSEId,
+            //                                         ChargingProduct,
+            //                                         SessionId,
+            //                                         RequestTimeout ?? RequestTimeout.Value))).
+            //                           ConfigureAwait(false);
+
+            //}
+            //catch (Exception e)
+            //{
+            //    e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartRequest));
+            //}
+
+            #endregion
+
+
+            //if (AuthorizationDatabase.TryGetValue(AuthToken, out AuthenticationResult))
+            //{
+
+            //    #region Authorized
+
+            //    if (AuthenticationResult == TokenAuthorizationResultType.Authorized)
+            //    {
+
+            //        if (!SessionId.HasValue)
+            //            SessionId = ChargingSession_Id.New;
+
+            //        SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthToken));
+
+            //        result = AuthStartEVSEResult.Authorized(Id,
+            //                                                SessionId,
+            //                                                ProviderId: Id);
+
+            //    }
+
+            //    #endregion
+
+            //    #region Token is blocked!
+
+            //    else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
+            //        result = AuthStartEVSEResult.Blocked(Id,
+            //                                             ProviderId:   Id,
+            //                                             SessionId:    SessionId,
+            //                                             Description:  "Token is blocked!");
+
+            //    #endregion
+
+            //    #region ...fall through!
+
+            //    else
+            //        result = AuthStartEVSEResult.Unspecified(Id,
+            //                                                 SessionId);
+
+            //    #endregion
+
+            //}
+
+            #region Unkown Token!
+
+            result = AuthStartEVSEResult.NotAuthorized(Id,
+                                                       ProviderId:   Id,
+                                                       SessionId:    SessionId,
+                                                       Description:  "Unkown token!");
+
+            #endregion
+
+
+            #region Send OnAuthorizeEVSEStartResponse event
+
+            //var EndTime = DateTime.Now;
+
+            //try
+            //{
+
+            //    if (OnAuthorizeEVSEStartResponse != null)
+            //        await Task.WhenAll(OnAuthorizeEVSEStartResponse.GetInvocationList().
+            //                           Cast<OnAuthorizeEVSEStartResponseDelegate>().
+            //                           Select(e => e(EndTime,
+            //                                         Timestamp.Value,
+            //                                         this,
+            //                                         Id.ToString(),
+            //                                         EventTrackingId,
+            //                                         RoamingNetwork.Id,
+            //                                         OperatorId,
+            //                                         AuthToken,
+            //                                         EVSEId,
+            //                                         ChargingProduct,
+            //                                         SessionId,
+            //                                         RequestTimeout ?? RequestTimeout.Value,
+            //                                         result,
+            //                                         EndTime - StartTime))).
+            //                           ConfigureAwait(false);
+
+            //}
+            //catch (Exception e)
+            //{
+            //    e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeEVSEStartResponse));
+            //}
 
             #endregion
 
@@ -2318,10 +2483,11 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Unkown Token!
 
-            result = AuthStartChargingStationResult.NotAuthorized(Id,
-                                                       ProviderId:   Id,
-                                                       SessionId:    SessionId,
-                                                       Description:  "Unkown token!");
+            else
+                result = AuthStartChargingStationResult.NotAuthorized(Id,
+                                                                      ProviderId:   Id,
+                                                                      SessionId:    SessionId,
+                                                                      Description:  "Unkown token!");
 
             #endregion
 
