@@ -17,6 +17,7 @@
 
 #region Usings
 
+using org.GraphDefined.WWCP.ChargingPools;
 using System;
 
 #endregion
@@ -30,7 +31,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
     public static partial class ExtentionMethods
     {
 
-        #region CreateNewVirtualStation(this ChargingPool, ChargingStationId = null, ChargingStationConfigurator = null, VirtualChargingStationConfigurator = null, OnSuccess = null, OnError = null)
+        #region CreateVirtualStation(this ChargingPool, ChargingStationId = null, ChargingStationConfigurator = null, VirtualChargingStationConfigurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
         /// Create a new virtual charging station.
@@ -41,12 +42,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="VirtualChargingStationConfigurator">An optional delegate to configure the new virtual charging station.</param>
         /// <param name="OnSuccess">An optional delegate for reporting success.</param>
         /// <param name="OnError">An optional delegate for reporting an error.</param>
-        public static ChargingStation CreateNewVirtualStation(this ChargingPool                         ChargingPool,
-                                                              ChargingStation_Id                        ChargingStationId,
-                                                              Action<ChargingStation>                   ChargingStationConfigurator         = null,
-                                                              Action<VirtualChargingStation>            VirtualChargingStationConfigurator  = null,
-                                                              Action<ChargingStation>                   OnSuccess                           = null,
-                                                              Action<ChargingPool, ChargingStation_Id>  OnError                             = null)
+        public static ChargingStation CreateVirtualStation(this ChargingPool                         ChargingPool,
+                                                           ChargingStation_Id                        ChargingStationId,
+                                                           ChargingStationAdminStatusTypes           InitialAdminStatus                  = ChargingStationAdminStatusTypes.Operational,
+                                                           ChargingStationStatusTypes                InitialStatus                       = ChargingStationStatusTypes.Available,
+                                                           UInt16                                    MaxAdminStatusListSize              = VirtualChargingStation.DefaultMaxAdminStatusListSize,
+                                                           UInt16                                    MaxStatusListSize                   = VirtualChargingStation.DefaultMaxStatusListSize,
+                                                           Action<ChargingStation>                   ChargingStationConfigurator         = null,
+                                                           Action<VirtualChargingStation>            VirtualChargingStationConfigurator  = null,
+                                                           Action<ChargingStation>                   OnSuccess                           = null,
+                                                           Action<ChargingPool, ChargingStation_Id>  OnError                             = null)
         {
 
             #region Initial checks
@@ -60,7 +65,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                       ChargingStationConfigurator,
                                                       newstation => {
 
-                                                          var virtualstation = new VirtualChargingStation(newstation);
+                                                          var virtualstation = new VirtualChargingStation(newstation.Id,
+                                                                                                          ChargingPool.RemoteChargingPool as VirtualChargingPool,
+                                                                                                          InitialAdminStatus,
+                                                                                                          InitialStatus,
+                                                                                                          MaxAdminStatusListSize,
+                                                                                                          MaxStatusListSize);
 
                                                           VirtualChargingStationConfigurator?.Invoke(virtualstation);
 

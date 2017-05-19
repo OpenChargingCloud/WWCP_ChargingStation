@@ -877,7 +877,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
 
-        IEnumerable<EVSE> IRemoteChargingStation.EVSEs
+        IEnumerable<IRemoteEVSE> IRemoteChargingStation.EVSEs
             => null;
 
         #region CreateNewEVSE(EVSEId, Configurator = null, OnSuccess = null, OnError = null)

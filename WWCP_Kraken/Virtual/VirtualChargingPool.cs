@@ -25,15 +25,20 @@ using System.Collections.Generic;
 
 using org.GraphDefined.Vanaheimr.Illias;
 
+using org.GraphDefined.WWCP.ChargingStations;
+
 #endregion
 
-namespace org.GraphDefined.WWCP.ChargingStations
+namespace org.GraphDefined.WWCP.ChargingPools
 {
 
     /// <summary>
     /// A demo implementation of a virtual WWCP charging pool.
     /// </summary>
-    public class VirtualChargingPool : IRemoteChargingPool
+    public class VirtualChargingPool : AEMobilityEntity<ChargingPool_Id>,
+                                       IEquatable<VirtualChargingPool>, IComparable<VirtualChargingPool>, IComparable,
+                                       IStatus<ChargingPoolStatusTypes>,
+                                       IRemoteChargingPool
     {
 
         #region Data
@@ -106,15 +111,94 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region Status
 
-        private ChargingPoolStatusTypes _Status;
+        #region AdminStatus
 
-        public ChargingPoolStatusTypes Status
+        /// <summary>
+        /// The current charging station admin status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingPoolAdminStatusTypes> AdminStatus
+        {
+
+            get
+            {
+                return _AdminStatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_AdminStatusSchedule.CurrentValue != value.Value)
+                    SetAdminStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region AdminStatusSchedule
+
+        private StatusSchedule<ChargingPoolAdminStatusTypes> _AdminStatusSchedule;
+
+        /// <summary>
+        /// The charging station admin status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingPoolAdminStatusTypes>> AdminStatusSchedule
         {
             get
             {
-                return _Status;
+                return _AdminStatusSchedule;
+            }
+        }
+
+        #endregion
+
+        #region Status
+
+        /// <summary>
+        /// The current charging station status.
+        /// </summary>
+        [InternalUseOnly]
+        public Timestamped<ChargingPoolStatusTypes> Status
+        {
+
+            get
+            {
+                return _StatusSchedule.CurrentStatus;
+            }
+
+            set
+            {
+
+                if (value == null)
+                    return;
+
+                if (_StatusSchedule.CurrentValue != value.Value)
+                    SetStatus(value);
+
+            }
+
+        }
+
+        #endregion
+
+        #region StatusSchedule
+
+        private StatusSchedule<ChargingPoolStatusTypes> _StatusSchedule;
+
+        /// <summary>
+        /// The charging station status schedule.
+        /// </summary>
+        public IEnumerable<Timestamped<ChargingPoolStatusTypes>> StatusSchedule
+        {
+            get
+            {
+                return _StatusSchedule;
             }
         }
 
@@ -151,21 +235,37 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// A virtual WWCP charging pool.
         /// </summary>
-        /// <param name="ChargingPool">A local charging pool.</param>
-        public VirtualChargingPool(ChargingPool ChargingPool)
+        public VirtualChargingPool(ChargingPool_Id               Id,
+                                   ChargingPoolAdminStatusTypes  InitialAdminStatus       = ChargingPoolAdminStatusTypes.Operational,
+                                   ChargingPoolStatusTypes       InitialStatus            = ChargingPoolStatusTypes.Available,
+                                   UInt16                        MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
+                                   UInt16                        MaxStatusListSize        = DefaultMaxStatusListSize)
+
+            : base(Id)
+
         {
 
-            #region Initial checks
+            #region Init data and properties
 
-            if (ChargingPool == null)
-                throw new ArgumentNullException(nameof(ChargingPool),  "The given charging pool parameter must not be null!");
+            this._Stations             = new HashSet<IRemoteChargingStation>();
+
+            this._AdminStatusSchedule  = new StatusSchedule<ChargingPoolAdminStatusTypes>(MaxAdminStatusListSize);
+            this._AdminStatusSchedule.Insert(InitialAdminStatus);
+
+            this._StatusSchedule       = new StatusSchedule<ChargingPoolStatusTypes>(MaxStatusListSize);
+            this._StatusSchedule.Insert(InitialStatus);
 
             #endregion
 
-            this._Id            = ChargingPool.Id;
-            this._ChargingPool  = ChargingPool;
-            this._Status        = ChargingPoolStatusTypes.Available;
-            this._Stations      = new HashSet<VirtualChargingStation>();
+            #region Link events
+
+            this._AdminStatusSchedule.OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
+                                                          => UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
+
+            this._StatusSchedule.     OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
+                                                          => UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
+
+            #endregion
 
         }
 
@@ -176,22 +276,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Stations
 
-        private readonly HashSet<VirtualChargingStation> _Stations;
+        private readonly HashSet<IRemoteChargingStation> _Stations;
 
         /// <summary>
         /// All registered charging stations.
         /// </summary>
-        public IEnumerable<VirtualChargingStation> Stations
-        {
-            get
-            {
-                return _Stations;
-            }
-        }
+        public IEnumerable<IRemoteChargingStation> Stations
+            => _Stations;
 
         #endregion
 
-        #region CreateNewStation(ChargingStation, Configurator = null, OnSuccess = null, OnError = null)
+        #region CreateVirtualStation(ChargingStation, Configurator = null, OnSuccess = null, OnError = null)
 
         /// <summary>
         /// Create and register a new charging station having the given
@@ -201,29 +296,38 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Configurator">An optional delegate to configure the new charging station after its creation.</param>
         /// <param name="OnSuccess">An optional delegate called after successful creation of the charging station.</param>
         /// <param name="OnError">An optional delegate for signaling errors.</param>
-        public VirtualChargingStation CreateNewStation(ChargingStation                                  ChargingStation,
-                                                       Action<VirtualChargingStation>                   Configurator  = null,
-                                                       Action<VirtualChargingStation>                   OnSuccess     = null,
-                                                       Action<VirtualChargingPool, ChargingStation_Id>  OnError       = null)
+        public VirtualChargingStation CreateVirtualStation(ChargingStation_Id                               ChargingStationId,
+                                                           ChargingStationAdminStatusTypes                  InitialAdminStatus       = ChargingStationAdminStatusTypes.Operational,
+                                                           ChargingStationStatusTypes                       InitialStatus            = ChargingStationStatusTypes.Available,
+                                                           UInt16                                           MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
+                                                           UInt16                                           MaxStatusListSize        = DefaultMaxStatusListSize,
+                                                           TimeSpan?                                        SelfCheckTimeSpan        = null,
+                                                           Action<VirtualChargingStation>                   Configurator             = null,
+                                                           Action<VirtualChargingStation>                   OnSuccess                = null,
+                                                           Action<VirtualChargingStation, ChargingStation_Id>  OnError                  = null)
         {
 
             #region Initial checks
 
-            if (ChargingStation == null)
-                throw new ArgumentNullException(nameof(ChargingStation), "The given charging station must not be null!");
-
-            if (_Stations.Any(station => station.Id == ChargingStation.Id))
+            if (_Stations.Any(station => station.Id == ChargingStationId))
             {
-                if (OnError == null)
-                    throw new ChargingStationAlreadyExistsInPool(this.ChargingPool, ChargingStation.Id);
-                else
-                    OnError?.Invoke(this, ChargingStation.Id);
+                throw new Exception("StationAlreadyExistsInPool");
+                //if (OnError == null)
+                //    throw new ChargingStationAlreadyExistsInStation(this.ChargingStation, ChargingStation.Id);
+                //else
+                //    OnError?.Invoke(this, ChargingStation.Id);
             }
 
             #endregion
 
-            var Now              = DateTime.Now;
-            var _VirtualStation  = new VirtualChargingStation(ChargingStation, this);
+            var Now           = DateTime.Now;
+            var _VirtualStation  = new VirtualChargingStation(ChargingStationId,
+                                                              this,
+                                                              InitialAdminStatus,
+                                                              InitialStatus,
+                                                              MaxAdminStatusListSize,
+                                                              MaxStatusListSize,
+                                                              SelfCheckTimeSpan);
 
             Configurator?.Invoke(_VirtualStation);
 
@@ -250,6 +354,306 @@ namespace org.GraphDefined.WWCP.ChargingStations
         }
 
         #endregion
+
+        #endregion
+
+
+        #region (Admin-)Status management
+
+        #region OnData/(Admin)StatusChanged
+
+        /// <summary>
+        /// An event fired whenever the static data of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingPoolDataChangedDelegate         OnDataChanged;
+
+        /// <summary>
+        /// An event fired whenever the admin status of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingPoolAdminStatusChangedDelegate  OnAdminStatusChanged;
+
+        /// <summary>
+        /// An event fired whenever the dynamic status of the charging station changed.
+        /// </summary>
+        public event OnRemoteChargingPoolStatusChangedDelegate       OnStatusChanged;
+
+        #endregion
+
+
+        #region SetAdminStatus(NewAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(ChargingPoolAdminStatusTypes  NewAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewTimestampedAdminStatus)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
+        public void SetAdminStatus(Timestamped<ChargingPoolAdminStatusTypes> NewTimestampedAdminStatus)
+        {
+            _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatus, Timestamp)
+
+        /// <summary>
+        /// Set the admin status.
+        /// </summary>
+        /// <param name="NewAdminStatus">A new admin status.</param>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetAdminStatus(ChargingPoolAdminStatusTypes  NewAdminStatus,
+                                   DateTime                         Timestamp)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
+        }
+
+        #endregion
+
+        #region SetAdminStatus(NewAdminStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped admin status.
+        /// </summary>
+        /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetAdminStatus(IEnumerable<Timestamped<ChargingPoolAdminStatusTypes>>  NewAdminStatusList,
+                                   ChangeMethods                                              ChangeMethod = ChangeMethods.Replace)
+        {
+            _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region SetStatus(NewStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewStatus">A new status.</param>
+        public void SetStatus(ChargingPoolStatusTypes  NewStatus)
+        {
+            _StatusSchedule.Insert(NewStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewTimestampedStatus)
+
+        /// <summary>
+        /// Set the current status.
+        /// </summary>
+        /// <param name="NewTimestampedStatus">A new timestamped status.</param>
+        public void SetStatus(Timestamped<ChargingPoolStatusTypes> NewTimestampedStatus)
+        {
+            _StatusSchedule.Insert(NewTimestampedStatus);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatus, Timestamp)
+
+        /// <summary>
+        /// Set the status.
+        /// </summary>
+        /// <param name="NewStatus">A new status.</param>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        public void SetStatus(ChargingPoolStatusTypes  NewStatus,
+                              DateTime                   Timestamp)
+        {
+            _StatusSchedule.Insert(NewStatus, Timestamp);
+        }
+
+        #endregion
+
+        #region SetStatus(NewStatusList, ChangeMethod = ChangeMethods.Replace)
+
+        /// <summary>
+        /// Set the timestamped status.
+        /// </summary>
+        /// <param name="NewStatusList">A list of new timestamped status.</param>
+        /// <param name="ChangeMethod">The change mode.</param>
+        public void SetStatus(IEnumerable<Timestamped<ChargingPoolStatusTypes>>  NewStatusList,
+                              ChangeMethods                                        ChangeMethod = ChangeMethods.Replace)
+        {
+            _StatusSchedule.Insert(NewStatusList, ChangeMethod);
+        }
+
+        #endregion
+
+
+        #region (internal) UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE admin status.</param>
+        /// <param name="NewStatus">The new EVSE admin status.</param>
+        internal async Task UpdateAdminStatus(DateTime                                   Timestamp,
+                                              EventTracking_Id                           EventTrackingId,
+                                              Timestamped<ChargingPoolAdminStatusTypes>  OldStatus,
+                                              Timestamped<ChargingPoolAdminStatusTypes>  NewStatus)
+        {
+
+            OnAdminStatusChanged?.Invoke(Timestamp,
+                                         EventTrackingId,
+                                         this,
+                                         OldStatus,
+                                         NewStatus);
+
+        }
+
+        #endregion
+
+        #region (internal) UpdateStatus     (Timestamp, EventTrackingId, OldStatus, NewStatus)
+
+        /// <summary>
+        /// Update the current status.
+        /// </summary>
+        /// <param name="Timestamp">The timestamp when this change was detected.</param>
+        /// <param name="OldStatus">The old EVSE status.</param>
+        /// <param name="NewStatus">The new EVSE status.</param>
+        internal async Task UpdateStatus(DateTime                              Timestamp,
+                                         EventTracking_Id                      EventTrackingId,
+                                         Timestamped<ChargingPoolStatusTypes>  OldStatus,
+                                         Timestamped<ChargingPoolStatusTypes>  NewStatus)
+        {
+
+            OnStatusChanged?.Invoke(Timestamp,
+                                    EventTrackingId,
+                                    this,
+                                    OldStatus,
+                                    NewStatus);
+
+        }
+
+        #endregion
+
+        #endregion
+
+
+        #region IComparable<VirtualChargingPool> Members
+
+        #region CompareTo(Object)
+
+        /// <summary>
+        /// Compares two instances of this object.
+        /// </summary>
+        /// <param name="Object">An object to compare with.</param>
+        public Int32 CompareTo(Object Object)
+        {
+
+            if (Object == null)
+                throw new ArgumentNullException(nameof(Object), "The given object must not be null!");
+
+            var VirtualChargingPool = Object as VirtualChargingPool;
+            if ((Object) VirtualChargingPool == null)
+                throw new ArgumentException("The given object is not a virtual charging station!");
+
+            return CompareTo(VirtualChargingPool);
+
+        }
+
+        #endregion
+
+        #region CompareTo(VirtualChargingPool)
+
+        /// <summary>
+        /// Compares two instances of this object.
+        /// </summary>
+        /// <param name="VirtualChargingPool">An virtual charging station to compare with.</param>
+        public Int32 CompareTo(VirtualChargingPool VirtualChargingPool)
+        {
+
+            if ((Object) VirtualChargingPool == null)
+                throw new ArgumentNullException(nameof(VirtualChargingPool),  "The given virtual charging station must not be null!");
+
+            return Id.CompareTo(VirtualChargingPool.Id);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region IEquatable<VirtualChargingPool> Members
+
+        #region Equals(Object)
+
+        /// <summary>
+        /// Compares two instances of this object.
+        /// </summary>
+        /// <param name="Object">An object to compare with.</param>
+        /// <returns>true|false</returns>
+        public override Boolean Equals(Object Object)
+        {
+
+            if (Object == null)
+                return false;
+
+            var VirtualChargingPool = Object as VirtualChargingPool;
+            if ((Object) VirtualChargingPool == null)
+                return false;
+
+            return Equals(VirtualChargingPool);
+
+        }
+
+        #endregion
+
+        #region Equals(VirtualChargingPool)
+
+        /// <summary>
+        /// Compares two virtual charging stations for equality.
+        /// </summary>
+        /// <param name="VirtualChargingPool">A virtual charging station to compare with.</param>
+        /// <returns>True if both match; False otherwise.</returns>
+        public Boolean Equals(VirtualChargingPool VirtualChargingPool)
+        {
+
+            if ((Object) VirtualChargingPool == null)
+                return false;
+
+            return Id.Equals(VirtualChargingPool.Id);
+
+        }
+
+        #endregion
+
+        #endregion
+
+        #region GetHashCode()
+
+        /// <summary>
+        /// Get the hashcode of this object.
+        /// </summary>
+        public override Int32 GetHashCode()
+
+            => Id.GetHashCode();
+
+        #endregion
+
+        #region (override) ToString()
+
+        /// <summary>
+        /// Return a string representation of this object.
+        /// </summary>
+        public override String ToString()
+
+            => Id.ToString();
 
         #endregion
 
@@ -321,10 +725,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
             throw new NotImplementedException();
         }
 
+        public Task<RemoteStartChargingStationResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingPool_Id ChargingPoolId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id? ProviderId, TimeSpan? RequestTimeout = default(TimeSpan?))
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<RemoteStopChargingStationResult> RemoteStop(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, ChargingStation_Id ChargingStationId, ChargingSession_Id SessionId, ReservationHandling ReservationHandling, eMobilityProvider_Id? ProviderId, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
+
+
 
     }
 
