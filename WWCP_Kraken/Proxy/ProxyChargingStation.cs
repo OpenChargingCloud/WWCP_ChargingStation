@@ -226,7 +226,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -344,7 +344,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                       requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                   }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             // HTTP / 1.1 200 OK
@@ -546,7 +546,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -814,7 +814,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1021,7 +1021,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                          requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
                                                                      }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1173,7 +1173,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : TimeSpan.FromSeconds(120),
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : TimeSpan.FromSeconds(120),
                                              CancellationToken: CancellationToken);
 
 
@@ -1353,7 +1353,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        ).ToUTF8Bytes();
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1473,7 +1473,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
 
-                                             Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                             RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                              CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1574,7 +1574,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                   ).ToUTF8Bytes();
                                                                 }),
 
-                                         Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                         RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                          CancellationToken: CancellationToken);
 
             if (response == null)
@@ -1784,7 +1784,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                    ).ToUTF8Bytes();
                                                                  }),
 
-                                         Timeout:           RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
+                                         RequestTimeout:    RequestTimeout.HasValue ? RequestTimeout : DefaultRequestTimeout,
                                          CancellationToken: CancellationToken);
 
             if (response == null)
