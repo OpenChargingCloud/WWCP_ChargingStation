@@ -381,12 +381,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region EVSEs
 
-        protected readonly HashSet<NetworkEVSEStub> _EVSEs;
+        protected readonly HashSet<IRemoteEVSE> _EVSEs;
 
         /// <summary>
         /// All registered EVSEs.
         /// </summary>
-        public IEnumerable<NetworkEVSEStub> EVSEs
+        public IEnumerable<IRemoteEVSE> EVSEs
         {
             get
             {
@@ -588,7 +588,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             this._Id                    = ChargingStation.Id;
             this._ChargingStation       = ChargingStation;
-            this._EVSEs                 = new HashSet<NetworkEVSEStub>();
+            this._EVSEs                 = new HashSet<IRemoteEVSE>();
 
             this._StatusSchedule        = new StatusSchedule<ChargingStationStatusTypes>(MaxStatusListSize);
             this._StatusSchedule.Insert(ChargingStationStatusTypes.OutOfService);
@@ -948,6 +948,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         IRemoteEVSE IRemoteChargingStation.CreateNewEVSE(EVSE_Id EVSEId, Action<EVSE> Configurator = null, Action<EVSE> OnSuccess = null, Action<ChargingStation, EVSE_Id> OnError = null)
             => this.CreateNewEVSE(EVSEId);
+
+        public IRemoteEVSE AddEVSE(IRemoteEVSE                       EVSE,
+                                   Action<EVSE>                      Configurator  = null,
+                                   Action<EVSE>                      OnSuccess     = null,
+                                   Action<ChargingStation, EVSE_Id>  OnError       = null)
+
+        {
+
+            _EVSEs.Add(EVSE);
+
+            return EVSE;
+
+        }
 
 
         public virtual async Task<IEnumerable<EVSEStatus>> GetEVSEStatus(DateTime           Timestamp,

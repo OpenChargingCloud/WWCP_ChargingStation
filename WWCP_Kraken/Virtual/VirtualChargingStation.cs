@@ -673,6 +673,19 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        public IRemoteEVSE AddEVSE(IRemoteEVSE                       EVSE,
+                                   Action<EVSE>                      Configurator  = null,
+                                   Action<EVSE>                      OnSuccess     = null,
+                                   Action<ChargingStation, EVSE_Id>  OnError       = null)
+
+        {
+
+            _EVSEs.Add(EVSE);
+
+            return EVSE;
+
+        }
+
 
         #region ContainsEVSE(EVSE)
 
