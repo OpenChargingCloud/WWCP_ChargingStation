@@ -70,9 +70,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region RemoteWhiteList
 
-        private readonly HashSet<AuthInfo> _RemoteWhiteList;
+        private readonly HashSet<AuthIdentification> _RemoteWhiteList;
 
-        public HashSet<AuthInfo> RemoteWhiteList
+        public HashSet<AuthIdentification> RemoteWhiteList
         {
             get
             {
@@ -128,7 +128,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Download white list
 
-            _RemoteWhiteList = new HashSet<AuthInfo>();
+            _RemoteWhiteList = new HashSet<AuthIdentification>();
 
             // Will put the results into _RemoteWhiteList!
             GetWhiteList(DateTime.Now, new CancellationTokenSource().Token, EventTracking_Id.New).Wait();
@@ -1450,7 +1450,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region GetWhiteList
 
-        public async Task<IEnumerable<AuthInfo>>
+        public async Task<IEnumerable<AuthIdentification>>
 
             GetWhiteList(DateTime           Timestamp,
                          CancellationToken  CancellationToken,
@@ -1477,7 +1477,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                              CancellationToken: CancellationToken);
 
             if (response == null)
-                return new AuthInfo[0];
+                return new AuthIdentification[0];
 
             // HTTP / 1.1 200 OK
             // Date: Wed, 10 Feb 2016 16:10:01 GMT
@@ -1488,11 +1488,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
             // { "EvseStatus":{ "\"49*822*483*1\"":{ "2016-02-10T17:09:28CET":"AVAILABLE"} } }
 
             if (response.HTTPStatusCode != HTTPStatusCode.OK)
-                return new AuthInfo[0];
+                return new AuthIdentification[0];
 
             Auth_Token            AuthToken  = null;
             eMobilityAccount_Id?  eMAId      = null;
-            var AuthInfos                    = new HashSet<AuthInfo>();
+            var AuthInfos                    = new HashSet<AuthIdentification>();
 
             foreach (JObject entry in JObject.Parse(response.HTTPBody.ToUTF8String())["Identifications"] as JArray)
             {
@@ -1506,13 +1506,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     case "RFID":
                         if (!Auth_Token.TryParse(entry["id"].Value<String>(), out AuthToken))
                             continue;
-                        AuthInfos.Add(AuthInfo.FromAuthToken(AuthToken));
+                        AuthInfos.Add(AuthIdentification.FromAuthToken(AuthToken));
                         break;
 
                     case "eMAId":
                         if (!eMobilityAccount_Id.TryParse(entry["id"].Value<String>(), out eMAId))
                             continue;
-                        AuthInfos.Add(AuthInfo.FromRemoteIdentification(eMAId.Value));
+                        AuthInfos.Add(AuthIdentification.FromRemoteIdentification(eMAId.Value));
                         break;
 
                 }
@@ -1667,17 +1667,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                                 case "CREATED":
                                 case "EXISTED_NOT_UPDATED":
-                                    RemoteWhiteList.Add(AuthInfo.FromAuthToken(AuthToken));
+                                    RemoteWhiteList.Add(AuthIdentification.FromAuthToken(AuthToken));
                                     break;
 
                                 case "ERROR":
-                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromAuthToken(AuthToken), AuthInfoStatusType.Error));
+                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromAuthToken(AuthToken), AuthInfoStatusType.Error));
                                     break;
 
                             }
 
                         else
-                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromAuthToken(AuthToken), AuthInfoStatusType.Invalid));
+                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromAuthToken(AuthToken), AuthInfoStatusType.Invalid));
 
                     }
 
@@ -1696,17 +1696,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                                 case "CREATED":
                                 case "EXISTED_NOT_UPDATED":
-                                    RemoteWhiteList.Add(AuthInfo.FromRemoteIdentification(eMAId));
+                                    RemoteWhiteList.Add(AuthIdentification.FromRemoteIdentification(eMAId));
                                     break;
 
                                 case "ERROR":
-                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromRemoteIdentification(eMAId), AuthInfoStatusType.Error));
+                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(eMAId), AuthInfoStatusType.Error));
                                     break;
 
                             }
 
                         else
-                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromRemoteIdentification(eMAId), AuthInfoStatusType.Invalid));
+                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(eMAId), AuthInfoStatusType.Invalid));
 
                     }
 
@@ -1726,9 +1726,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             // Everything is invalid!
             return _AuthTokens.
-                       Select(authtoken => new AuthInfoStatus(AuthInfo.FromAuthToken(authtoken), AuthInfoStatusType.Error)).
+                       Select(authtoken => new AuthInfoStatus(AuthIdentification.FromAuthToken(authtoken), AuthInfoStatusType.Error)).
                        Concat(_eMAIds.
-                                  Select(emaid => new AuthInfoStatus(AuthInfo.FromRemoteIdentification(emaid), AuthInfoStatusType.Error)));
+                                  Select(emaid => new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(emaid), AuthInfoStatusType.Error)));
 
         }
 
@@ -1849,17 +1849,17 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             {
 
                                 case "EXISTED_UPDATED":
-                                    RemoteWhiteList.Remove(AuthInfo.FromAuthToken(AuthToken));
+                                    RemoteWhiteList.Remove(AuthIdentification.FromAuthToken(AuthToken));
                                     break;
 
                                 case "NOT_FOUND":
-                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromAuthToken(AuthToken), AuthInfoStatusType.Error));
+                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromAuthToken(AuthToken), AuthInfoStatusType.Error));
                                     break;
 
                             }
 
                         else
-                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromAuthToken(AuthToken), AuthInfoStatusType.Invalid));
+                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromAuthToken(AuthToken), AuthInfoStatusType.Invalid));
 
                     }
 
@@ -1877,18 +1877,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             {
 
                                 case "EXISTED_UPDATED":
-                                    RemoteWhiteList.Add(AuthInfo.FromRemoteIdentification(eMAId));
+                                    RemoteWhiteList.Add(AuthIdentification.FromRemoteIdentification(eMAId));
                                     break;
 
                                 case "NOT_FOUND":
-                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromRemoteIdentification(eMAId), AuthInfoStatusType.NotFound));
+                                    InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(eMAId), AuthInfoStatusType.NotFound));
 
                                     break;
 
                             }
 
                         else
-                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthInfo.FromRemoteIdentification(eMAId), AuthInfoStatusType.Invalid));
+                            InvalidAuthInfos.Add(new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(eMAId), AuthInfoStatusType.Invalid));
 
                     }
 
@@ -1908,9 +1908,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             // Everything is invalid!
             return _AuthTokens.
-                       Select(authtoken => new AuthInfoStatus(AuthInfo.FromAuthToken(authtoken), AuthInfoStatusType.Error)).
+                       Select(authtoken => new AuthInfoStatus(AuthIdentification.FromAuthToken(authtoken), AuthInfoStatusType.Error)).
                        Concat(_eMAIds.
-                                  Select(emaid => new AuthInfoStatus(AuthInfo.FromRemoteIdentification(emaid), AuthInfoStatusType.Error)));
+                                  Select(emaid => new AuthInfoStatus(AuthIdentification.FromRemoteIdentification(emaid), AuthInfoStatusType.Error)));
 
         }
 
@@ -1937,10 +1937,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var ToRemove = CurrentWhiteList.Where(item => item.AuthToken             != null && !AuthTokens.Contains(item.AuthToken) ||
                                                           item.RemoteIdentification.HasValue && !eMAIds.    Contains(item.RemoteIdentification.Value)).ToArray();
 
-            var ToInsert = AuthTokens.Where (item => !CurrentWhiteList.Contains(AuthInfo.FromAuthToken(item))).
-                                      Select(item => AuthInfo.FromAuthToken(item)).Concat(
-                           eMAIds.    Where(item => !CurrentWhiteList.Contains(AuthInfo.FromRemoteIdentification(item))).
-                                      Select(item => AuthInfo.FromRemoteIdentification(item))).
+            var ToInsert = AuthTokens.Where (item => !CurrentWhiteList.Contains(AuthIdentification.FromAuthToken(item))).
+                                      Select(item => AuthIdentification.FromAuthToken(item)).Concat(
+                           eMAIds.    Where(item => !CurrentWhiteList.Contains(AuthIdentification.FromRemoteIdentification(item))).
+                                      Select(item => AuthIdentification.FromRemoteIdentification(item))).
                                       ToArray();
 
             var Removed = ToRemove.Any()

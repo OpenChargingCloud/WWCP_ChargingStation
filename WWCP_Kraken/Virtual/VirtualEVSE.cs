@@ -1396,13 +1396,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                              SessionTime:               new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
 
                                                                              IdentificationStart:       _ChargingSession.eMAIdStart.HasValue
-                                                                                                            ? AuthInfo.FromRemoteIdentification(_ChargingSession.eMAIdStart.Value)
+                                                                                                            ? AuthIdentification.FromRemoteIdentification(_ChargingSession.eMAIdStart.Value)
                                                                                                             : _ChargingSession.AuthTokenStart != null
-                                                                                                                ? AuthInfo.FromAuthToken(_ChargingSession.AuthTokenStart)
+                                                                                                                ? AuthIdentification.FromAuthToken(_ChargingSession.AuthTokenStart)
                                                                                                                 : null,
 
                                                                              IdentificationStop:        eMAId.HasValue
-                                                                                                            ? AuthInfo.FromRemoteIdentification(eMAId.Value)
+                                                                                                            ? AuthIdentification.FromRemoteIdentification(eMAId.Value)
                                                                                                             : null,
 
                                                                              EnergyMeterId:             EnergyMeter_Id.Parse("default"),

@@ -234,13 +234,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region WhiteLists
 
-        private readonly Dictionary<String, HashSet<AuthInfo>> _WhiteLists;
+        private readonly Dictionary<String, HashSet<AuthIdentification>> _WhiteLists;
 
         /// <summary>
         /// The authentication white lists.
         /// </summary>
         [InternalUseOnly]
-        public Dictionary<String, HashSet<AuthInfo>> WhiteLists
+        public Dictionary<String, HashSet<AuthIdentification>> WhiteLists
         {
             get
             {
@@ -256,7 +256,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The authentication white lists.
         /// </summary>
         [InternalUseOnly]
-        public HashSet<AuthInfo> DefaultWhiteList
+        public HashSet<AuthIdentification> DefaultWhiteList
         {
             get
             {
@@ -335,8 +335,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._StatusSchedule       = new StatusSchedule<ChargingStationStatusTypes>(MaxStatusListSize);
             this._StatusSchedule.Insert(InitialStatus);
 
-            this._WhiteLists           = new Dictionary<String, HashSet<AuthInfo>>();
-            _WhiteLists.Add("default", new HashSet<AuthInfo>());
+            this._WhiteLists           = new Dictionary<String, HashSet<AuthIdentification>>();
+            _WhiteLists.Add("default", new HashSet<AuthIdentification>());
 
             this._SelfCheckTimeSpan    = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
             this._SelfCheckTimer       = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
@@ -951,7 +951,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return ReservationResult.InvalidCredentials;
 
                 #endregion
@@ -1062,7 +1062,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return ReservationResult.InvalidCredentials;
 
                 #endregion
@@ -1367,7 +1367,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return RemoteStartEVSEResult.InvalidCredentials;
 
                 #endregion
@@ -1459,7 +1459,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return RemoteStartChargingStationResult.InvalidCredentials;
 
                 #endregion
@@ -1627,7 +1627,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return RemoteStopResult.InvalidCredentials(SessionId);
 
                 #endregion
@@ -1758,7 +1758,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return RemoteStopEVSEResult.InvalidCredentials(SessionId);
 
                 #endregion
@@ -1855,7 +1855,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthInfo.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
                     return RemoteStopChargingStationResult.InvalidCredentials(SessionId);
 
                 #endregion
@@ -1957,7 +1957,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region GetWhiteList(Name)
 
-        public HashSet<AuthInfo> GetWhiteList(String Name)
+        public HashSet<AuthIdentification> GetWhiteList(String Name)
 
             => _WhiteLists[Name];
 
