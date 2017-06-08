@@ -1994,11 +1994,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Unkown Token!
 
-            result = AuthStartResult.NotAuthorized(Id,
-                                                   this,
-                                                   ProviderId:   Id,
-                                                   SessionId:    SessionId,
-                                                   Description:  "Unkown token!");
+            else
+                result = AuthStartResult.NotAuthorized(Id,
+                                                       this,
+                                                       ProviderId:   Id,
+                                                       SessionId:    SessionId,
+                                                       Description:  "Unkown token!");
 
             #endregion
 
