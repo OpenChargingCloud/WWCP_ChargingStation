@@ -92,35 +92,37 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
         public ProxyChargingStation(ChargingStation                      ChargingStation,
-                                    TimeSpan?                            SelfCheckTimeSpan           = null,
-                                    UInt16                               MaxStatusListSize           = DefaultMaxStatusListSize,
-                                    UInt16                               MaxAdminStatusListSize      = DefaultMaxAdminStatusListSize,
-                                    IPTransport                          IPTransport                 = IPTransport.IPv4only,
-                                    DNSClient                            DNSClient                   = null,
-                                    String                               Hostname                    = DefaultHostname,
-                                    IPPort                               TCPPort                     = null,
-                                    String                               Service                     = null,
-                                    RemoteCertificateValidationCallback  RemoteCertificateValidator  = null,
-                                    X509Certificate                      ClientCert                  = null,
-                                    String                               VirtualHost                 = DefaultVirtualHost,
-                                    String                               URIPrefix                   = DefaultURIPrefix,
-                                    TimeSpan?                            RequestTimeout                = null)
+                                    TimeSpan?                            SelfCheckTimeSpan            = null,
+                                    UInt16                               MaxStatusListSize            = DefaultMaxStatusListSize,
+                                    UInt16                               MaxAdminStatusListSize       = DefaultMaxAdminStatusListSize,
+                                    IPTransport                          IPTransport                  = IPTransport.IPv4only,
+                                    DNSClient                            DNSClient                    = null,
+                                    String                               Hostname                     = DefaultHostname,
+                                    IPPort                               TCPPort                      = null,
+                                    String                               Service                      = null,
+                                    RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
+                                    LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
+                                    X509Certificate                      ClientCert                   = null,
+                                    String                               VirtualHost                  = DefaultVirtualHost,
+                                    String                               URIPrefix                    = DefaultURIPrefix,
+                                    TimeSpan?                            RequestTimeout               = null)
 
             : base(ChargingStation,
                    SelfCheckTimeSpan,
                    MaxStatusListSize,
                    MaxAdminStatusListSize,
                    IPTransport,
-                   DNSClient != null              ? DNSClient    : new DNSClient(SearchForIPv4DNSServers: true,
-                                                                                 SearchForIPv6DNSServers: false),
-                   Hostname.IsNotNullOrEmpty()    ? Hostname     : DefaultHostname,
-                   TCPPort   != null              ? TCPPort      : DefaultTCPPort,
+                   DNSClient != null              ? DNSClient      : new DNSClient(SearchForIPv4DNSServers: true,
+                                                                                   SearchForIPv6DNSServers: false),
+                   Hostname.IsNotNullOrEmpty()    ? Hostname       : DefaultHostname,
+                   TCPPort   != null              ? TCPPort        : DefaultTCPPort,
                    Service,
                    RemoteCertificateValidator,
+                   LocalCertificateSelector,
                    ClientCert,
-                   VirtualHost.IsNotNullOrEmpty() ? VirtualHost  : DefaultVirtualHost,
-                   URIPrefix.  IsNotNullOrEmpty() ? URIPrefix    : DefaultURIPrefix,
-                   RequestTimeout.HasValue          ? RequestTimeout : DefaultRequestTimeout)
+                   VirtualHost.IsNotNullOrEmpty() ? VirtualHost    : DefaultVirtualHost,
+                   URIPrefix.  IsNotNullOrEmpty() ? URIPrefix      : DefaultURIPrefix,
+                   RequestTimeout.HasValue        ? RequestTimeout : DefaultRequestTimeout)
 
         {
 
@@ -215,7 +217,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/EVSEStatus",
@@ -333,7 +337,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/Reservations",
@@ -489,7 +495,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation",
@@ -757,7 +765,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation",
@@ -1009,7 +1019,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/Reservations/" + ReservationId + "/Delete",
@@ -1124,7 +1136,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId).ToString() + "/RemoteStart",
@@ -1328,7 +1342,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/RemoteStop",
@@ -1462,7 +1478,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
                                                 RemoteCertificateValidator,
+                                                LocalCertificateSelector,
                                                 ClientCert,
+                                                RequestTimeout,
                                                 DNSClient).
 
                                      Execute(client => client.GET(URIPrefix + "/AuthLists/12345678",

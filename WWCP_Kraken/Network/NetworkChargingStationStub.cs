@@ -193,6 +193,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         public RemoteCertificateValidationCallback RemoteCertificateValidator { get; }
 
+        public LocalCertificateSelectionCallback LocalCertificateSelector { get; }
+
         public X509Certificate ClientCert { get; }
 
         #region VirtualHost
@@ -621,19 +623,20 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">A local charging station.</param>
         /// <param name="DNSClient">An optional DNS client used to resolve DNS names.</param>
         public NetworkChargingStationStub(ChargingStation                      ChargingStation,
-                                          TimeSpan?                            SelfCheckTimeSpan           = null,
-                                          UInt16                               MaxStatusListSize           = DefaultMaxStatusListSize,
-                                          UInt16                               MaxAdminStatusListSize      = DefaultMaxAdminStatusListSize,
-                                          IPTransport                          IPTransport                 = IPTransport.IPv4only,
-                                          DNSClient                            DNSClient                   = null,
-                                          String                               Hostname                    = null,
-                                          IPPort                               TCPPort                     = null,
-                                          String                               Service                     = null,
-                                          RemoteCertificateValidationCallback  RemoteCertificateValidator  = null,
-                                          X509Certificate                      ClientCert                  = null,
-                                          String                               VirtualHost                 = null,
-                                          String                               URIPrefix                   = null,
-                                          TimeSpan?                            RequestTimeout                = null)
+                                          TimeSpan?                            SelfCheckTimeSpan            = null,
+                                          UInt16                               MaxStatusListSize            = DefaultMaxStatusListSize,
+                                          UInt16                               MaxAdminStatusListSize       = DefaultMaxAdminStatusListSize,
+                                          IPTransport                          IPTransport                  = IPTransport.IPv4only,
+                                          DNSClient                            DNSClient                    = null,
+                                          String                               Hostname                     = null,
+                                          IPPort                               TCPPort                      = null,
+                                          String                               Service                      = null,
+                                          RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
+                                          LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
+                                          X509Certificate                      ClientCert                   = null,
+                                          String                               VirtualHost                  = null,
+                                          String                               URIPrefix                    = null,
+                                          TimeSpan?                            RequestTimeout               = null)
 
             : this(ChargingStation, MaxStatusListSize, MaxAdminStatusListSize)
 
@@ -646,6 +649,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._TCPPort                     = TCPPort;
             this._Service                     = Service;
             this.RemoteCertificateValidator   = RemoteCertificateValidator;
+            this.LocalCertificateSelector     = LocalCertificateSelector;
             this.ClientCert                   = ClientCert;
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
             this._URIPrefix                   = URIPrefix;
