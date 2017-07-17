@@ -56,7 +56,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public const           String    DefaultURIPrefix                = "/ext/BoschEBike";
         public const           String    HTTPLogin                       = "boschsi";
         public const           String    HTTPPassword                    = "fad/09q23w!rf";
-        public static readonly TimeSpan  DefaultRequestTimeout             = TimeSpan.FromSeconds(180);
+        public static readonly TimeSpan  DefaultRequestTimeout           = TimeSpan.FromSeconds(180);
+        public const           String    UserAgent                       = "GraphDefined OpenChargingCloud";
 
         private readonly Timer EVSEStatusImportTimer;
 
@@ -219,6 +220,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -339,6 +341,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -497,6 +500,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -767,6 +771,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -1021,6 +1026,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -1138,6 +1144,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -1344,6 +1351,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
@@ -1480,6 +1488,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
+                                                UserAgent,
                                                 RequestTimeout,
                                                 DNSClient).
 
