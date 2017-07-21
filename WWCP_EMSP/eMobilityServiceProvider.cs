@@ -2524,6 +2524,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
                 return AuthStopResult.InvalidSessionId(Id,
+                                                       this,
                                                        SessionId);
 
             #endregion
@@ -2542,12 +2543,14 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (AuthIdentification?.AuthToken != null &&
                         SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification?.AuthToken))
                         return AuthStopResult.Authorized(Id,
+                                                         this,
                                                          SessionId:   SessionId,
                                                          ProviderId:  Id);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopResult.NotAuthorized(Id,
+                                                            this,
                                                             SessionId:    SessionId,
                                                             ProviderId:   Id,
                                                             Description:  "Invalid token for given session identification!");
@@ -2560,6 +2563,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopResult.Blocked(Id,
+                                                  this,
                                                   SessionId:    SessionId,
                                                   ProviderId:   Id,
                                                   Description:  "Token is blocked!");
@@ -2570,6 +2574,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else
                     return AuthStopResult.Unspecified(Id,
+                                                      this,
                                                       SessionId);
 
                 #endregion
@@ -2579,6 +2584,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStopResult.NotAuthorized(Id,
+                                                this,
                                                 SessionId:    SessionId,
                                                 ProviderId:   Id,
                                                 Description:  "Unkown token!");
@@ -2633,6 +2639,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
                 return AuthStopEVSEResult.InvalidSessionId(Id,
+                                                           this,
                                                            SessionId);
 
             #endregion
@@ -2651,12 +2658,14 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (AuthIdentification.AuthToken != null &&
                         SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
                         return AuthStopEVSEResult.Authorized(Id,
+                                                             this,
                                                              SessionId:   SessionId,
                                                              ProviderId:  Id);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopEVSEResult.NotAuthorized(Id,
+                                                                this,
                                                                 SessionId:    SessionId,
                                                                 ProviderId:   Id,
                                                                 Description:  "Invalid token for given session identification!");
@@ -2669,6 +2678,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopEVSEResult.Blocked(Id,
+                                                      this,
                                                       SessionId:    SessionId,
                                                       ProviderId:   Id,
                                                       Description:  "Token is blocked!");
@@ -2679,6 +2689,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else
                     return AuthStopEVSEResult.Unspecified(Id,
+                                                          this,
                                                           SessionId);
 
                 #endregion
@@ -2688,6 +2699,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStopEVSEResult.NotAuthorized(Id,
+                                                    this,
                                                     SessionId:    SessionId,
                                                     ProviderId:   Id,
                                                     Description:  "Unkown token!");
@@ -2742,6 +2754,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
                 return AuthStopChargingStationResult.InvalidSessionId(Id,
+                                                                      this,
                                                                       SessionId);
 
             #endregion
@@ -2760,12 +2773,14 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (AuthIdentification.AuthToken != null &&
                         SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
                         return AuthStopChargingStationResult.Authorized(Id,
+                                                                        this,
                                                                         SessionId:   SessionId,
                                                                         ProviderId:  Id);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopChargingStationResult.NotAuthorized(Id,
+                                                                           this,
                                                                            SessionId:    SessionId,
                                                                            ProviderId:   Id,
                                                                            Description:  "Invalid token for given session identification!");
@@ -2778,6 +2793,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopChargingStationResult.Blocked(Id,
+                                                                 this,
                                                                  SessionId:    SessionId,
                                                                  ProviderId:   Id,
                                                                  Description:  "Token is blocked!");
@@ -2788,6 +2804,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else
                     return AuthStopChargingStationResult.Unspecified(Id,
+                                                                     this,
                                                                      SessionId);
 
                 #endregion
@@ -2797,6 +2814,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStopChargingStationResult.NotAuthorized(Id,
+                                                               this,
                                                                SessionId:    SessionId,
                                                                ProviderId:   Id,
                                                                Description:  "Unkown token!");
@@ -2851,6 +2869,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             if (!SessionDatabase.TryGetValue(SessionId, out SessionInfo))
                 return AuthStopChargingPoolResult.InvalidSessionId(Id,
+                                                                   this,
                                                                    SessionId);
 
             #endregion
@@ -2869,12 +2888,14 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (AuthIdentification.AuthToken != null &&
                         SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
                         return AuthStopChargingPoolResult.Authorized(Id,
+                                                                     this,
                                                                      SessionId:   SessionId,
                                                                      ProviderId:  Id);
 
                     // Invalid Token for SessionId!
                     else
                         return AuthStopChargingPoolResult.NotAuthorized(Id,
+                                                                        this,
                                                                         SessionId:    SessionId,
                                                                         ProviderId:   Id,
                                                                         Description:  "Invalid token for given session identification!");
@@ -2887,6 +2908,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else if (AuthenticationResult == TokenAuthorizationResultType.Blocked)
                     return AuthStopChargingPoolResult.Blocked(Id,
+                                                              this,
                                                               SessionId:    SessionId,
                                                               ProviderId:   Id,
                                                               Description:  "Token is blocked!");
@@ -2897,6 +2919,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                 else
                     return AuthStopChargingPoolResult.Unspecified(Id,
+                                                                  this,
                                                                   SessionId);
 
                 #endregion
@@ -2906,6 +2929,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #region Unkown Token!
 
             return AuthStopChargingPoolResult.NotAuthorized(Id,
+                                                            this,
                                                             SessionId:    SessionId,
                                                             ProviderId:   Id,
                                                             Description:  "Unkown token!");
