@@ -547,7 +547,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                            eMAId             != null
                                                                                                                ? new JProperty("eMAId",              eMAId.            ToString())
                                                                                                                : null,
-                                                                                                           AuthTokens.NotNullAny()
+                                                                                                           AuthTokens.IsNeitherNullNorEmpty()
                                                                                                                ? new JProperty("AuthorizedIds",
                                                                                                                      JSONObject.Create(
                                                                                                                          new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),
@@ -818,7 +818,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                            eMAId             != null
                                                                                                                ? new JProperty("eMAId",              eMAId.            ToString())
                                                                                                                : null,
-                                                                                                           AuthTokens.NotNullAny()
+                                                                                                           AuthTokens.IsNeitherNullNorEmpty()
                                                                                                                ? new JProperty("AuthorizedIds",
                                                                                                                      JSONObject.Create(
                                                                                                                          new JProperty("RFIDIds", new JArray(AuthTokens.SafeSelect(token => token.ToString()))),

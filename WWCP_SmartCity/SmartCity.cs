@@ -272,7 +272,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(EVSE                EVSE,
 
@@ -290,7 +290,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -307,7 +307,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(EVSE                EVSE,
 
@@ -325,7 +325,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -346,7 +346,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(EVSE                EVSE,
                                              String              PropertyName,
@@ -367,7 +367,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -384,7 +384,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(EVSE                EVSE,
 
@@ -402,7 +402,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -420,7 +420,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -438,7 +438,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -455,7 +455,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -473,7 +473,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -490,7 +490,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -508,7 +508,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -525,7 +525,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -543,7 +543,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -561,14 +561,14 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                           Timestamp,
-                                                CancellationToken?                  CancellationToken,
-                                                EventTracking_Id                    EventTrackingId,
-                                                TimeSpan?                           RequestTimeout)
+                                                  DateTime?                           Timestamp,
+                                                  CancellationToken?                  CancellationToken,
+                                                  EventTracking_Id                    EventTrackingId,
+                                                  TimeSpan?                           RequestTimeout)
 
         {
 
@@ -577,14 +577,9 @@ namespace org.GraphDefined.WWCP.SmartCity
             if (AdminStatusUpdates == null)
                 throw new ArgumentNullException(nameof(AdminStatusUpdates), "The given enumeration of EVSE admin status updates must not be null!");
 
-
-            PushStatusResult result;
-
             #endregion
 
-            result = new PushStatusResult(ResultTypes.NoOperation);
-
-            return result;
+            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -601,7 +596,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
 
@@ -617,14 +612,9 @@ namespace org.GraphDefined.WWCP.SmartCity
             if (StatusUpdates == null)
                 throw new ArgumentNullException(nameof(StatusUpdates), "The given enumeration of evse status updates must not be null!");
 
-
-            PushStatusResult result;
-
             #endregion
 
-            result = new PushStatusResult(ResultTypes.NoOperation);
-
-            return result;
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -645,7 +635,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingStation     ChargingStation,
 
@@ -663,7 +653,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -680,7 +670,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingStation     ChargingStation,
 
@@ -698,7 +688,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -718,7 +708,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
                                              String              PropertyName,
@@ -739,7 +729,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -756,7 +746,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
 
@@ -774,7 +764,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -792,7 +782,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -810,7 +800,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -827,7 +817,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -845,7 +835,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -862,7 +852,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -880,7 +870,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -897,7 +887,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -915,7 +905,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -933,18 +923,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                      Timestamp,
-                                                CancellationToken?                             CancellationToken,
-                                                EventTracking_Id                               EventTrackingId,
-                                                TimeSpan?                                      RequestTimeout)
+                                                  DateTime?                                      Timestamp,
+                                                  CancellationToken?                             CancellationToken,
+                                                  EventTracking_Id                               EventTrackingId,
+                                                  TimeSpan?                                      RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -961,7 +951,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
 
@@ -972,7 +962,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -993,7 +983,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingPool        ChargingPool,
 
@@ -1011,7 +1001,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1028,7 +1018,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingPool        ChargingPool,
 
@@ -1046,7 +1036,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1066,7 +1056,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingPool        ChargingPool,
                                              String              PropertyName,
@@ -1087,7 +1077,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1104,7 +1094,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingPool        ChargingPool,
 
@@ -1122,7 +1112,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1140,7 +1130,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1158,7 +1148,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1175,7 +1165,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1193,7 +1183,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1210,7 +1200,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1228,7 +1218,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1245,7 +1235,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1263,7 +1253,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1281,9 +1271,9 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
 
                                                 DateTime?                                   Timestamp,
                                                 CancellationToken?                          CancellationToken,
@@ -1292,7 +1282,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1309,7 +1299,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingPoolStatusUpdate>  StatusUpdates,
 
@@ -1320,7 +1310,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1341,7 +1331,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1359,7 +1349,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1376,7 +1366,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1394,7 +1384,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1411,7 +1401,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1429,7 +1419,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1446,7 +1436,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1464,7 +1454,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1482,7 +1472,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1500,7 +1490,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1517,7 +1507,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1535,7 +1525,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
 
         }
@@ -1553,7 +1543,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1571,7 +1561,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1588,7 +1578,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1606,7 +1596,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1625,9 +1615,9 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
 
                                                 DateTime?                                              Timestamp,
                                                 CancellationToken?                                     CancellationToken,
@@ -1636,7 +1626,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1654,7 +1644,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationOperatorStatusUpdate>  StatusUpdates,
 
@@ -1665,7 +1655,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1686,7 +1676,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1704,7 +1694,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1721,7 +1711,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1739,7 +1729,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1756,7 +1746,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1774,7 +1764,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1791,7 +1781,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1809,7 +1799,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1827,9 +1817,9 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
 
                                                 DateTime?                                     Timestamp,
                                                 CancellationToken?                            CancellationToken,
@@ -1838,7 +1828,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1855,18 +1845,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<RoamingNetworkStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                                Timestamp,
-                                           CancellationToken?                       CancellationToken,
-                                           EventTracking_Id                         EventTrackingId,
-                                           TimeSpan?                                RequestTimeout)
+                                        DateTime?                                Timestamp,
+                                        CancellationToken?                       CancellationToken,
+                                        EventTracking_Id                         EventTrackingId,
+                                        TimeSpan?                                RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1886,9 +1876,9 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="EVSE">An EVSE.</param>
         /// <param name="OldStatus">The old status of the EVSE.</param>
         /// <param name="NewStatus">The new status of the EVSE.</param>
-        public Task<WWCP.PushDataResult>
+        public Task<PushEVSEDataResult>
 
-            EnqueueEVSEStatusUpdate(EVSE                         EVSE,
+            EnqueueEVSEStatusUpdate(EVSE                          EVSE,
                                     Timestamped<EVSEStatusTypes>  OldStatus,
                                     Timestamped<EVSEStatusTypes>  NewStatus)
 
@@ -1901,7 +1891,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return Task.FromResult(new WWCP.PushDataResult(ResultTypes.True));
+            return Task.FromResult(PushEVSEDataResult.NoOperation(Id, this));
 
         }
 
@@ -1914,7 +1904,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// Enqueue the given EVSE data for a delayed upload.
         /// </summary>
         /// <param name="ChargingPool">A charging station.</param>
-        public Task<WWCP.PushDataResult>
+        public Task<PushEVSEDataResult>
 
             EnqueueChargingPoolDataUpdate(ChargingPool  ChargingPool,
                                           String        PropertyName,
@@ -1930,7 +1920,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return Task.FromResult(new WWCP.PushDataResult(ResultTypes.True));
+            return Task.FromResult(PushEVSEDataResult.NoOperation(Id, this));
 
         }
 
@@ -1942,7 +1932,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// Enqueue the given EVSE data for a delayed upload.
         /// </summary>
         /// <param name="ChargingStation">A charging station.</param>
-        public Task<WWCP.PushDataResult>
+        public Task<PushEVSEDataResult>
 
             EnqueueChargingStationDataUpdate(ChargingStation  ChargingStation,
                                              String           PropertyName,
@@ -1958,7 +1948,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return Task.FromResult(new WWCP.PushDataResult(ResultTypes.True));
+            return Task.FromResult(PushEVSEDataResult.NoOperation(Id, this));
 
         }
 

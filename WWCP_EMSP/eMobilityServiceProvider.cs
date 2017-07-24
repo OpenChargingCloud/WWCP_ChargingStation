@@ -272,14 +272,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(EVSE                EVSE,
 
-                                          DateTime?           Timestamp,
-                                          CancellationToken?  CancellationToken,
-                                          EventTracking_Id    EventTrackingId,
-                                          TimeSpan?           RequestTimeout)
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -290,7 +290,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushEVSEDataResult.NoOperation(Id, this));
 
         }
 
@@ -307,7 +307,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(EVSE                EVSE,
 
@@ -325,7 +325,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -346,7 +346,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(EVSE                EVSE,
                                              String              PropertyName,
@@ -367,7 +367,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -384,7 +384,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(EVSE                EVSE,
 
@@ -402,7 +402,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -420,7 +420,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -438,7 +438,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -455,7 +455,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -473,7 +473,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -490,7 +490,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -508,7 +508,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -525,7 +525,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
@@ -543,7 +543,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -561,30 +561,20 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                           Timestamp,
-                                                CancellationToken?                  CancellationToken,
-                                                EventTracking_Id                    EventTrackingId,
-                                                TimeSpan?                           RequestTimeout)
+                                                  DateTime?                           Timestamp,
+                                                  CancellationToken?                  CancellationToken,
+                                                  EventTracking_Id                    EventTrackingId,
+                                                  TimeSpan?                           RequestTimeout)
 
         {
 
-            #region Initial checks
-
-            if (AdminStatusUpdates == null)
-                throw new ArgumentNullException(nameof(AdminStatusUpdates), "The given enumeration of EVSE admin status updates must not be null!");
-
-
-            PushStatusResult result;
-
-            #endregion
-
-            result = new PushStatusResult(ResultTypes.NoOperation);
-
-            return result;
+            return Task.FromResult(PushAdminStatusResult.OutOfService(Id,
+                                                                      this,
+                                                                      AdminStatusUpdates));
 
         }
 
@@ -601,14 +591,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                      Timestamp,
-                                           CancellationToken?             CancellationToken,
-                                           EventTracking_Id               EventTrackingId,
-                                           TimeSpan?                      RequestTimeout)
+                                        DateTime?                      Timestamp,
+                                        CancellationToken?             CancellationToken,
+                                        EventTracking_Id               EventTrackingId,
+                                        TimeSpan?                      RequestTimeout)
 
         {
 
@@ -622,9 +612,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            result = new PushStatusResult(ResultTypes.NoOperation);
-
-            return result;
+            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
 
         }
 
@@ -645,7 +633,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingStation     ChargingStation,
 
@@ -663,7 +651,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -680,7 +668,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingStation     ChargingStation,
 
@@ -698,7 +686,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -718,7 +706,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
                                              String              PropertyName,
@@ -739,7 +727,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -756,7 +744,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
 
@@ -774,7 +762,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -792,7 +780,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -810,7 +798,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -827,7 +815,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -845,7 +833,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -862,7 +850,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -880,7 +868,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -897,7 +885,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
@@ -915,7 +903,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -933,18 +921,20 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                      Timestamp,
-                                                CancellationToken?                             CancellationToken,
-                                                EventTracking_Id                               EventTrackingId,
-                                                TimeSpan?                                      RequestTimeout)
+                                                  DateTime?                                      Timestamp,
+                                                  CancellationToken?                             CancellationToken,
+                                                  EventTracking_Id                               EventTrackingId,
+                                                  TimeSpan?                                      RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.OutOfService(Id,
+                                                                      this,
+                                                                      AdminStatusUpdates));
 
         }
 
@@ -965,14 +955,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                                 Timestamp,
-                                           CancellationToken?                        CancellationToken,
-                                           EventTracking_Id                          EventTrackingId,
-                                           TimeSpan?                                 RequestTimeout)
+                                        DateTime?                                 Timestamp,
+                                        CancellationToken?                        CancellationToken,
+                                        EventTracking_Id                          EventTrackingId,
+                                        TimeSpan?                                 RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return PushStatusResult.OutOfService(Id,
+                                                 this,
+                                                 StatusUpdates);
 
         }
 
@@ -993,7 +985,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingPool        ChargingPool,
 
@@ -1011,7 +1003,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1028,7 +1020,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingPool        ChargingPool,
 
@@ -1046,7 +1038,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1066,7 +1058,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingPool        ChargingPool,
                                              String              PropertyName,
@@ -1087,7 +1079,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1104,7 +1096,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingPool        ChargingPool,
 
@@ -1122,7 +1114,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1140,7 +1132,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1158,7 +1150,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1175,7 +1167,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1193,7 +1185,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1210,7 +1202,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1228,7 +1220,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1245,7 +1237,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
@@ -1263,7 +1255,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1281,18 +1273,20 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                   Timestamp,
-                                                CancellationToken?                          CancellationToken,
-                                                EventTracking_Id                            EventTrackingId,
-                                                TimeSpan?                                   RequestTimeout)
+                                                  DateTime?                                   Timestamp,
+                                                  CancellationToken?                          CancellationToken,
+                                                  EventTracking_Id                            EventTrackingId,
+                                                  TimeSpan?                                   RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.OutOfService(Id,
+                                                                      this,
+                                                                      AdminStatusUpdates));
 
         }
 
@@ -1320,7 +1314,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return PushStatusResult.NoOperation(Id, this);
 
         }
 
@@ -1341,7 +1335,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1359,7 +1353,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1376,7 +1370,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1394,7 +1388,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1411,7 +1405,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1429,7 +1423,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1446,7 +1440,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
 
@@ -1464,7 +1458,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1482,7 +1476,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1500,7 +1494,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1517,7 +1511,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1535,7 +1529,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
 
         }
@@ -1553,7 +1547,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1571,7 +1565,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1588,7 +1582,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
@@ -1606,7 +1600,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1625,18 +1619,20 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                              Timestamp,
-                                                CancellationToken?                                     CancellationToken,
-                                                EventTracking_Id                                       EventTrackingId,
-                                                TimeSpan?                                              RequestTimeout)
+                                                  DateTime?                                              Timestamp,
+                                                  CancellationToken?                                     CancellationToken,
+                                                  EventTracking_Id                                       EventTrackingId,
+                                                  TimeSpan?                                              RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.OutOfService(Id,
+                                                                      this,
+                                                                      AdminStatusUpdates));
 
         }
 
@@ -1665,7 +1661,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return PushStatusResult.NoOperation(Id, this);
 
         }
 
@@ -1686,7 +1682,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.SetStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1704,7 +1700,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1721,7 +1717,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1739,7 +1735,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1756,7 +1752,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1774,7 +1770,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1791,7 +1787,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushDataResult>
+        async Task<PushEVSEDataResult>
 
             IReceiveData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
 
@@ -1809,7 +1805,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return new PushDataResult(ResultTypes.NoOperation);
+            return PushEVSEDataResult.NoOperation(Id, this);
 
         }
 
@@ -1827,18 +1823,20 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushStatusResult>
+        Task<PushAdminStatusResult>
 
-            IReceiveStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
+            IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                     Timestamp,
-                                                CancellationToken?                            CancellationToken,
-                                                EventTracking_Id                              EventTrackingId,
-                                                TimeSpan?                                     RequestTimeout)
+                                                  DateTime?                                     Timestamp,
+                                                  CancellationToken?                            CancellationToken,
+                                                  EventTracking_Id                              EventTrackingId,
+                                                  TimeSpan?                                     RequestTimeout)
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return Task.FromResult(PushAdminStatusResult.OutOfService(Id,
+                                                                      this,
+                                                                      AdminStatusUpdates));
 
         }
 
@@ -1866,7 +1864,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         {
 
-            return new PushStatusResult(ResultTypes.NoOperation);
+            return PushStatusResult.NoOperation(Id, this);
 
         }
 
@@ -2953,14 +2951,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<SendCDRsResult>
+        Task<SendCDRsResult>
 
-            IRemoteSendChargeDetailRecords.SendChargeDetailRecords(IEnumerable<ChargeDetailRecord>  ChargeDetailRecords,
+            IReceiveChargeDetailRecords.SendChargeDetailRecords(IEnumerable<ChargeDetailRecord>  ChargeDetailRecords,
 
-                                                                   DateTime?                        Timestamp,
-                                                                   CancellationToken?               CancellationToken,
-                                                                   EventTracking_Id                 EventTrackingId,
-                                                                   TimeSpan?                        RequestTimeout)
+                                                                DateTime?                        Timestamp,
+                                                                CancellationToken?               CancellationToken,
+                                                                EventTracking_Id                 EventTrackingId,
+                                                                TimeSpan?                        RequestTimeout)
         {
 
             #region Initial checks
@@ -3017,7 +3015,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
             //};
 
-            return SendCDRsResult.InvalidSessionId(Id);
+            return Task.FromResult(SendCDRsResult.OutOfService(Id,
+                                                               this,
+                                                               ChargeDetailRecords));
 
         }
 
