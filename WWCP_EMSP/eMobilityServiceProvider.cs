@@ -1916,7 +1916,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeStartRequest event
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
 
             try
             {
@@ -2004,7 +2004,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeStartRequest event
 
-            var EndTime = DateTime.Now;
+            var EndTime = DateTime.UtcNow;
 
             try
             {
@@ -2083,7 +2083,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeEVSEStartRequest event
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
 
             try
             {
@@ -2102,6 +2102,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EVSEId,
                                                      ChargingProduct,
                                                      SessionId,
+                                                     new ISendAuthorizeStartStop[0],
                                                      RequestTimeout ?? RequestTimeout.Value))).
                                        ConfigureAwait(false);
 
@@ -2172,7 +2173,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeEVSEStartResponse event
 
-            var EndTime = DateTime.Now;
+            var EndTime = DateTime.UtcNow;
 
             try
             {
@@ -2191,6 +2192,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EVSEId,
                                                      ChargingProduct,
                                                      SessionId,
+                                                     new ISendAuthorizeStartStop[0],
                                                      RequestTimeout ?? RequestTimeout.Value,
                                                      result,
                                                      EndTime - StartTime))).
@@ -2252,7 +2254,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeChargingStationStartRequest event
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
 
             try
             {
@@ -2341,7 +2343,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnAuthorizeChargingStationStartResponse event
 
-            var EndTime = DateTime.Now;
+            var EndTime = DateTime.UtcNow;
 
             try
             {
@@ -3086,7 +3088,7 @@ namespace org.GraphDefined.WWCP.EMSP
             try
             {
 
-                OnReserveEVSERequest?.Invoke(DateTime.Now,
+                OnReserveEVSERequest?.Invoke(DateTime.UtcNow,
                                              Timestamp.Value,
                                              this,
                                              EventTrackingId,
@@ -3137,7 +3139,7 @@ namespace org.GraphDefined.WWCP.EMSP
             try
             {
 
-                OnReservedEVSEResponse?.Invoke(DateTime.Now,
+                OnReservedEVSEResponse?.Invoke(DateTime.UtcNow,
                                                Timestamp.Value,
                                                this,
                                                EventTrackingId,
@@ -3209,7 +3211,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             //var OnReservationCancelledLocal = OnReservationCancelled;
             //if (OnReservationCancelledLocal != null)
-            //    OnReservationCancelledLocal(DateTime.Now,
+            //    OnReservationCancelledLocal(DateTime.UtcNow,
             //                                this,
             //                                EventTracking_Id.New,
             //                                ReservationId,
@@ -3264,7 +3266,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnRemoteEVSEStartRequest event
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
 
             try
             {
@@ -3307,7 +3309,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnRemoteEVSEStartResponse event
 
-            var EndTime = DateTime.Now;
+            var EndTime = DateTime.UtcNow;
 
             try
             {
@@ -3384,7 +3386,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnRemoteEVSEStop event
 
-            var StartTime = DateTime.Now;
+            var StartTime = DateTime.UtcNow;
 
             try
             {
@@ -3424,7 +3426,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Send OnRemoteEVSEStopped event
 
-            var EndTime = DateTime.Now;
+            var EndTime = DateTime.UtcNow;
 
             try
             {
