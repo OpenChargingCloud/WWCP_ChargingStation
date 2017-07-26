@@ -448,7 +448,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
-        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="Identification">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -465,7 +465,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id?              eMAId               = null,
+                    AuthIdentification                Identification      = null,
                     ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -539,13 +539,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                                     ))
                                                                                                                : null,
                                                                                                            ReservationId     != null
-                                                                                                               ? new JProperty("ReservationId",      ReservationId.    ToString())
+                                                                                                               ? new JProperty("ReservationId",      ReservationId.                      ToString())
                                                                                                                : null,
                                                                                                            ProviderId        != null
-                                                                                                               ? new JProperty("ProviderId",         ProviderId.       ToString())
+                                                                                                               ? new JProperty("ProviderId",         ProviderId.                         ToString())
                                                                                                                : null,
-                                                                                                           eMAId             != null
-                                                                                                               ? new JProperty("eMAId",              eMAId.            ToString())
+                                                                                                           Identification?.RemoteIdentification != null
+                                                                                                               ? new JProperty("eMAId",              Identification.RemoteIdentification.ToString())
                                                                                                                : null,
                                                                                                            AuthTokens.IsNeitherNullNorEmpty()
                                                                                                                ? new JProperty("AuthorizedIds",
@@ -625,8 +625,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                          JSON["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(JSON["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                          ChargingReservationLevel.EVSE,
                                          ProviderId,
-                                         eMAId,
-                                         this.ChargingStation.Operator.RoamingNetwork,
+                                         Identification,
+                                         ChargingStation.Operator.RoamingNetwork,
                                          ChargingStationId:  Id,
                                          EVSEId:             EVSEId,
                                          AuthTokens:         AuthTokens,  // As it is not included in the HTTP response!
@@ -725,7 +725,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
-        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="Identification">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -741,7 +741,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id?              eMAId               = null,
+                    AuthIdentification                Identification      = null,
                     ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -810,13 +810,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                                     ))
                                                                                                                : null,
                                                                                                            ReservationId     != null
-                                                                                                               ? new JProperty("ReservationId",      ReservationId.    ToString())
+                                                                                                               ? new JProperty("ReservationId",      ReservationId.                      ToString())
                                                                                                                : null,
                                                                                                            ProviderId        != null
-                                                                                                               ? new JProperty("ProviderId",         ProviderId.       ToString())
+                                                                                                               ? new JProperty("ProviderId",         ProviderId.                         ToString())
                                                                                                                : null,
-                                                                                                           eMAId             != null
-                                                                                                               ? new JProperty("eMAId",              eMAId.            ToString())
+                                                                                                           Identification?.RemoteIdentification != null
+                                                                                                               ? new JProperty("eMAId",              Identification.RemoteIdentification.ToString())
                                                                                                                : null,
                                                                                                            AuthTokens.IsNeitherNullNorEmpty()
                                                                                                                ? new JProperty("AuthorizedIds",
@@ -897,8 +897,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                          JSON["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(JSON["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                          ChargingReservationLevel.ChargingStation,
                                          ProviderId,
-                                         eMAId,
-                                         this.ChargingStation.Operator.RoamingNetwork,
+                                         Identification,
+                                         ChargingStation.Operator.RoamingNetwork,
                                          EVSEId:             MapIncomingId(EVSE_Id.Parse(JSON["EVSEId"].Value<String>())),
                                          ChargingStationId:  Id,
                                          AuthTokens:         AuthTokens,  // As it is not included in the HTTP response!

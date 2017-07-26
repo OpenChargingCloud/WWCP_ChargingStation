@@ -877,7 +877,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                              StartTime,
                                                                              Duration,
                                                                              ReservationId,
-                                                                             eMAId,
+                                                                             eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null,
                                                                              ChargingProductId.HasValue    // of IntendedCharging
                                                                                  ? new ChargingProduct(ChargingProductId.Value)
                                                                                  : null,

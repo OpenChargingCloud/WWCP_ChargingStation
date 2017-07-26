@@ -902,7 +902,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
-        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="Identification">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -918,7 +918,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id?              eMAId               = null,
+                    AuthIdentification                Identification      = null,
                     ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -951,7 +951,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(Identification))
                     return ReservationResult.InvalidCredentials;
 
                 #endregion
@@ -970,7 +970,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                            Duration,
                                            ReservationId,
                                            ProviderId,
-                                           eMAId,
+                                           Identification,
                                            ChargingProduct,
                                            AuthTokens,
                                            eMAIds,
@@ -1009,7 +1009,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
         /// <param name="ProviderId">An optional unique identification of e-Mobility service provider.</param>
-        /// <param name="eMAId">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="Identification">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -1026,7 +1026,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     TimeSpan?                         Duration,
                     ChargingReservation_Id?           ReservationId       = null,
                     eMobilityProvider_Id?             ProviderId          = null,
-                    eMobilityAccount_Id?              eMAId               = null,
+                    AuthIdentification                Identification      = null,
                     ChargingProduct                   ChargingProduct     = null,
                     IEnumerable<Auth_Token>           AuthTokens          = null,
                     IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
@@ -1062,7 +1062,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 #region Check if the eMAId is on the white list
 
                 if (_UseWhiteLists &&
-                   !_WhiteLists["default"].Contains(AuthIdentification.FromRemoteIdentification(eMAId.Value)))
+                   !_WhiteLists["default"].Contains(Identification))
                     return ReservationResult.InvalidCredentials;
 
                 #endregion
@@ -1076,7 +1076,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                         Duration,
                                                         ReservationId,
                                                         ProviderId,
-                                                        eMAId,
+                                                        Identification,
                                                         ChargingProduct,
                                                         AuthTokens,
                                                         eMAIds,
