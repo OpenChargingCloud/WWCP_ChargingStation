@@ -39,8 +39,8 @@ namespace org.GraphDefined.WWCP
                                            I18NString                                    Description    = null,
                                            Action<eMobilityProvider>                     Configurator   = null,
                                            eMobilityProviderPriority                     Priority       = null,
-                                           eMobilityProviderAdminStatusType              AdminStatus    = eMobilityProviderAdminStatusType.Operational,
-                                           eMobilityProviderStatusType                   Status         = eMobilityProviderStatusType.Available,
+                                           eMobilityProviderAdminStatusTypes              AdminStatus    = eMobilityProviderAdminStatusTypes.Operational,
+                                           eMobilityProviderStatusTypes                   Status         = eMobilityProviderStatusTypes.Available,
                                            Action<eMobilityProvider>                     OnSuccess      = null,
                                            Action<RoamingNetwork, eMobilityProvider_Id>  OnError        = null)
 
