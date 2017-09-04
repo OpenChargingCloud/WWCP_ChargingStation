@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.WWCP.ChargingPools;
+using org.GraphDefined.Vanaheimr.Hermod;
 
 #endregion
 
@@ -884,8 +885,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                  TimeSpan?          RequestTimeout  = null)
 
             => _EVSEs.Select(evse => new EVSEStatus(evse.Id,
-                                                    evse.Status.Value,
-                                                    evse.Status.Timestamp));
+                                                    new Timestamped<EVSEStatusTypes>(
+                                                        evse.Status.Timestamp,
+                                                        evse.Status.Value
+                                                    )));
 
         #endregion
 

@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using org.GraphDefined.Vanaheimr.Illias;
 
 using org.GraphDefined.WWCP.ChargingStations;
+using org.GraphDefined.Vanaheimr.Hermod;
 
 #endregion
 
