@@ -307,14 +307,14 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        async Task<PushEVSEDataResult>
+        Task<PushEVSEDataResult>
 
             IReceiveData.AddStaticData(EVSE                EVSE,
 
-                                          DateTime?           Timestamp,
-                                          CancellationToken?  CancellationToken,
-                                          EventTracking_Id    EventTrackingId,
-                                          TimeSpan?           RequestTimeout)
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -325,7 +325,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #endregion
 
-            return PushEVSEDataResult.NoOperation(Id, this);
+            return Task.FromResult(PushEVSEDataResult.NoOperation(Id, this));
 
         }
 
@@ -349,14 +349,14 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(EVSE                EVSE,
-                                             String              PropertyName,
-                                             Object              OldValue,
-                                             Object              NewValue,
+                                          String              PropertyName,
+                                          Object              OldValue,
+                                          Object              NewValue,
 
-                                             DateTime?           Timestamp,
-                                             CancellationToken?  CancellationToken,
-                                             EventTracking_Id    EventTrackingId,
-                                             TimeSpan?           RequestTimeout)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
         {
 
@@ -424,10 +424,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
-                                          DateTime?           Timestamp,
-                                          CancellationToken?  CancellationToken,
-                                          EventTracking_Id    EventTrackingId,
-                                          TimeSpan?           RequestTimeout)
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -494,10 +494,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
-                                             DateTime?           Timestamp,
-                                             CancellationToken?  CancellationToken,
-                                             EventTracking_Id    EventTrackingId,
-                                             TimeSpan?           RequestTimeout)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
         {
 
@@ -529,10 +529,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
-                                             DateTime?           Timestamp,
-                                             CancellationToken?  CancellationToken,
-                                             EventTracking_Id    EventTrackingId,
-                                             TimeSpan?           RequestTimeout)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
         {
 
@@ -637,10 +637,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.SetStaticData(ChargingStation     ChargingStation,
 
-                                          DateTime?           Timestamp,
-                                          CancellationToken?  CancellationToken,
-                                          EventTracking_Id    EventTrackingId,
-                                          TimeSpan?           RequestTimeout)
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -672,10 +672,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.AddStaticData(ChargingStation     ChargingStation,
 
-                                          DateTime?           Timestamp,
-                                          CancellationToken?  CancellationToken,
-                                          EventTracking_Id    EventTrackingId,
-                                          TimeSpan?           RequestTimeout)
+                                       DateTime?           Timestamp,
+                                       CancellationToken?  CancellationToken,
+                                       EventTracking_Id    EventTrackingId,
+                                       TimeSpan?           RequestTimeout)
 
         {
 
@@ -709,14 +709,14 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<PushEVSEDataResult>
 
             IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
-                                             String              PropertyName,
-                                             Object              OldValue,
-                                             Object              NewValue,
+                                          String              PropertyName,
+                                          Object              OldValue,
+                                          Object              NewValue,
 
-                                             DateTime?           Timestamp,
-                                             CancellationToken?  CancellationToken,
-                                             EventTracking_Id    EventTrackingId,
-                                             TimeSpan?           RequestTimeout)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
         {
 
@@ -748,10 +748,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
             IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
 
-                                             DateTime?           Timestamp,
-                                             CancellationToken?  CancellationToken,
-                                             EventTracking_Id    EventTrackingId,
-                                             TimeSpan?           RequestTimeout)
+                                          DateTime?           Timestamp,
+                                          CancellationToken?  CancellationToken,
+                                          EventTracking_Id    EventTrackingId,
+                                          TimeSpan?           RequestTimeout)
 
         {
 
