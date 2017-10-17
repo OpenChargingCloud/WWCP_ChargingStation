@@ -1909,8 +1909,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (AuthIdentification  == null)
                 throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
 
-            TokenAuthorizationResultType AuthenticationResult;
-            AuthStartResult              result;
+            AuthStartResult result;
 
             #endregion
 
@@ -1946,7 +1945,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out TokenAuthorizationResultType AuthenticationResult))
             {
 
                 #region Authorized
