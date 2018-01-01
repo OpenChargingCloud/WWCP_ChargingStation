@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2014-2017, GaphDefined GmbH <achim.friedland@graphdefined.com>
+ * Copyright (c) 2014-2018, GaphDefined GmbH <achim.friedland@graphdefined.com>
  * This file is part of WWCP TypeScript Client <http://www.github.com/OpenCharingCloud/WWCP_TypedClient>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
