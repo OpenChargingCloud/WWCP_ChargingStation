@@ -561,7 +561,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushAdminStatusResult>
+        Task<PushEVSEAdminStatusResult>
 
             IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<EVSEAdminStatusUpdate>  AdminStatusUpdates,
 
@@ -579,7 +579,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushEVSEAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -596,7 +596,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushStatusResult>
+        Task<PushEVSEStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<EVSEStatusUpdate>  StatusUpdates,
 
@@ -614,7 +614,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
             #endregion
 
-            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushEVSEStatusResult.NoOperation(Id, this));
 
         }
 
@@ -923,7 +923,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushAdminStatusResult>
+        Task<PushChargingStationAdminStatusResult>
 
             IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationAdminStatusUpdate>  AdminStatusUpdates,
 
@@ -934,7 +934,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingStationAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -951,18 +951,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushStatusResult>
+        Task<PushChargingStationStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                                 Timestamp,
-                                           CancellationToken?                        CancellationToken,
-                                           EventTracking_Id                          EventTrackingId,
-                                           TimeSpan?                                 RequestTimeout)
+                                        DateTime?                                 Timestamp,
+                                        CancellationToken?                        CancellationToken,
+                                        EventTracking_Id                          EventTrackingId,
+                                        TimeSpan?                                 RequestTimeout)
 
         {
 
-            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingStationStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1271,18 +1271,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushAdminStatusResult>
+        Task<PushChargingPoolAdminStatusResult>
 
             IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingPoolAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                   Timestamp,
-                                                CancellationToken?                          CancellationToken,
-                                                EventTracking_Id                            EventTrackingId,
-                                                TimeSpan?                                   RequestTimeout)
+                                                  DateTime?                                   Timestamp,
+                                                  CancellationToken?                          CancellationToken,
+                                                  EventTracking_Id                            EventTrackingId,
+                                                  TimeSpan?                                   RequestTimeout)
 
         {
 
-            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingPoolAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1299,18 +1299,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushStatusResult>
+        Task<PushChargingPoolStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingPoolStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                              Timestamp,
-                                           CancellationToken?                     CancellationToken,
-                                           EventTracking_Id                       EventTrackingId,
-                                           TimeSpan?                              RequestTimeout)
+                                        DateTime?                              Timestamp,
+                                        CancellationToken?                     CancellationToken,
+                                        EventTracking_Id                       EventTrackingId,
+                                        TimeSpan?                              RequestTimeout)
 
         {
 
-            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingPoolStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1609,24 +1609,23 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// Update the given enumeration of charging station operator admin status updates.
         /// </summary>
         /// <param name="AdminStatusUpdates">An enumeration of charging station operator admin status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging station operator admin status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushAdminStatusResult>
+        Task<PushChargingStationOperatorAdminStatusResult>
 
             IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<ChargingStationOperatorAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                              Timestamp,
-                                                CancellationToken?                                     CancellationToken,
-                                                EventTracking_Id                                       EventTrackingId,
-                                                TimeSpan?                                              RequestTimeout)
+                                                  DateTime?                                              Timestamp,
+                                                  CancellationToken?                                     CancellationToken,
+                                                  EventTracking_Id                                       EventTrackingId,
+                                                  TimeSpan?                                              RequestTimeout)
 
         {
 
-            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingStationOperatorAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1638,24 +1637,23 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// Update the given enumeration of charging station operator status updates.
         /// </summary>
         /// <param name="StatusUpdates">An enumeration of charging station operator status updates.</param>
-        /// <param name="TransmissionType">Whether to send the charging station operator status updates directly or enqueue it for a while.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushStatusResult>
+        Task<PushChargingStationOperatorStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<ChargingStationOperatorStatusUpdate>  StatusUpdates,
 
-                                           DateTime?                                         Timestamp,
-                                           CancellationToken?                                CancellationToken,
-                                           EventTracking_Id                                  EventTrackingId,
-                                           TimeSpan?                                         RequestTimeout)
+                                        DateTime?                                         Timestamp,
+                                        CancellationToken?                                CancellationToken,
+                                        EventTracking_Id                                  EventTrackingId,
+                                        TimeSpan?                                         RequestTimeout)
 
         {
 
-            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushChargingStationOperatorStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1817,18 +1815,18 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushAdminStatusResult>
+        Task<PushRoamingNetworkAdminStatusResult>
 
             IReceiveAdminStatus.UpdateAdminStatus(IEnumerable<RoamingNetworkAdminStatusUpdate>  AdminStatusUpdates,
 
-                                                DateTime?                                     Timestamp,
-                                                CancellationToken?                            CancellationToken,
-                                                EventTracking_Id                              EventTrackingId,
-                                                TimeSpan?                                     RequestTimeout)
+                                                  DateTime?                                     Timestamp,
+                                                  CancellationToken?                            CancellationToken,
+                                                  EventTracking_Id                              EventTrackingId,
+                                                  TimeSpan?                                     RequestTimeout)
 
         {
 
-            return Task.FromResult(PushAdminStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushRoamingNetworkAdminStatusResult.NoOperation(Id, this));
 
         }
 
@@ -1845,7 +1843,7 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
         /// <param name="EventTrackingId">An optional event tracking identification for correlating this request with other events.</param>
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
-        Task<PushStatusResult>
+        Task<PushRoamingNetworkStatusResult>
 
             IReceiveStatus.UpdateStatus(IEnumerable<RoamingNetworkStatusUpdate>  StatusUpdates,
 
@@ -1856,7 +1854,7 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         {
 
-            return Task.FromResult(PushStatusResult.NoOperation(Id, this));
+            return Task.FromResult(PushRoamingNetworkStatusResult.NoOperation(Id, this));
 
         }
 
