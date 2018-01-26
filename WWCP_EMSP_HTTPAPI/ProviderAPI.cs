@@ -55,7 +55,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// The default HTTP server TCP port.
         /// </summary>
-        public static readonly IPPort           DefaultHTTPServerPort               = new IPPort(3200);
+        public static readonly IPPort           DefaultHTTPServerPort               = IPPort.Parse(3200);
 
         /// <summary>
         /// The default HTTP server URI prefix.
@@ -263,7 +263,7 @@ namespace org.GraphDefined.WWCP.EMSP
         public ProviderAPI(eMobilityServiceProvider          EMSP,
 
                            String                            HTTPServerName                    = DefaultHTTPServerName,
-                           IPPort                            HTTPServerPort                    = null,
+                           IPPort?                           HTTPServerPort                    = null,
                            HTTPHostname                      HTTPHostname                      = null,
                            String                            URIPrefix                         = DefaultURIPrefix,
 

@@ -54,7 +54,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                             IPTransport                               IPTransport                       = IPTransport.IPv4only,
                                                             DNSClient                                 DNSClient                         = null,
                                                             String                                    Hostname                          = ProxyChargingStation.DefaultHostname,
-                                                            IPPort                                    TCPPort                           = null,
+                                                            IPPort?                                   TCPPort                           = null,
                                                             String                                    Service                           = null,
                                                             RemoteCertificateValidationCallback       RemoteCertificateValidator        = null,
                                                             LocalCertificateSelectionCallback         LocalCertificateSelector          = null,

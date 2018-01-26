@@ -57,6 +57,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public static readonly TimeSpan  DefaultRequestTimeout  = TimeSpan.FromSeconds(180);
 
 
+        public static readonly IPPort DefaultTCPPort = IPPort.Parse(2348);
+
         /// <summary>
         /// The default time span between self checks.
         /// </summary>
@@ -629,7 +631,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           IPTransport                          IPTransport                  = IPTransport.IPv4only,
                                           DNSClient                            DNSClient                    = null,
                                           String                               Hostname                     = null,
-                                          IPPort                               TCPPort                      = null,
+                                          IPPort?                              TCPPort                      = null,
                                           String                               Service                      = null,
                                           RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
                                           LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
@@ -646,7 +648,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._DNSClient                   = DNSClient ?? new DNSClient(SearchForIPv4DNSServers: true,
                                                                            SearchForIPv6DNSServers: false);
             this._Hostname                    = Hostname;
-            this._TCPPort                     = TCPPort;
+            this._TCPPort                     = TCPPort ?? DefaultTCPPort;
             this._Service                     = Service;
             this.RemoteCertificateValidator   = RemoteCertificateValidator;
             this.LocalCertificateSelector     = LocalCertificateSelector;

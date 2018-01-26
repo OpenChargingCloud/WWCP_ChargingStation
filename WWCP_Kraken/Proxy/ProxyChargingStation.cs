@@ -51,7 +51,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #region Data
 
         public const           String    DefaultHostname                 = "ahzf.de";
-        public static readonly IPPort    DefaultTCPPort                  = new IPPort(3004);
+        public static readonly IPPort    DefaultTCPPort                  = IPPort.Parse(3004);
         public const           String    DefaultVirtualHost              = DefaultHostname;
         public const           String    DefaultURIPrefix                = "/ext/BoschEBike";
         public const           String    HTTPLogin                       = "boschsi";
@@ -99,7 +99,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     IPTransport                          IPTransport                  = IPTransport.IPv4only,
                                     DNSClient                            DNSClient                    = null,
                                     String                               Hostname                     = DefaultHostname,
-                                    IPPort                               TCPPort                      = null,
+                                    IPPort?                              TCPPort                      = null,
                                     String                               Service                      = null,
                                     RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
                                     LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
