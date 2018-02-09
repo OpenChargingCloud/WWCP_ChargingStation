@@ -53,7 +53,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public const           String    DefaultHostname                 = "ahzf.de";
         public static readonly IPPort    DefaultTCPPort                  = IPPort.Parse(3004);
         public const           String    DefaultVirtualHost              = DefaultHostname;
-        public const           String    DefaultURIPrefix                = "/ext/BoschEBike";
+        public static readonly HTTPURI   DefaultURIPrefix                = HTTPURI.Parse("/ext/BoschEBike");
         public const           String    HTTPLogin                       = "boschsi";
         public const           String    HTTPPassword                    = "fad/09q23w!rf";
         public static readonly TimeSpan  DefaultRequestTimeout           = TimeSpan.FromSeconds(180);
@@ -105,7 +105,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                     X509Certificate                      ClientCert                   = null,
                                     String                               VirtualHost                  = DefaultVirtualHost,
-                                    String                               URIPrefix                    = DefaultURIPrefix,
+                                    HTTPURI?                             URIPrefix                    = null,
                                     TimeSpan?                            RequestTimeout               = null)
 
             : base(ChargingStation,
@@ -122,7 +122,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                    LocalCertificateSelector,
                    ClientCert,
                    VirtualHost.IsNotNullOrEmpty() ? VirtualHost    : DefaultVirtualHost,
-                   URIPrefix.  IsNotNullOrEmpty() ? URIPrefix      : DefaultURIPrefix,
+                   URIPrefix ?? DefaultURIPrefix,
                    RequestTimeout.HasValue        ? RequestTimeout : DefaultRequestTimeout)
 
         {
@@ -506,7 +506,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RequestTimeout,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation",
+                                     Execute(client => client.POST(URIPrefix + ("/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation"),
 
                                                                    requestbuilder => {
                                                                        requestbuilder.Host           = VirtualHost;
@@ -777,7 +777,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RequestTimeout,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation",
+                                     Execute(client => client.POST(URIPrefix + ("/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation"),
 
                                                                    requestbuilder => {
                                                                        requestbuilder.Host           = VirtualHost;
@@ -1032,7 +1032,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RequestTimeout,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/Reservations/" + ReservationId + "/Delete",
+                                     Execute(client => client.POST(URIPrefix + ("/Reservations/" + ReservationId + "/Delete"),
 
                                                                      requestbuilder => {
                                                                          requestbuilder.Host           = VirtualHost;
@@ -1357,7 +1357,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                 RequestTimeout,
                                                 DNSClient).
 
-                                     Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId) + "/RemoteStop",
+                                     Execute(client => client.POST(URIPrefix + ("/EVSEs/" + MapOutgoingId(EVSEId) + "/RemoteStop"),
 
                                                                    requestbuilder => {
                                                                        requestbuilder.Host           = VirtualHost;

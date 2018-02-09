@@ -30,6 +30,7 @@ using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
 using System.Security.Cryptography.X509Certificates;
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 #endregion
 
@@ -63,6 +64,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// The default time span between self checks.
         /// </summary>
         public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(5);
+
+        private static readonly HTTPURI DefaultURIPrefix = HTTPURI.Parse("/");
 
         private Timer _SelfCheckTimer;
 
@@ -215,15 +218,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region URIPrefix
 
-        private readonly String _URIPrefix;
-
-        public String URIPrefix
-        {
-            get
-            {
-                return _URIPrefix;
-            }
-        }
+        public HTTPURI URIPrefix { get; }
 
         #endregion
 
@@ -637,7 +632,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                           X509Certificate                      ClientCert                   = null,
                                           String                               VirtualHost                  = null,
-                                          String                               URIPrefix                    = null,
+                                          HTTPURI?                             URIPrefix                    = null,
                                           TimeSpan?                            RequestTimeout               = null)
 
             : this(ChargingStation, MaxStatusListSize, MaxAdminStatusListSize)
@@ -654,8 +649,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this.LocalCertificateSelector     = LocalCertificateSelector;
             this.ClientCert                   = ClientCert;
             this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
-            this._URIPrefix                   = URIPrefix;
-            this._RequestTimeout                = RequestTimeout.HasValue          ? RequestTimeout.Value : DefaultRequestTimeout;
+            this.URIPrefix                    = URIPrefix ?? DefaultURIPrefix;
+            this._RequestTimeout              = RequestTimeout.HasValue          ? RequestTimeout.Value : DefaultRequestTimeout;
 
             this._SelfCheckTimeSpan           = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
             this._SelfCheckTimer              = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);

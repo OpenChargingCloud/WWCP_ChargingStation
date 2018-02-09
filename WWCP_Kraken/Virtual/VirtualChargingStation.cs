@@ -74,14 +74,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Properties
 
-        #region Id
+        //#region Id
 
-        /// <summary>
-        /// The unique identification of this virtual charging station.
-        /// </summary>
-        public ChargingStation_Id Id { get; }
+        ///// <summary>
+        ///// The unique identification of this virtual charging station.
+        ///// </summary>
+        //public ChargingStation_Id Id { get; }
 
-        #endregion
+        //#endregion
 
         #region Description
 

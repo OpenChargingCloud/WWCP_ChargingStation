@@ -60,7 +60,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// The default HTTP server URI prefix.
         /// </summary>
-        public const           String           DefaultURIPrefix                    = "/emsp";
+        public static readonly HTTPURI          DefaultURIPrefix                    = HTTPURI.Parse("/emsp");
 
         /// <summary>
         /// The default HTTP logfile.
@@ -99,7 +99,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// A common URI prefix for all URIs within this API.
         /// </summary>
-        public String                     URIPrefix       { get; }
+        public HTTPURI                    URIPrefix       { get; }
 
         /// <summary>
         /// The DNS resolver to use.
@@ -264,8 +264,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
                            String                            HTTPServerName                    = DefaultHTTPServerName,
                            IPPort?                           HTTPServerPort                    = null,
-                           HTTPHostname                      HTTPHostname                      = null,
-                           String                            URIPrefix                         = DefaultURIPrefix,
+                           HTTPHostname?                     HTTPHostname                      = null,
+                           HTTPURI?                          URIPrefix                         = null,
 
                            String                            ServerThreadName                  = null,
                            ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
@@ -295,7 +295,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                   DNSClient:                         DNSClient,
                                   Autostart:                         false),
                    HTTPHostname,
-                   URIPrefix)
+                   URIPrefix ?? DefaultURIPrefix)
 
         {
 
@@ -310,37 +310,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
         private ProviderAPI(eMobilityServiceProvider  EMSP,
                             HTTPServer                HTTPServer,
-                            HTTPHostname              HTTPHostname  = null,
-                            String                    URIPrefix     = "/")
+                            HTTPHostname?             Hostname  = null,
+                            HTTPURI?                  URIPrefix     = null)
         {
 
-            #region Initial checks
-
-            if (EMSP == null)
-                throw new ArgumentNullException(nameof(EMSP),        "The given e-mobility service provider must not be null!");
-
-            if (HTTPServer == null)
-                throw new ArgumentNullException(nameof(HTTPServer),  "The given HTTP server must not be null!");
-
-            if (URIPrefix.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(URIPrefix),   "The given URI prefix must not be null or empty!");
-
-            if (!URIPrefix.StartsWith("/", StringComparison.Ordinal))
-                URIPrefix = "/" + URIPrefix;
-
-            #endregion
-
-            #region Init data
-
-            this.EMSP          = EMSP;
-
-            this.HTTPServer    = HTTPServer;
-            this.HTTPHostname  = HTTPHostname ?? HTTPHostname.Any;
-            this.URIPrefix     = URIPrefix;
-
+            this.EMSP          = EMSP       ?? throw new ArgumentNullException(nameof(EMSP),       "The given e-mobility service provider must not be null!");
+            this.HTTPServer    = HTTPServer ?? throw new ArgumentNullException(nameof(HTTPServer), "The given HTTP server must not be null!");
+            this.HTTPHostname  = Hostname   ?? HTTPHostname.Any;
+            this.URIPrefix     = URIPrefix  ?? DefaultURIPrefix;
             this.DNSClient     = HTTPServer.DNSClient;
-
-            #endregion
 
             RegisterURITemplates();
 
@@ -358,12 +336,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// </summary>
         public static ProviderAPI AttachToHTTPAPI(eMobilityServiceProvider  EMSP,
                                                   HTTPServer                HTTPServer,
-                                                  HTTPHostname              HTTPHostname  = null,
-                                                  String                    URIPrefix     = "/")
+                                                  HTTPHostname?             Hostname   = null,
+                                                  HTTPURI?                  URIPrefix  = null)
 
             => new ProviderAPI(EMSP,
                                HTTPServer,
-                               HTTPHostname,
+                               Hostname,
                                URIPrefix);
 
         #endregion
@@ -904,7 +882,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                              AccessControlAllowOrigin   = "*",
                                                              AccessControlAllowMethods  = "POST",
                                                              AccessControlAllowHeaders  = "Content-Type, Accept, Authorization",
-                                                             Location                   = "~/ext/BoschEBike/Reservations/" + result.Reservation.Id.ToString(),
+                                                             Location                   = HTTPURI.Parse("~/ext/BoschEBike/Reservations/" + result.Reservation.Id.ToString()),
                                                              Connection                 = "close",
                                                              ContentType                = HTTPContentType.JSON_UTF8,
                                                              Content                    = JSONObject.Create(

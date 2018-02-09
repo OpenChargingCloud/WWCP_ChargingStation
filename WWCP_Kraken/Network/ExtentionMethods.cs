@@ -66,7 +66,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              RemoteCertificateValidationCallback       RemoteCertificateValidator         = null,
                                                              String                                    VirtualHost                        = null,
                                                              String                                    URIPrefix                          = null,
-                                                             TimeSpan?                                 QueryTimeout                       = null,
+                                                             TimeSpan?                                 RequestTimeout                       = null,
                                                              Action<NetworkChargingStationStub>        RemoteChargingStationConfigurator  = null,
                                                              Action<ChargingStation>                   OnSuccess                          = null,
                                                              Action<ChargingPool, ChargingStation_Id>  OnError                            = null)

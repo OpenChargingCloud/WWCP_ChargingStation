@@ -19,6 +19,7 @@
 
 using org.GraphDefined.Vanaheimr.Hermod;
 using org.GraphDefined.Vanaheimr.Hermod.DNS;
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 using System;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -60,8 +61,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                             LocalCertificateSelectionCallback         LocalCertificateSelector          = null,
                                                             X509Certificate                           ClientCert                        = null,
                                                             String                                    VirtualHost                       = ProxyChargingStation.DefaultVirtualHost,
-                                                            String                                    URIPrefix                         = ProxyChargingStation.DefaultURIPrefix,
-                                                            TimeSpan?                                 QueryTimeout                      = null,
+                                                            HTTPURI?                                  URIPrefix                         = null,
+                                                            TimeSpan?                                 RequestTimeout                      = null,
                                                             Action<ProxyChargingStation>              ProxyChargingStationConfigurator  = null,
                                                             Action<ChargingStation>                   OnSuccess                         = null,
                                                             Action<ChargingPool, ChargingStation_Id>  OnError                           = null)
@@ -91,8 +92,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                                        LocalCertificateSelector,
                                                                                                        ClientCert,
                                                                                                        VirtualHost,
-                                                                                                       URIPrefix,
-                                                                                                       QueryTimeout);
+                                                                                                       URIPrefix ?? ProxyChargingStation.DefaultURIPrefix,
+                                                                                                       RequestTimeout);
 
                                                           ProxyChargingStationConfigurator?.Invoke(remotestation);
 

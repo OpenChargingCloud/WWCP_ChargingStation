@@ -683,25 +683,25 @@ namespace org.GraphDefined.WWCP.ChargingPools
         /// <param name="EventTrackingId">An unique event tracking identification for correlating this request with other events.</param>
         /// <param name="ReservationId">The unique charging reservation identification.</param>
         /// <param name="Reason">A reason for this cancellation.</param>
-        /// <param name="QueryTimeout">An optional timeout for this request.</param>
+        /// <param name="RequestTimeout">An optional timeout for this request.</param>
         public async Task<CancelReservationResult> CancelReservation(DateTime                               Timestamp,
                                                                      CancellationToken                      CancellationToken,
                                                                      EventTracking_Id                       EventTrackingId,
                                                                      ChargingReservation_Id                 ReservationId,
                                                                      ChargingReservationCancellationReason  Reason,
-                                                                     TimeSpan?                              QueryTimeout  = null)
+                                                                     TimeSpan?                              RequestTimeout  = null)
         {
             throw new NotImplementedException();
         }
 
         #endregion
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, EVSE_Id EVSEId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
 
-        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? QueryTimeout = default(TimeSpan?))
+        public Task<ReservationResult> Reserve(DateTime Timestamp, CancellationToken CancellationToken, EventTracking_Id EventTrackingId, DateTime? StartTime, TimeSpan? Duration, ChargingReservation_Id? ReservationId = default(ChargingReservation_Id?), eMobilityProvider_Id? ProviderId = default(eMobilityProvider_Id?), ChargingProduct_Id? ChargingProductId = default(ChargingProduct_Id?), IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, TimeSpan? RequestTimeout = default(TimeSpan?))
         {
             throw new NotImplementedException();
         }
