@@ -457,18 +457,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Parse JSON  [mandatory]
 
-                                             JSONWrapper              JSON               = null;
-
-                                             eMobilityAccount_Id?     eMAId              = null;
-                                             ChargingReservation_Id?  ReservationId      = null;
                                              DateTime?                StartTime          = null;
                                              TimeSpan?                Duration           = null;
+                                             eMobilityAccount_Id      eMAId              = default(eMobilityAccount_Id);
+                                             ChargingReservation_Id?  ReservationId      = null;
 
                                              // IntendedCharging
                                              DateTime?                ChargingStartTime  = null;
                                              TimeSpan?                CharingDuration    = null;
                                              ChargingProduct_Id?      ChargingProductId  = null;
-                                             var                      Plug               = PlugTypes.Unspecified;
+                                             PlugTypes?               Plug               = null;
                                              var                      Consumption        = 0U;
 
                                              // AuthorizedIds
@@ -476,31 +474,23 @@ namespace org.GraphDefined.WWCP.EMSP
                                              var                      eMAIds             = new List<eMobilityAccount_Id>();
                                              var                      PINs               = new List<UInt32>();
 
-                                             if (Request.TryParseJObjectRequestBody(out JSON, out _HTTPResponse, AllowEmptyHTTPBody: true))
+                                             if (Request.TryParseJObjectRequestBody(out JObject JSON,
+                                                                                    out _HTTPResponse,
+                                                                                    AllowEmptyHTTPBody: true))
                                              {
-
-                                                 Object JSONToken;
 
                                                  #region Check StartTime            [optional]
 
-                                                 if (JSON.TryGetValue("StartTime", out JSONToken))
+                                                 if (JSON.ParseOptional("StartTime",
+                                                                        "Reservation start time",
+                                                                        HTTPServer.DefaultHTTPServerName,
+                                                                        out StartTime,
+                                                                        Request,
+                                                                        out _HTTPResponse))
                                                  {
 
-                                                     try
-                                                     {
-                                                         StartTime = (DateTime) JSONToken;
-                                                     }
-                                                     catch (Exception)
-                                                     {
-
-                                                        return SendEVSEReserved(
-                                                            new HTTPResponseBuilder(Request) {
-                                                                HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                ContentType     = HTTPContentType.JSON_UTF8,
-                                                                Content         = new JObject(new JProperty("description", "Invalid value for parameter 'StartTime'!")).ToUTF8Bytes()
-                                                            });
-
-                                                     }
+                                                     if (_HTTPResponse != null)
+                                                        return SendEVSEReserved(_HTTPResponse);
 
                                                      if (StartTime <= DateTime.Now)
                                                          return SendEVSEReserved(
@@ -516,24 +506,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check Duration             [optional]
 
-                                                 if (JSON.TryGetValue("Duration", out JSONToken))
+                                                 if (JSON.ParseOptional("Duration",
+                                                                        "Reservation duration",
+                                                                        HTTPServer.DefaultHTTPServerName,
+                                                                        out Duration,
+                                                                        Request,
+                                                                        out _HTTPResponse))
                                                  {
 
-                                                     try
-                                                     {
-                                                         Duration = TimeSpan.FromSeconds(Convert.ToUInt32(JSONToken));
-                                                     }
-                                                     catch (Exception)
-                                                     {
-
-                                                        return SendEVSEReserved(
-                                                            new HTTPResponseBuilder(Request) {
-                                                                HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                ContentType     = HTTPContentType.JSON_UTF8,
-                                                                Content         = new JObject(new JProperty("description", "Invalid value for parameter 'duration'!")).ToUTF8Bytes()
-                                                            });
-
-                                                     }
+                                                     if (_HTTPResponse != null)
+                                                         return SendEVSEReserved(_HTTPResponse);
 
                                                  }
 
@@ -541,32 +523,23 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ReservationId        [optional]
 
-                                                 if (!JSON.ParseOptionalN("ReservationId",
-                                                                          "Charging reservation identification",
-                                                                          HTTPServer.DefaultServerName,
-                                                                          ChargingReservation_Id.TryParse,
-                                                                          out ReservationId,
-                                                                          Request,
-                                                                          out _HTTPResponse))
+                                                 if (JSON.ParseOptionalN("ReservationId",
+                                                                         "Charging reservation identification",
+                                                                         HTTPServer.DefaultServerName,
+                                                                         ChargingReservation_Id.TryParse,
+                                                                         out ReservationId,
+                                                                         Request,
+                                                                         out _HTTPResponse))
+                                                 {
 
-                                                     return SendEVSEReserved(_HTTPResponse);
+                                                     if (_HTTPResponse != null)
+                                                         return SendEVSEReserved(_HTTPResponse);
 
-                                                 //if (JSON.TryGetValue("ReservationId", out JSONToken) &&
-                                                 //    !ChargingReservation_Id.TryParse(JSONToken.ToString(), out ReservationId))
-                                                 //{
-                                                 //
-                                                 //    return SendEVSEReserved(
-                                                 //        new HTTPResponseBuilder(Request) {
-                                                 //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                 //            ContentType     = HTTPContentType.JSON_UTF8,
-                                                 //            Content         = new JObject(new JProperty("description", "Invalid ReservationId!")).ToUTF8Bytes()
-                                                 //        });
-                                                 //
-                                                 //}
+                                                 }
 
                                                  #endregion
 
-                                                 #region Parse eMAId               [mandatory]
+                                                 #region Parse eMAId                [mandatory]
 
                                                  if (!JSON.ParseMandatory("eMAId",
                                                                           "e-Mobility account identification",
@@ -576,46 +549,36 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                           Request,
                                                                           out _HTTPResponse))
 
-                                                     return SendEVSERemoteStarted(_HTTPResponse);
+                                                     return SendEVSEReserved(_HTTPResponse);
 
                                                  #endregion
 
 
                                                  #region Check IntendedCharging     [optional] -> ...
 
-                                                 JSONWrapper IntendedChargingJSON = null;
-
-                                                 if (JSON.AsJSONObject("IntendedCharging", out IntendedChargingJSON))
+                                                 if (JSON.ParseOptional("IntendedCharging",
+                                                                        "IntendedCharging",
+                                                                        HTTPServer.DefaultServerName,
+                                                                        out JObject IntendedChargingJSON,
+                                                                        Request,
+                                                                        out _HTTPResponse))
                                                  {
 
-                                                     if (IntendedChargingJSON == null)
-                                                         return SendEVSEReserved(
-                                                             new HTTPResponseBuilder(Request) {
-                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                 ContentType     = HTTPContentType.JSON_UTF8,
-                                                                 Content         = new JObject(new JProperty("description", "Invalid IntendedCharging section!")).ToUTF8Bytes()
-                                                             });
+                                                     if (_HTTPResponse != null)
+                                                         return SendEVSEReserved(_HTTPResponse);
 
                                                      #region Check ChargingStartTime    [optional]
 
-                                                     if (IntendedChargingJSON.TryGetValue("StartTime", out JSONToken))
+                                                     if (IntendedChargingJSON.ParseOptional("StartTime",
+                                                                                            "IntendedCharging/StartTime",
+                                                                                            HTTPServer.DefaultServerName,
+                                                                                            out ChargingStartTime,
+                                                                                            Request,
+                                                                                            out _HTTPResponse))
                                                      {
 
-                                                         try
-                                                         {
-                                                             ChargingStartTime = (DateTime) JSONToken;
-                                                         }
-                                                         catch (Exception)
-                                                         {
-
-                                                            return SendEVSEReserved(
-                                                                new HTTPResponseBuilder(Request) {
-                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                    ContentType     = HTTPContentType.JSON_UTF8,
-                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/StartTime!")).ToUTF8Bytes()
-                                                                });
-
-                                                         }
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
                                                      }
 
@@ -623,24 +586,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check Duration             [optional]
 
-                                                     if (IntendedChargingJSON.TryGetValue("Duration", out JSONToken))
+                                                     if (IntendedChargingJSON.ParseOptional("Duration",
+                                                                                            "IntendedCharging/Duration",
+                                                                                            HTTPServer.DefaultServerName,
+                                                                                            out CharingDuration,
+                                                                                            Request,
+                                                                                            out _HTTPResponse))
                                                      {
 
-                                                         try
-                                                         {
-                                                             CharingDuration = TimeSpan.FromSeconds(Convert.ToUInt32(JSONToken));
-                                                         }
-                                                         catch (Exception)
-                                                         {
-
-                                                            return SendEVSEReserved(
-                                                                new HTTPResponseBuilder(Request) {
-                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                    ContentType     = HTTPContentType.JSON_UTF8,
-                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Duration!")).ToUTF8Bytes()
-                                                                });
-
-                                                         }
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
                                                      }
 
@@ -648,43 +603,34 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check ChargingProductId    [optional]
 
-                                                     if (!JSON.ParseOptionalN("ChargingProductId",
-                                                                              "Charging product identification",
-                                                                              HTTPServer.DefaultServerName,
-                                                                              ChargingProduct_Id.TryParse,
-                                                                              out ChargingProductId,
-                                                                              Request,
-                                                                              out _HTTPResponse))
+                                                     if (JSON.ParseOptionalN("ChargingProductId",
+                                                                             "Charging product identification",
+                                                                             HTTPServer.DefaultServerName,
+                                                                             ChargingProduct_Id.TryParse,
+                                                                             out ChargingProductId,
+                                                                             Request,
+                                                                             out _HTTPResponse))
+                                                     {
 
-                                                         return SendEVSEReserved(_HTTPResponse);
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
-                                                     //if (JSON.TryGetValue("ChargingProductId", out JSONToken) &&
-                                                     //    !ChargingProduct_Id.TryParse(JSONToken.ToString(), out ChargingProductId))
-                                                     //{
-                                                     //
-                                                     //    return SendEVSEReserved(
-                                                     //        new HTTPResponseBuilder(Request) {
-                                                     //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                     //            ContentType     = HTTPContentType.JSON_UTF8,
-                                                     //            Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/ChargingProductId!")).ToUTF8Bytes()
-                                                     //        });
-                                                     //
-                                                     //}
+                                                     }
 
                                                      #endregion
 
                                                      #region Check Plug                 [optional]
 
-                                                     if (IntendedChargingJSON.TryGetValue("Plug", out JSONToken) &&
-                                                         !Enum.TryParse<PlugTypes>(JSONToken.ToString(), out Plug))
+                                                     if (IntendedChargingJSON.ParseOptional("Plug",
+                                                                                            "IntendedCharging/Plug",
+                                                                                            HTTPServer.DefaultServerName,
+                                                                                            out Plug,
+                                                                                            Request,
+                                                                                            out _HTTPResponse))
                                                      {
 
-                                                         return SendEVSEReserved(
-                                                             new HTTPResponseBuilder(Request) {
-                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                 ContentType     = HTTPContentType.JSON_UTF8,
-                                                                 Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Plug!")).ToUTF8Bytes()
-                                                             });
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
                                                      }
 
@@ -692,24 +638,17 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check Consumption          [optional, kWh]
 
-                                                     if (IntendedChargingJSON.TryGetValue("Consumption", out JSONToken))
+                                                     if (IntendedChargingJSON.ParseOptional("Consumption",
+                                                                                            "IntendedCharging/Consumption",
+                                                                                            HTTPServer.DefaultServerName,
+                                                                                            UInt32.Parse,
+                                                                                            out Consumption,
+                                                                                            Request,
+                                                                                            out _HTTPResponse))
                                                      {
 
-                                                         try
-                                                         {
-                                                             Consumption = Convert.ToUInt32(JSONToken);
-        }
-                                                         catch (Exception)
-                                                         {
-
-                                                            return SendEVSEReserved(
-                                                                new HTTPResponseBuilder(Request) {
-                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                    ContentType     = HTTPContentType.JSON_UTF8,
-                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Consumption!")).ToUTF8Bytes()
-                                                                });
-
-                                                         }
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
                                                      }
 
@@ -721,40 +660,28 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check AuthorizedIds        [optional] -> ...
 
-                                                 JSONWrapper AuthorizedIdsJSON = null;
-
-                                                 if (JSON.AsJSONObject("AuthorizedIds", out AuthorizedIdsJSON))
+                                                 if (JSON.ParseOptional("AuthorizedIds",
+                                                                        "AuthorizedIds",
+                                                                        HTTPServer.DefaultServerName,
+                                                                        out JObject AuthorizedIdsJSON,
+                                                                        Request,
+                                                                        out _HTTPResponse))
                                                  {
-
-                                                     if (AuthorizedIdsJSON == null)
-                                                         return SendEVSEReserved(
-                                                             new HTTPResponseBuilder(Request) {
-                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                 ContentType     = HTTPContentType.JSON_UTF8,
-                                                                 Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds section!")).ToUTF8Bytes()
-                                                             });
 
                                                      #region Check RFIDIds      [optional]
 
-                                                     if (AuthorizedIdsJSON.TryGetValue("RFIDIds", out JSONToken))
+                                                     if (AuthorizedIdsJSON.ParseOptional("RFIDIds",
+                                                                                         "RFIDIds",
+                                                                                         HTTPServer.DefaultServerName,
+                                                                                         out JArray AuthTokensJSON,
+                                                                                         Request,
+                                                                                         out _HTTPResponse))
                                                      {
-
-                                                         var AuthTokensJSON = JSONToken as JArray;
-
-                                                         if (AuthTokensJSON == null)
-                                                             return SendEVSEReserved(
-                                                                 new HTTPResponseBuilder(Request) {
-                                                                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                     ContentType     = HTTPContentType.JSON_UTF8,
-                                                                     Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/RFIDIds section!")).ToUTF8Bytes()
-                                                                 });
 
                                                          foreach (var jtoken in AuthTokensJSON)
                                                          {
 
-                                                             Auth_Token AuthToken = null;
-
-                                                             if (!Auth_Token.TryParse(jtoken.Value<String>(), out AuthToken))
+                                                             if (!Auth_Token.TryParse(jtoken.Value<String>(), out Auth_Token AuthToken))
                                                                  return SendEVSEReserved(
                                                                      new HTTPResponseBuilder(Request) {
                                                                          HTTPStatusCode  = HTTPStatusCode.BadRequest,
@@ -772,23 +699,21 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check eMAIds       [optional]
 
-                                                     if (AuthorizedIdsJSON.TryGetValue("eMAIds", out JSONToken))
+                                                     if (AuthorizedIdsJSON.ParseOptional("eMAIds",
+                                                                                         "AuthorizedIds/eMAIds",
+                                                                                         HTTPServer.DefaultServerName,
+                                                                                         out JArray eMAIdsJSON,
+                                                                                         Request,
+                                                                                         out _HTTPResponse))
                                                      {
 
-                                                         var eMAIdsJSON = JSONToken as JArray;
+                                                         if (_HTTPResponse != null)
+                                                             return SendEVSEReserved(_HTTPResponse);
 
-                                                         if (eMAIdsJSON == null)
-                                                             return SendEVSEReserved(
-                                                                 new HTTPResponseBuilder(Request) {
-                                                                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
-                                                                     ContentType     = HTTPContentType.JSON_UTF8,
-                                                                     Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/eMAIds section!")).ToUTF8Bytes()
-                                                                 });
+                                                         eMobilityAccount_Id? eMAId2 = null;
 
                                                          foreach (var jtoken in eMAIdsJSON)
                                                          {
-
-                                                             eMobilityAccount_Id? eMAId2 = null;
 
                                                              if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMAId2))
                                                                  return SendEVSEReserved(
@@ -855,7 +780,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                              StartTime,
                                                                              Duration,
                                                                              ReservationId,
-                                                                             eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null,
+                                                                             AuthIdentification.FromRemoteIdentification(eMAId),
                                                                              ChargingProductId.HasValue    // of IntendedCharging
                                                                                  ? new ChargingProduct(ChargingProductId.Value)
                                                                                  : null,
@@ -1136,13 +1061,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Parse JSON  [mandatory]
 
-                                             JSONWrapper              JSON               = null;
                                              ChargingProduct_Id?      ChargingProductId  = null;
                                              ChargingReservation_Id?  ReservationId      = null;
                                              ChargingSession_Id       SessionId          = default(ChargingSession_Id);
-                                             eMobilityAccount_Id?     eMAId              = null;
+                                             eMobilityAccount_Id      eMAId;
 
-                                             if (!Request.TryParseJObjectRequestBody(out JSON,
+                                             if (!Request.TryParseJObjectRequestBody(out JObject JSON,
                                                                                      out _HTTPResponse,
                                                                                      AllowEmptyHTTPBody: false))
 
@@ -1426,11 +1350,10 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Parse JSON  [mandatory]
 
-                                             JSONWrapper           JSON       = null;
                                              ChargingSession_Id    SessionId  = default(ChargingSession_Id);
                                              eMobilityAccount_Id?  eMAId      = null;
 
-                                             if (!Request.TryParseJObjectRequestBody(out JSON,
+                                             if (!Request.TryParseJObjectRequestBody(out JObject JSON,
                                                                                      out _HTTPResponse,
                                                                                      AllowEmptyHTTPBody: false))
 
@@ -1452,7 +1375,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Parse eMAId              [optional]
 
-                                                 if (!JSON.ParseOptional("eMAId",
+                                                 if (!JSON.ParseOptionalN("eMAId",
                                                                           "e-Mobility account identification",
                                                                           HTTPServer.DefaultServerName,
                                                                           eMobilityAccount_Id.TryParse,
