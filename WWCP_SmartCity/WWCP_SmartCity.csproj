@@ -80,21 +80,9 @@
     <None Include="HTTPRoot\css\EVSEStatus.scss" />
     <None Include="HTTPRoot\css\Infotext.scss" />
     <None Include="HTTPRoot\css\styles.scss" />
-    <EmbeddedResource Include="HTTPRoot\fonts\fontawesome-webfont.eot" />
-    <EmbeddedResource Include="HTTPRoot\fonts\fontawesome-webfont.ttf" />
-    <EmbeddedResource Include="HTTPRoot\fonts\fontawesome-webfont.woff" />
-    <EmbeddedResource Include="HTTPRoot\fonts\fontawesome-webfont.woff2" />
-    <EmbeddedResource Include="HTTPRoot\fonts\FontAwesome.otf" />
     <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.js.map" />
     <None Include="HTTPRoot\HTTPWorker\tsconfig.json" />
-    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js.map" />
-    <None Include="HTTPRoot\js\tsconfig.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="HTTPRoot\css\font-awesome.css" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="HTTPRoot\css\font-awesome.min.css" />
+    <None Include="tsconfig.json" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HTTPRoot\css\styles.css">
@@ -105,24 +93,13 @@
     <Content Include="HTTPRoot\css\styles.min.css">
       <DependentUpon>styles.css</DependentUpon>
     </Content>
+    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js">
+      <DependentUpon>CreateMap.ts</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js.map">
+      <DependentUpon>CreateMap.ts</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="HTTPRoot\robots.txt" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\Semicircle.js" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\sample-geojson.js" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\MarkerCluster.Default.css" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\MarkerCluster.css" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\leaflet.markercluster-src.js" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\leaflet.js" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\leaflet.css" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\L.Control.Locate.min.js" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\L.Control.Locate.min.css" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\index.html" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging3.png" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging2.png" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging-yellow.png" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging-red.png" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging-green.png" />
-    <EmbeddedResource Include="HTTPRoot\leaflet\images\e-charging-blue.png" />
-    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js" />
     <EmbeddedResource Include="HTTPRoot\index.html" />
     <EmbeddedResource Include="HTTPRoot\images\Ladestecker\Typ_3A.svg" />
     <EmbeddedResource Include="HTTPRoot\images\Ladestecker\T23.svg" />
@@ -139,7 +116,6 @@
     <EmbeddedResource Include="HTTPRoot\images\clouds-bg.jpg" />
     <EmbeddedResource Include="HTTPRoot\humans.txt" />
     <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.js" />
-    <EmbeddedResource Include="HTTPRoot\fonts\fontawesome-webfont.svg" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.ts" />
@@ -152,12 +128,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="HTTPRoot\js\WWCPClient.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="HTTPRoot\js\WWCPDatatypes.ts" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="HTTPRoot\js\WWCPEntities.ts" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="HTTPRoot\libs\" />
