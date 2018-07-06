@@ -854,7 +854,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         // Will do: Status = EVSEStatusType.Reserved
                         // Will do: Send OnNewReservation event!
-                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.GetString(25)),
+                        this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.RandomString(25)),
                                                                    Timestamp:               Timestamp.Value,
                                                                    StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
                                                                    Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,

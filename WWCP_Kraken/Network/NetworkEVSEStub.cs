@@ -919,7 +919,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 case EVSEStatusTypes.Available:
 
-                    this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.GetString(25)),
+                    this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.RandomString(25)),
                                                                 Timestamp:               Timestamp.Value,
                                                                 StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
                                                                 Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
