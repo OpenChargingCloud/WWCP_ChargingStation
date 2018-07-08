@@ -912,7 +912,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var Now           = DateTime.Now;
+            var Now           = DateTime.UtcNow;
             var _NetworkEVSE  = new NetworkEVSEStub(EVSEId, this);
 
             Configurator?.Invoke(_NetworkEVSE);
@@ -1081,7 +1081,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         protected internal void SendNewReservation(ChargingReservation Reservation)
         {
 
-            OnNewReservation?.Invoke(DateTime.Now,
+            OnNewReservation?.Invoke(DateTime.UtcNow,
                                      this,
                                      Reservation);
 
@@ -1216,7 +1216,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         protected internal void SendNewChargingSession(ChargingSession ChargingSession)
         {
 
-            OnNewChargingSession?.Invoke(DateTime.Now,
+            OnNewChargingSession?.Invoke(DateTime.UtcNow,
                                          this,
                                          ChargingSession);
 

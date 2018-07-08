@@ -64,7 +64,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         public static readonly TimeSpan ReservationSelfCancelAfter  = TimeSpan.FromSeconds(10);
 
-        private static readonly Random _random = new Random(DateTime.Now.Millisecond);
+        private static readonly Random _random = new Random(DateTime.UtcNow.Millisecond);
 
         #endregion
 
@@ -298,27 +298,27 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region PointOfDelivery // MeterId
+        #region EnergyMeterId
 
-        private String _PointOfDelivery;
+        private EnergyMeter_Id? _EnergyMeterId;
 
         /// <summary>
-        /// Point of delivery or meter identification.
+        /// The energy meter identification.
         /// </summary>
         [Optional]
-        public String PointOfDelivery
+        public EnergyMeter_Id? EnergyMeterId
         {
 
             get
             {
-                return _PointOfDelivery;
+                return _EnergyMeterId;
             }
 
             set
             {
 
-                if (_PointOfDelivery != value)
-                    SetProperty<String>(ref _PointOfDelivery, value);
+                if (_EnergyMeterId != value)
+                    SetProperty<EnergyMeter_Id?>(ref _EnergyMeterId, value);
 
             }
 
@@ -819,7 +819,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusTypes.Reserved);
 
-                        OnNewReservation?.Invoke(DateTime.Now, this, _Reservation);
+                        OnNewReservation?.Invoke(DateTime.UtcNow, this, _Reservation);
 
                     }
 
@@ -921,9 +921,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     this._Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.RandomString(25)),
                                                                 Timestamp:               Timestamp.Value,
-                                                                StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
+                                                                StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.UtcNow,
                                                                 Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
-                                                                EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.UtcNow) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                 ConsumedReservationTime: TimeSpan.FromSeconds(0),
                                                                 ReservationLevel:        ChargingReservationLevel.EVSE,
                                                                 ProviderId:              ProviderId,
@@ -1023,7 +1023,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                          Reason,
                                                          SavedReservation);
 
-            OnReservationCancelled?.Invoke(DateTime.Now,
+            OnReservationCancelled?.Invoke(DateTime.UtcNow,
                                            Timestamp.Value,
                                            this,
                                            EventTrackingId,
@@ -1081,7 +1081,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         var OnNewChargingSessionLocal = OnNewChargingSession;
                         if (OnNewChargingSessionLocal != null)
-                            OnNewChargingSessionLocal(DateTime.Now, this, _ChargingSession);
+                            OnNewChargingSessionLocal(DateTime.UtcNow, this, _ChargingSession);
 
                     }
 

@@ -23,9 +23,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
+using Org.BouncyCastle.Bcpg.OpenPgp;
+
 using org.GraphDefined.Vanaheimr.Illias;
-using org.GraphDefined.Vanaheimr.Illias.Votes;
-using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.Vanaheimr.Hermod;
 
 #endregion
@@ -62,7 +62,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         public  static readonly TimeSpan MaxReservationDuration  = TimeSpan.FromMinutes(15);
 
-        private static readonly Random   _random                 = new Random(DateTime.Now.Millisecond);
+        private static readonly Random   _random                 = new Random(DateTime.UtcNow.Millisecond);
 
         #endregion
 
@@ -300,33 +300,41 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region PointOfDelivery // MeterId
+        #region EnergyMeterId
 
-        private String _PointOfDelivery;
+        private EnergyMeter_Id? _EnergyMeterId;
 
         /// <summary>
-        /// Point of delivery or meter identification.
+        /// The energy meter identification.
         /// </summary>
         [Optional]
-        public String PointOfDelivery
+        public EnergyMeter_Id? EnergyMeterId
         {
 
             get
             {
-                return _PointOfDelivery;
+                return _EnergyMeterId;
             }
 
             set
             {
 
-                if (_PointOfDelivery != value)
-                    SetProperty<String>(ref _PointOfDelivery, value);
+                if (value != null)
+                    SetProperty(ref _EnergyMeterId, value);
+
+                else
+                    DeleteProperty(ref _EnergyMeterId);
 
             }
 
         }
 
         #endregion
+
+
+        public PgpSecretKeyRingBundle SecretKeys   { get; set; }
+        public PgpPublicKeyRingBundle PublicKeys   { get; set; }
+        public String                 Passphrase   { get; set; }
 
 
         #region SocketOutlets
@@ -510,6 +518,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="MaxStatusListSize">The maximum size of the EVSE status list.</param>
         internal VirtualEVSE(EVSE_Id                 Id,
                              VirtualChargingStation  ChargingStation,
+                             EnergyMeter_Id          EnergyMeterId,
                              EVSEAdminStatusTypes    InitialAdminStatus      = EVSEAdminStatusTypes.Operational,
                              EVSEStatusTypes         InitialStatus           = EVSEStatusTypes.Available,
                              UInt16                  MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize,
@@ -519,20 +528,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            #region Initial checks
-
-            if (ChargingStation == null)
-                throw new ArgumentNullException(nameof(ChargingStation), "The charging station must not be null!");
-
-            #endregion
-
             #region Init data and properties
 
-            this._ChargingStation       = ChargingStation;
+            this._ChargingStation       = ChargingStation ?? throw new ArgumentNullException(nameof(ChargingStation), "The charging station must not be null!");
 
             this._Description           = new I18NString();
             this._ChargingModes         = new ReactiveSet<ChargingModes>();
             this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
+
+            this.EnergyMeterId          = EnergyMeterId;
 
             this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxAdminStatusListSize);
             this._AdminStatusSchedule.Insert(InitialAdminStatus);
@@ -811,7 +815,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                     Timestamp.Value,
                                                                     OldReservation.StartTime,
                                                                     Duration. HasValue  ? Duration. Value : MaxReservationDuration,
-                                                                    (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                    (StartTime.HasValue ? StartTime.Value : DateTime.UtcNow) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                     OldReservation.ConsumedReservationTime + OldReservation.Duration - OldReservation.TimeLeft,
                                                                     ReservationLevel,
                                                                     ProviderId,
@@ -825,7 +829,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                     eMAIds,
                                                                     PINs);
 
-                        OnNewReservation?.Invoke(DateTime.Now, this, _Reservation);
+                        OnNewReservation?.Invoke(DateTime.UtcNow, this, _Reservation);
 
                         return ReservationResult.Success(_Reservation);
 
@@ -856,9 +860,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         // Will do: Send OnNewReservation event!
                         this.Reservation = new ChargingReservation(ReservationId:           ReservationId ?? ChargingReservation_Id.Parse(OperatorId, _random.RandomString(25)),
                                                                    Timestamp:               Timestamp.Value,
-                                                                   StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.Now,
+                                                                   StartTime:               StartTime. HasValue ? StartTime.Value : DateTime.UtcNow,
                                                                    Duration:                Duration.  HasValue ? Duration. Value : MaxReservationDuration,
-                                                                   EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                   EndTime:                 (StartTime.HasValue ? StartTime.Value : DateTime.UtcNow) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
                                                                    ConsumedReservationTime: TimeSpan.FromSeconds(0),
                                                                    ReservationLevel:        ReservationLevel,
                                                                    ProviderId:              ProviderId,
@@ -927,7 +931,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusTypes.Reserved);
 
-                        OnNewReservation?.Invoke(DateTime.Now,
+                        OnNewReservation?.Invoke(DateTime.UtcNow,
                                                  this,
                                                  _Reservation);
 
@@ -940,8 +944,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusTypes.Available);
 
-                        //OnReservationCancelled?.Invoke(DateTime.Now,
-                        //                               DateTime.Now,
+                        //OnReservationCancelled?.Invoke(DateTime.UtcNow,
+                        //                               DateTime.UtcNow,
                         //                               this,
                         //                               EventTracking_Id.New,
                         //                               RoamingNetworkId,
@@ -1029,10 +1033,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                          Reason,
                                                          SavedReservation);
 
-            OnReservationCancelled?.Invoke(DateTime.Now,
+            OnReservationCancelled?.Invoke(DateTime.UtcNow,
                                            Timestamp.HasValue
                                                ? Timestamp.Value
-                                               : DateTime.Now,
+                                               : DateTime.UtcNow,
                                            this,
                                            EventTrackingId,
                                            new RoamingNetwork_Id?(),
@@ -1169,14 +1173,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         // Will also set the status -> EVSEStatusType.Charging!
                         ChargingSession = new ChargingSession(SessionId.Value) {
-                                                                 EventTrackingId    = EventTrackingId,
-                                                                 Reservation        = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
-                                                                 ReservationId      = ReservationId,
-                                                                 EVSEId             = Id,
-                                                                 ChargingProduct    = ChargingProduct,
-                                                                 ProviderIdStart    = ProviderId,
-                                                                 eMAIdStart         = eMAId
-                                                             };
+                                              EventTrackingId      = EventTrackingId,
+                                              Reservation          = Reservation != null && Reservation.Id == ReservationId ? Reservation : null,
+                                              ReservationId        = ReservationId,
+                                              EVSEId               = Id,
+                                              ChargingProduct      = ChargingProduct,
+                                              ProviderIdStart      = ProviderId,
+                                              IdentificationStart  = eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null,
+                                          };
 
                         return RemoteStartEVSEResult.Success(_ChargingSession);
 
@@ -1206,13 +1210,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         Reservation.AddToConsumedReservationTime(Reservation.Duration - Reservation.TimeLeft);
 
                         // Will also set the status -> EVSEStatusType.Charging;
-                        ChargingSession = new ChargingSession(SessionId.Value) {
-                                                                 EventTrackingId  = EventTrackingId,
-                                                                 Reservation      = Reservation,
-                                                                 ProviderIdStart  = ProviderId,
-                                                                 eMAIdStart       = eMAId,
-                                                                 EVSEId           = Id,
-                                                                 ChargingProduct  = ChargingProduct
+                        ChargingSession  = new ChargingSession(SessionId.Value) {
+                                                               EventTrackingId      = EventTrackingId,
+                                                               Reservation          = Reservation,
+                                                               ProviderIdStart      = ProviderId,
+                                                               IdentificationStart  = eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null,
+                                                               EVSEId               = Id,
+                                                               ChargingProduct      = ChargingProduct
                         };
 
 
@@ -1298,7 +1302,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         SetStatus(EVSEStatusTypes.Charging);
 
-                        OnNewChargingSession?.Invoke(DateTime.Now, this, _ChargingSession);
+                        OnNewChargingSession?.Invoke(DateTime.UtcNow, this, _ChargingSession);
 
                     }
 
@@ -1380,37 +1384,53 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         if (ChargingSession.Id == SessionId)
                         {
 
-                            var Now = DateTime.Now;
+                            var Now                  = DateTime.UtcNow;
+                            var Duration             = Now - _ChargingSession.SessionTime.StartTime;
+                            var Consumption          = (Single) Math.Round(Duration.TotalHours * MaxPower, 2);
 
-                            var _ChargeDetailRecord = new ChargeDetailRecord(SessionId:                 _ChargingSession.Id,
-                                                                             Reservation:               _ChargingSession.Reservation,
-                                                                             EVSEId:                    _ChargingSession.EVSEId,
-                                                                             EVSE:                      _ChargingSession.EVSE,
-                                                                             ChargingStation:           _ChargingSession.EVSE?.ChargingStation,
-                                                                             ChargingPool:              _ChargingSession.EVSE?.ChargingStation?.ChargingPool,
-                                                                             ChargingStationOperator:   _ChargingSession.EVSE?.Operator,
-                                                                             ChargingProduct:           _ChargingSession.ChargingProduct,
-                                                                             ProviderIdStart:           _ChargingSession.ProviderIdStart,
-                                                                             ProviderIdStop:            _ChargingSession.ProviderIdStop,
-                                                                             SessionTime:               new StartEndDateTime(_ChargingSession.SessionTime.Value.StartTime, Now),
+                            var _ChargeDetailRecord  = new ChargeDetailRecord(SessionId:                 _ChargingSession.Id,
+                                                                              Reservation:               _ChargingSession.Reservation,
+                                                                              EVSEId:                    _ChargingSession.EVSEId,
+                                                                              EVSE:                      _ChargingSession.EVSE,
+                                                                              ChargingStation:           _ChargingSession.EVSE?.ChargingStation,
+                                                                              ChargingPool:              _ChargingSession.EVSE?.ChargingStation?.ChargingPool,
+                                                                              ChargingStationOperator:   _ChargingSession.EVSE?.Operator,
+                                                                              ChargingProduct:           _ChargingSession.ChargingProduct,
+                                                                                ProviderIdStart:           _ChargingSession.ProviderIdStart,
+                                                                                ProviderIdStop:            _ChargingSession.ProviderIdStop,
+                                                                              SessionTime:               _ChargingSession.SessionTime,
 
-                                                                             IdentificationStart:       _ChargingSession.eMAIdStart.HasValue
-                                                                                                            ? AuthIdentification.FromRemoteIdentification(_ChargingSession.eMAIdStart.Value)
-                                                                                                            : _ChargingSession.AuthTokenStart != null
-                                                                                                                ? AuthIdentification.FromAuthToken(_ChargingSession.AuthTokenStart)
-                                                                                                                : null,
+                                                                                IdentificationStart:       _ChargingSession.IdentificationStart,
+                                                                                IdentificationStop:        _ChargingSession.IdentificationStop,
 
-                                                                             IdentificationStop:        eMAId.HasValue
-                                                                                                            ? AuthIdentification.FromRemoteIdentification(eMAId.Value)
-                                                                                                            : null,
+                                                                              EnergyMeterId:             EnergyMeter_Id.Parse("default"),
+                                                                              EnergyMeteringValues:      new Timestamped<Single>[] {
+                                                                                                             new Timestamped<Single>(_ChargingSession.SessionTime.StartTime,           0),
+                                                                                                             new Timestamped<Single>(Now,                                    Consumption)
+                                                                                                         },
+                                                                              SignedMeteringValues:      new SignedMeteringValue[] {
 
-                                                                             EnergyMeterId:             EnergyMeter_Id.Parse("default"),
-                                                                             EnergyMeteringValues:      new List<Timestamped<Single>>() {
-                                                                                                            new Timestamped<Single>(_ChargingSession.SessionTime.Value.StartTime,   0),
-                                                                                                            new Timestamped<Single>(Now,                                          100)
-                                                                                                        }
+                                                                                                             new SignedMeteringValue(_ChargingSession.SessionTime.StartTime,
+                                                                                                                                     0,
+                                                                                                                                     EnergyMeterId.Value,
+                                                                                                                                     Id,
+                                                                                                                                     _ChargingSession.IdentificationStart,
+                                                                                                                                     PublicKeys.First().First()).
+                                                                                                                 Sign(SecretKeys.First().First(),
+                                                                                                                      Passphrase),
 
-                                                                            );
+                                                                                                             new SignedMeteringValue(Now,
+                                                                                                                                     Consumption,
+                                                                                                                                     EnergyMeterId.Value,
+                                                                                                                                     Id,
+                                                                                                                                     _ChargingSession.IdentificationStart,
+                                                                                                                                     PublicKeys.First().First()).
+                                                                                                                 Sign(SecretKeys.First().First(),
+                                                                                                                      Passphrase),
+
+                                                                                                         }
+
+                                                                             );
 
                             // Will do: Status = EVSEStatusType.Available
                             ChargingSession = null;
@@ -1431,9 +1451,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                             }
 
 
-                            OnNewChargeDetailRecord?.Invoke(DateTime.Now, this, _ChargeDetailRecord);
+                            OnNewChargeDetailRecord?.Invoke(DateTime.UtcNow,
+                                                            this,
+                                                            _ChargeDetailRecord);
 
-                            return RemoteStopEVSEResult.Success(_ChargeDetailRecord, null, ReservationHandling);
+                            return RemoteStopEVSEResult.Success(_ChargeDetailRecord,
+                                                                _ChargingSession.Reservation?.Id,
+                                                                ReservationHandling);
 
                         }
 

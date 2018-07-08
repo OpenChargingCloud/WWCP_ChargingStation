@@ -98,6 +98,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OnError">An optional delegate for reporting an error.</param>
         public static EVSE CreateVirtualEVSE(this ChargingStation              ChargingStation,
                                              EVSE_Id                           EVSEId,
+                                             EnergyMeter_Id                    EnergyMeterId,
                                              EVSEAdminStatusTypes              InitialAdminStatus        = EVSEAdminStatusTypes.Operational,
                                              EVSEStatusTypes                   InitialStatus             = EVSEStatusTypes.Available,
                                              UInt16                            MaxAdminStatusListSize    = VirtualEVSE.DefaultMaxAdminStatusListSize,
@@ -121,6 +122,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                                                   var virtualevse = new VirtualEVSE(newevse.Id,
                                                                                     ChargingStation.RemoteChargingStation as VirtualChargingStation,
+                                                                                    EnergyMeterId,
                                                                                     InitialAdminStatus,
                                                                                     InitialStatus,
                                                                                     MaxAdminStatusListSize,

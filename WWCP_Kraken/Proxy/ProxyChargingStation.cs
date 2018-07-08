@@ -134,7 +134,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             _RemoteWhiteList = new HashSet<AuthIdentification>();
 
             // Will put the results into _RemoteWhiteList!
-            GetWhiteList(DateTime.Now, new CancellationTokenSource().Token, EventTracking_Id.New).Wait();
+            GetWhiteList(DateTime.UtcNow, new CancellationTokenSource().Token, EventTracking_Id.New).Wait();
 
             #endregion
 
@@ -153,7 +153,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                 try
                 {
 
-                    var EVSEStatus = GetEVSEStatus(DateTime.Now,
+                    var EVSEStatus = GetEVSEStatus(DateTime.UtcNow,
                                                    new CancellationTokenSource().Token,
                                                    EventTracking_Id.New).Result;
 
@@ -402,10 +402,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     return _JSONArray.AsEnumerable().Select(jsonarray =>
                                    new ChargingReservation(
                                        ChargingReservation_Id.Parse(jsonarray["ReservationId"].Value<String>()),
-                                       DateTime.Now,
+                                       DateTime.UtcNow,
                                        jsonarray["StartTime"].Value<DateTime>(),
                                        TimeSpan.FromSeconds(jsonarray["Duration"].Value<Int32>()),
-                                       DateTime.Now + TimeSpan.FromSeconds(jsonarray["Duration"].Value<Int32>()),
+                                       DateTime.UtcNow + TimeSpan.FromSeconds(jsonarray["Duration"].Value<Int32>()),
                                        jsonarray["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(jsonarray["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                        ChargingReservationLevel.EVSE,
                                        eMobilityProvider_Id.Parse("DE*GEF"),
@@ -419,10 +419,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
                     return new ChargingReservation[] {
                                    new ChargingReservation(
                                        ChargingReservation_Id.Parse(_JSONObject["ReservationId"].Value<String>()),
-                                       DateTime.Now,
+                                       DateTime.UtcNow,
                                        _JSONObject["StartTime"].Value<DateTime>(),
                                        TimeSpan.FromSeconds(_JSONObject["Duration"].Value<Int32>()),
-                                       DateTime.Now + TimeSpan.FromSeconds(_JSONObject["Duration"].Value<Int32>()),
+                                       DateTime.UtcNow + TimeSpan.FromSeconds(_JSONObject["Duration"].Value<Int32>()),
                                        _JSONObject["ConsumedReservationTime"] != null ? TimeSpan.FromSeconds(_JSONObject["ConsumedReservationTime"].Value<UInt32>()) : TimeSpan.FromSeconds(0),
                                        ChargingReservationLevel.EVSE,
                                        eMobilityProvider_Id.Parse("DE*GEF"),
@@ -568,7 +568,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_ReserveEVSE.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -580,7 +580,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_ReserveEVSE.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -620,7 +620,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 var NewReservation = new ChargingReservation(
                                          ChargingReservation_Id.Parse(JSON["ReservationId"].Value<String>()),
-                                         DateTime.Now,
+                                         DateTime.UtcNow,
                                          JSON["StartTime"].Value<DateTime>(),
                                          TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
                                          JSON["StartTime"].Value<DateTime>() + TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
@@ -839,7 +839,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ReserveChargingStation.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -851,7 +851,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ReserveChargingStation.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -892,7 +892,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 var NewReservation = new ChargingReservation(
                                          ChargingReservation_Id.Parse(JSON["ReservationId"].Value<String>()),
-                                         DateTime.Now,
+                                         DateTime.UtcNow,
                                          JSON["StartTime"].Value<DateTime>(),
                                          TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
                                          JSON["StartTime"].Value<DateTime>() + TimeSpan.FromSeconds(JSON["Duration"].Value<Int32>()),
@@ -1049,7 +1049,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_CancelReservation.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1062,7 +1062,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_CancelReservation.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -1205,7 +1205,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_RemoteStartEVSE.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1217,7 +1217,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_RemoteStartEVSE.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -1239,12 +1239,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
             {
 
                 var NewSession = new ChargingSession(ChargingSession_Id.Parse(JSON["SessionId"].Value<String>())) {
-                                     EVSEId             = EVSEId,
-                                     ChargingProduct    = ChargingProduct,
-                                     ReservationId      = ReservationId,
-                                     ProviderIdStart         = ProviderId,
-                                     eMAIdStart         = eMAId,
-                                     SessionTime        = StartEndDateTime.Now
+                                     EVSEId               = EVSEId,
+                                     ChargingProduct      = ChargingProduct,
+                                     ReservationId        = ReservationId,
+                                     ProviderIdStart      = ProviderId,
+                                     IdentificationStart  = eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null
                                  };
 
                 SendNewChargingSession(NewSession);
@@ -1387,7 +1386,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_RemoteStopEVSE.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1399,7 +1398,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + EVSEId.ToString().Replace("*", "_") + "_RemoteStopEVSE.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -1611,7 +1610,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ADDToWhiteList.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1623,7 +1622,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_ADDToWhiteList.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -1821,7 +1820,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                 using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_REMOVEFromWhiteList.log"))
                 {
-                    logfile.WriteLine(DateTime.Now);
+                    logfile.WriteLine(DateTime.UtcNow);
                     logfile.WriteLine("--------------------------------------------------------------------------------");
                     logfile.WriteLine("timeout...");
                     logfile.WriteLine("--------------------------------------------------------------------------------");
@@ -1833,7 +1832,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             using (var logfile = File.AppendText("BoschEBike_2lemonage_" + Id.ToString().Replace("*", "_") + "_REMOVEFromWhiteList.log"))
             {
-                logfile.WriteLine(DateTime.Now);
+                logfile.WriteLine(DateTime.UtcNow);
                 logfile.WriteLine(response.HTTPRequest.EntirePDU);
                 logfile.WriteLine("--------------------------------------------------------------------------------");
                 logfile.WriteLine(response.EntirePDU);
@@ -1958,7 +1957,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            var CurrentWhiteList = await GetWhiteList(DateTime.Now,
+            var CurrentWhiteList = await GetWhiteList(DateTime.UtcNow,
                                                       CancellationToken,
                                                       EventTrackingId,
                                                       RequestTimeout);
@@ -1973,7 +1972,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                       ToArray();
 
             var Removed = ToRemove.Any()
-                              ? await REMOVEFromWhiteList(DateTime.Now,
+                              ? await REMOVEFromWhiteList(DateTime.UtcNow,
                                                           CancellationToken,
                                                           EventTrackingId,
                                                           ToRemove.Where(item => item.AuthToken             != null).Select(item => item.AuthToken),
@@ -1982,7 +1981,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                               : new AuthInfoStatus[0];
 
             var Inserted = ToInsert.Any()
-                              ? await ADDToWhiteList(DateTime.Now,
+                              ? await ADDToWhiteList(DateTime.UtcNow,
                                                      CancellationToken,
                                                      EventTrackingId,
                                                      ToInsert.Where(item => item.AuthToken             != null).Select(item => item.AuthToken),

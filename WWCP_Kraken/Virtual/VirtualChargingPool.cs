@@ -321,7 +321,7 @@ namespace org.GraphDefined.WWCP.ChargingPools
 
             #endregion
 
-            var Now           = DateTime.Now;
+            var Now           = DateTime.UtcNow;
             var _VirtualStation  = new VirtualChargingStation(ChargingStationId,
                                                               this,
                                                               InitialAdminStatus,

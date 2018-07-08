@@ -617,6 +617,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OnSuccess">An optional delegate called after successful creation of the EVSE.</param>
         /// <param name="OnError">An optional delegate for signaling errors.</param>
         public VirtualEVSE CreateVirtualEVSE(EVSE_Id                       EVSEId,
+                                             EnergyMeter_Id                EnergyMeterId,
                                              EVSEAdminStatusTypes          InitialAdminStatus       = EVSEAdminStatusTypes.Operational,
                                              EVSEStatusTypes               InitialStatus            = EVSEStatusTypes.Available,
                                              UInt16                        MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
@@ -639,9 +640,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            var Now           = DateTime.Now;
+            var Now           = DateTime.UtcNow;
             var _VirtualEVSE  = new VirtualEVSE(EVSEId,
                                                 this,
+                                                EnergyMeterId,
                                                 InitialAdminStatus,
                                                 InitialStatus,
                                                 MaxAdminStatusListSize,
@@ -937,7 +939,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1045,7 +1047,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1204,7 +1206,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1350,7 +1352,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1444,7 +1446,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1612,7 +1614,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1740,7 +1742,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
@@ -1840,7 +1842,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Initial checks
 
             if (!Timestamp.HasValue)
-                Timestamp = DateTime.Now;
+                Timestamp = DateTime.UtcNow;
 
             if (!CancellationToken.HasValue)
                 CancellationToken = new CancellationTokenSource().Token;
