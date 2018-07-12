@@ -451,7 +451,7 @@
 //                                             {
 
 //                                                 return SendEVSERemoteStarted(
-//                                                     new HTTPResponseBuilder(Request) {
+//                                                     new HTTPResponse.Builder(Request) {
 //                                                         HTTPStatusCode   = HTTPStatusCode.Unauthorized,
 //                                                         WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
 //                                                         Server           = HTTPServer.DefaultServerName,
@@ -516,7 +516,7 @@
 //                                                     {
 
 //                                                        return SendEVSEReserved(
-//                                                            new HTTPResponseBuilder(Request) {
+//                                                            new HTTPResponse.Builder(Request) {
 //                                                                HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                Content         = new JObject(new JProperty("description", "Invalid value for parameter 'StartTime'!")).ToUTF8Bytes()
@@ -526,7 +526,7 @@
 
 //                                                     if (StartTime <= DateTime.Now)
 //                                                         return SendEVSEReserved(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                 ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                 Content         = new JObject(new JProperty("description", "The starting time must be in the future!")).ToUTF8Bytes()
@@ -549,7 +549,7 @@
 //                                                     {
 
 //                                                        return SendEVSEReserved(
-//                                                            new HTTPResponseBuilder(Request) {
+//                                                            new HTTPResponse.Builder(Request) {
 //                                                                HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                Content         = new JObject(new JProperty("description", "Invalid value for parameter 'duration'!")).ToUTF8Bytes()
@@ -578,7 +578,7 @@
 //                                                 //{
 //                                                 //
 //                                                 //    return SendEVSEReserved(
-//                                                 //        new HTTPResponseBuilder(Request) {
+//                                                 //        new HTTPResponse.Builder(Request) {
 //                                                 //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                 //            ContentType     = HTTPContentType.JSON_UTF8,
 //                                                 //            Content         = new JObject(new JProperty("description", "Invalid ReservationId!")).ToUTF8Bytes()
@@ -612,7 +612,7 @@
 
 //                                                     if (IntendedChargingJSON == null)
 //                                                         return SendEVSEReserved(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                 ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                 Content         = new JObject(new JProperty("description", "Invalid IntendedCharging section!")).ToUTF8Bytes()
@@ -631,7 +631,7 @@
 //                                                         {
 
 //                                                            return SendEVSEReserved(
-//                                                                new HTTPResponseBuilder(Request) {
+//                                                                new HTTPResponse.Builder(Request) {
 //                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                    ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/StartTime!")).ToUTF8Bytes()
@@ -656,7 +656,7 @@
 //                                                         {
 
 //                                                            return SendEVSEReserved(
-//                                                                new HTTPResponseBuilder(Request) {
+//                                                                new HTTPResponse.Builder(Request) {
 //                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                    ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Duration!")).ToUTF8Bytes()
@@ -685,7 +685,7 @@
 //                                                     //{
 //                                                     //
 //                                                     //    return SendEVSEReserved(
-//                                                     //        new HTTPResponseBuilder(Request) {
+//                                                     //        new HTTPResponse.Builder(Request) {
 //                                                     //            HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                     //            ContentType     = HTTPContentType.JSON_UTF8,
 //                                                     //            Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/ChargingProductId!")).ToUTF8Bytes()
@@ -702,7 +702,7 @@
 //                                                     {
 
 //                                                         return SendEVSEReserved(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                 ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                 Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Plug!")).ToUTF8Bytes()
@@ -725,7 +725,7 @@
 //                                                         {
 
 //                                                            return SendEVSEReserved(
-//                                                                new HTTPResponseBuilder(Request) {
+//                                                                new HTTPResponse.Builder(Request) {
 //                                                                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                    ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                    Content         = new JObject(new JProperty("description", "Invalid IntendedCharging/Consumption!")).ToUTF8Bytes()
@@ -750,7 +750,7 @@
 
 //                                                     if (AuthorizedIdsJSON == null)
 //                                                         return SendEVSEReserved(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                 ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                 Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds section!")).ToUTF8Bytes()
@@ -765,7 +765,7 @@
 
 //                                                         if (AuthTokensJSON == null)
 //                                                             return SendEVSEReserved(
-//                                                                 new HTTPResponseBuilder(Request) {
+//                                                                 new HTTPResponse.Builder(Request) {
 //                                                                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                     ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                     Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/RFIDIds section!")).ToUTF8Bytes()
@@ -778,7 +778,7 @@
 
 //                                                             if (!Auth_Token.TryParse(jtoken.Value<String>(), out AuthToken))
 //                                                                 return SendEVSEReserved(
-//                                                                     new HTTPResponseBuilder(Request) {
+//                                                                     new HTTPResponse.Builder(Request) {
 //                                                                         HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                         ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                         Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/RFIDId '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -801,7 +801,7 @@
 
 //                                                         if (eMAIdsJSON == null)
 //                                                             return SendEVSEReserved(
-//                                                                 new HTTPResponseBuilder(Request) {
+//                                                                 new HTTPResponse.Builder(Request) {
 //                                                                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                     ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                     Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/eMAIds section!")).ToUTF8Bytes()
@@ -814,7 +814,7 @@
 
 //                                                             if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMAId2))
 //                                                                 return SendEVSEReserved(
-//                                                                     new HTTPResponseBuilder(Request) {
+//                                                                     new HTTPResponse.Builder(Request) {
 //                                                                         HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                                         ContentType     = HTTPContentType.JSON_UTF8,
 //                                                                         Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/eMAIds '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -837,7 +837,7 @@
 
 //                                                     //    if (PINsJSON == null)
 //                                                     //        return SendEVSEReserved(
-//                                                     //            new HTTPResponseBuilder(Request) {
+//                                                     //            new HTTPResponse.Builder(Request) {
 //                                                     //                HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                     //                ContentType     = HTTPContentType.JSON_UTF8,
 //                                                     //                Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/PINs section!")).ToUTF8Bytes()
@@ -850,7 +850,7 @@
 
 //                                                     //        if (!UInt32.TryParse(jtoken.Value<String>(), out PIN))
 //                                                     //            return SendEVSEReserved(
-//                                                     //                new HTTPResponseBuilder(Request) {
+//                                                     //                new HTTPResponse.Builder(Request) {
 //                                                     //                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
 //                                                     //                    ContentType     = HTTPContentType.JSON_UTF8,
 //                                                     //                    Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/PINs '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -895,7 +895,7 @@
 
 //                                                 case ReservationResultType.Success:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Created,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -940,7 +940,7 @@
 
 //                                                 case ReservationResultType.InvalidCredentials:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Unauthorized,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -959,7 +959,7 @@
 
 //                                                 case ReservationResultType.UnknownChargingReservationId:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.NotFound,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -979,7 +979,7 @@
 
 //                                                 case ReservationResultType.UnknownEVSE:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.NotFound,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -999,7 +999,7 @@
 
 //                                                 case ReservationResultType.AlreadyReserved:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1019,7 +1019,7 @@
 
 //                                                 case ReservationResultType.AlreadyInUse:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1039,7 +1039,7 @@
 
 //                                                 case ReservationResultType.OutOfService:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1059,7 +1059,7 @@
 
 //                                                 case ReservationResultType.Timeout:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1079,7 +1079,7 @@
 
 //                                                 default:
 //                                                     return SendEVSEReserved(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.BadRequest,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1128,7 +1128,7 @@
 //                                             {
 
 //                                                 return SendEVSERemoteStarted(
-//                                                     new HTTPResponseBuilder(Request) {
+//                                                     new HTTPResponse.Builder(Request) {
 //                                                         HTTPStatusCode   = HTTPStatusCode.Unauthorized,
 //                                                         WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
 //                                                         Server           = HTTPServer.DefaultServerName,
@@ -1250,7 +1250,7 @@
 
 //                                                 case RemoteStartEVSEResultType.Success:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Created,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1269,7 +1269,7 @@
 
 //                                                 case RemoteStartEVSEResultType.InvalidCredentials:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Unauthorized,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1288,7 +1288,7 @@
 
 //                                                 case RemoteStartEVSEResultType.AlreadyInUse:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1307,7 +1307,7 @@
 
 //                                                 case RemoteStartEVSEResultType.Reserved:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1326,7 +1326,7 @@
 
 //                                                 case RemoteStartEVSEResultType.OutOfService:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1345,7 +1345,7 @@
 
 //                                                 case RemoteStartEVSEResultType.Timeout:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1364,7 +1364,7 @@
 
 //                                                 default:
 //                                                     return SendEVSERemoteStarted(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.BadRequest,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1416,7 +1416,7 @@
 //                                             {
 
 //                                                 return SendEVSERemoteStopped(
-//                                                     new HTTPResponseBuilder(Request) {
+//                                                     new HTTPResponse.Builder(Request) {
 //                                                         HTTPStatusCode   = HTTPStatusCode.Unauthorized,
 //                                                         WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
 //                                                         Server           = HTTPServer.DefaultServerName,
@@ -1512,7 +1512,7 @@
 //                                                     if (response.ReservationHandling             == null ||
 //                                                         response.ReservationHandling.IsKeepAlive == false)
 //                                                         return SendEVSERemoteStopped(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode             = HTTPStatusCode.NoContent,
 //                                                                 Server                     = HTTPServer.DefaultServerName,
 //                                                                 Date                       = DateTime.Now,
@@ -1523,7 +1523,7 @@
 
 //                                                     else
 //                                                         return SendEVSERemoteStopped(
-//                                                             new HTTPResponseBuilder(Request) {
+//                                                             new HTTPResponse.Builder(Request) {
 //                                                                 HTTPStatusCode             = HTTPStatusCode.OK,
 //                                                                 Server                     = HTTPServer.DefaultServerName,
 //                                                                 Date                       = DateTime.Now,
@@ -1542,7 +1542,7 @@
 
 //                                                 case RemoteStopEVSEResultType.InvalidCredentials:
 //                                                     return SendEVSERemoteStopped(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Unauthorized,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1561,7 +1561,7 @@
 
 //                                                 case RemoteStopEVSEResultType.InvalidSessionId:
 //                                                     return SendEVSERemoteStopped(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1580,7 +1580,7 @@
 
 //                                                 case RemoteStopEVSEResultType.OutOfService:
 //                                                     return SendEVSERemoteStopped(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1599,7 +1599,7 @@
 
 //                                                 case RemoteStopEVSEResultType.Offline:
 //                                                     return SendEVSERemoteStopped(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.Conflict,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,
@@ -1618,7 +1618,7 @@
 
 //                                                 default:
 //                                                     return SendEVSERemoteStopped(
-//                                                         new HTTPResponseBuilder(Request) {
+//                                                         new HTTPResponse.Builder(Request) {
 //                                                             HTTPStatusCode             = HTTPStatusCode.BadRequest,
 //                                                             Server                     = HTTPServer.DefaultServerName,
 //                                                             Date                       = DateTime.Now,

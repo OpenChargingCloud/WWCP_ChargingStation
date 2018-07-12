@@ -387,7 +387,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              {
 
                                                  return SendEVSERemoteStarted(
-                                                     new HTTPResponseBuilder(Request) {
+                                                     new HTTPResponse.Builder(Request) {
                                                          HTTPStatusCode   = HTTPStatusCode.Unauthorized,
                                                          WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
                                                          Server           = HTTPServer.DefaultServerName,
@@ -452,7 +452,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      if (StartTime <= DateTime.Now)
                                                          return SendEVSEReserved(
-                                                             new HTTPResponseBuilder(Request) {
+                                                             new HTTPResponse.Builder(Request) {
                                                                  HTTPStatusCode  = HTTPStatusCode.BadRequest,
                                                                  ContentType     = HTTPContentType.JSON_UTF8,
                                                                  Content         = new JObject(new JProperty("description", "The starting time must be in the future!")).ToUTF8Bytes()
@@ -641,7 +641,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                              if (!Auth_Token.TryParse(jtoken.Value<String>(), out Auth_Token AuthToken))
                                                                  return SendEVSEReserved(
-                                                                     new HTTPResponseBuilder(Request) {
+                                                                     new HTTPResponse.Builder(Request) {
                                                                          HTTPStatusCode  = HTTPStatusCode.BadRequest,
                                                                          ContentType     = HTTPContentType.JSON_UTF8,
                                                                          Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/RFIDId '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -675,7 +675,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                              if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMAId2))
                                                                  return SendEVSEReserved(
-                                                                     new HTTPResponseBuilder(Request) {
+                                                                     new HTTPResponse.Builder(Request) {
                                                                          HTTPStatusCode  = HTTPStatusCode.BadRequest,
                                                                          ContentType     = HTTPContentType.JSON_UTF8,
                                                                          Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/eMAIds '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -698,7 +698,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      //    if (PINsJSON == null)
                                                      //        return SendEVSEReserved(
-                                                     //            new HTTPResponseBuilder(Request) {
+                                                     //            new HTTPResponse.Builder(Request) {
                                                      //                HTTPStatusCode  = HTTPStatusCode.BadRequest,
                                                      //                ContentType     = HTTPContentType.JSON_UTF8,
                                                      //                Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/PINs section!")).ToUTF8Bytes()
@@ -711,7 +711,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      //        if (!UInt32.TryParse(jtoken.Value<String>(), out PIN))
                                                      //            return SendEVSEReserved(
-                                                     //                new HTTPResponseBuilder(Request) {
+                                                     //                new HTTPResponse.Builder(Request) {
                                                      //                    HTTPStatusCode  = HTTPStatusCode.BadRequest,
                                                      //                    ContentType     = HTTPContentType.JSON_UTF8,
                                                      //                    Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/PINs '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
@@ -758,7 +758,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.Success:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Created,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -803,7 +803,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.InvalidCredentials:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -822,7 +822,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.UnknownChargingReservationId:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.NotFound,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -842,7 +842,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.UnknownEVSE:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.NotFound,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -862,7 +862,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.AlreadyReserved:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -882,7 +882,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.AlreadyInUse:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -902,7 +902,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.OutOfService:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -922,7 +922,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case ReservationResultType.Timeout:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -942,7 +942,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  default:
                                                      return SendEVSEReserved(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.BadRequest,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -991,7 +991,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              {
 
                                                  return SendEVSERemoteStarted(
-                                                     new HTTPResponseBuilder(Request) {
+                                                     new HTTPResponse.Builder(Request) {
                                                          HTTPStatusCode   = HTTPStatusCode.Unauthorized,
                                                          WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
                                                          Server           = HTTPServer.DefaultServerName,
@@ -1114,7 +1114,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.Success:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Created,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1133,7 +1133,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.InvalidCredentials:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1152,7 +1152,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.AlreadyInUse:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1171,7 +1171,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.Reserved:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1190,7 +1190,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.OutOfService:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1209,7 +1209,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStartEVSEResultType.Timeout:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1228,7 +1228,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  default:
                                                      return SendEVSERemoteStarted(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.BadRequest,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1280,7 +1280,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              {
 
                                                  return SendEVSERemoteStopped(
-                                                     new HTTPResponseBuilder(Request) {
+                                                     new HTTPResponse.Builder(Request) {
                                                          HTTPStatusCode   = HTTPStatusCode.Unauthorized,
                                                          WWWAuthenticate  = @"Basic realm=""" + WWWAuthenticationRealm + @"""",
                                                          Server           = HTTPServer.DefaultServerName,
@@ -1374,7 +1374,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      if (response.ReservationHandling.IsKeepAlive == false)
                                                          return SendEVSERemoteStopped(
-                                                             new HTTPResponseBuilder(Request) {
+                                                             new HTTPResponse.Builder(Request) {
                                                                  HTTPStatusCode             = HTTPStatusCode.NoContent,
                                                                  Server                     = HTTPServer.DefaultServerName,
                                                                  Date                       = DateTime.Now,
@@ -1385,7 +1385,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      else
                                                          return SendEVSERemoteStopped(
-                                                             new HTTPResponseBuilder(Request) {
+                                                             new HTTPResponse.Builder(Request) {
                                                                  HTTPStatusCode             = HTTPStatusCode.OK,
                                                                  Server                     = HTTPServer.DefaultServerName,
                                                                  Date                       = DateTime.Now,
@@ -1404,7 +1404,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStopEVSEResultType.InvalidCredentials:
                                                      return SendEVSERemoteStopped(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1423,7 +1423,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStopEVSEResultType.InvalidSessionId:
                                                      return SendEVSERemoteStopped(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1442,7 +1442,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStopEVSEResultType.OutOfService:
                                                      return SendEVSERemoteStopped(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1461,7 +1461,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  case RemoteStopEVSEResultType.Offline:
                                                      return SendEVSERemoteStopped(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,
@@ -1480,7 +1480,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  default:
                                                      return SendEVSERemoteStopped(
-                                                         new HTTPResponseBuilder(Request) {
+                                                         new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.BadRequest,
                                                              Server                     = HTTPServer.DefaultServerName,
                                                              Date                       = DateTime.Now,

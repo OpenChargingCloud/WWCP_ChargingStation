@@ -50,7 +50,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
@@ -64,7 +64,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!ChargingPool_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingPoolId))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
@@ -95,7 +95,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
@@ -110,7 +110,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!ChargingStation_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingStationId))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
@@ -142,7 +142,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
@@ -155,7 +155,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!EVSE_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out EVSEId))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
@@ -189,7 +189,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
@@ -202,7 +202,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!ChargingReservation_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingReservationId))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
@@ -241,7 +241,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!RoamingNetwork.TryGetReservationById(ChargingReservationId, out ChargingReservation))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.NotFound,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
@@ -276,7 +276,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (HTTPRequest.ParsedURIParameters.Length < 1)
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now
@@ -289,7 +289,7 @@ namespace org.GraphDefined.WWCP.EMSP
             if (!ChargingSession_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingSessionId))
             {
 
-                HTTPResponse = new HTTPResponseBuilder(HTTPRequest) {
+                HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
                     HTTPStatusCode  = HTTPStatusCode.BadRequest,
                     Server          = DefaultServerName,
                     Date            = DateTime.Now,
