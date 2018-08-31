@@ -42,7 +42,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Data
 
-        private                HTTPEventSource  DebugLog;
+        private                HTTPEventSource<Object>  DebugLog;
 
         private const          String           HTTPRoot                            = "org.GraphDefined.WWCP.EMSP.HTTPRoot";
 
@@ -312,7 +312,8 @@ namespace org.GraphDefined.WWCP.EMSP
             DebugLog  = HTTPServer.AddEventSource(EventIdentification:      HTTPEventSource_Id.Parse("DebugLog"),
                                                   MaxNumberOfCachedEvents:  1000,
                                                   RetryIntervall:           TimeSpan.FromSeconds(5),
-                                                  URITemplate:              URIPrefix + "/DebugLog");
+                                                  URITemplate:              URIPrefix + "/DebugLog",
+                                                  CreateHelper:             _ => new Object());
 
             #region / (HTTPRoot)
 
