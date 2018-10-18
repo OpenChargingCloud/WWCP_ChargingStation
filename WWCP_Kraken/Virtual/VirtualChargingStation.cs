@@ -27,6 +27,7 @@ using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
 using org.GraphDefined.WWCP.ChargingPools;
 using org.GraphDefined.Vanaheimr.Hermod;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 #endregion
 
@@ -74,14 +75,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Properties
 
-        //#region Id
+        public PgpSecretKeyRing SecretKeyRing   { get; }
 
-        ///// <summary>
-        ///// The unique identification of this virtual charging station.
-        ///// </summary>
-        //public ChargingStation_Id Id { get; }
+        public PgpPublicKeyRing PublicKeyRing   { get; }
 
-        //#endregion
 
         #region Description
 
@@ -308,6 +305,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="MaxAdminStatusListSize">The maximum size of the charging station admin status list.</param>
         public VirtualChargingStation(ChargingStation_Id               Id,
                                       VirtualChargingPool              ChargingPool,
+                                      PgpSecretKeyRing                 SecretKeyRing            = null,
+                                      PgpPublicKeyRing                 PublicKeyRing            = null,
                                       ChargingStationAdminStatusTypes  InitialAdminStatus       = ChargingStationAdminStatusTypes.Operational,
                                       ChargingStationStatusTypes       InitialStatus            = ChargingStationStatusTypes.Available,
                                       UInt16                           MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
@@ -328,6 +327,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
             #region Init data and properties
 
             this.ChargingPool          = ChargingPool;
+            this.SecretKeyRing         = SecretKeyRing;
+            this.PublicKeyRing         = PublicKeyRing;
+
             this._EVSEs                = new HashSet<IRemoteEVSE>();
 
             this._AdminStatusSchedule  = new StatusSchedule<ChargingStationAdminStatusTypes>(MaxAdminStatusListSize);
@@ -618,6 +620,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="OnError">An optional delegate for signaling errors.</param>
         public VirtualEVSE CreateVirtualEVSE(EVSE_Id                       EVSEId,
                                              EnergyMeter_Id                EnergyMeterId,
+                                             PgpSecretKeyRing              SecretKeyRing            = null,
+                                             PgpPublicKeyRing              PublicKeyRing            = null,
                                              EVSEAdminStatusTypes          InitialAdminStatus       = EVSEAdminStatusTypes.Operational,
                                              EVSEStatusTypes               InitialStatus            = EVSEStatusTypes.Available,
                                              UInt16                        MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
@@ -644,6 +648,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
             var _VirtualEVSE  = new VirtualEVSE(EVSEId,
                                                 this,
                                                 EnergyMeterId,
+                                                SecretKeyRing,
+                                                PublicKeyRing,
                                                 InitialAdminStatus,
                                                 InitialStatus,
                                                 MaxAdminStatusListSize,

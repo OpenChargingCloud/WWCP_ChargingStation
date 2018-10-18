@@ -27,6 +27,7 @@ using org.GraphDefined.Vanaheimr.Illias;
 
 using org.GraphDefined.WWCP.ChargingStations;
 using org.GraphDefined.Vanaheimr.Hermod;
+using Org.BouncyCastle.Bcpg.OpenPgp;
 
 #endregion
 
@@ -324,6 +325,81 @@ namespace org.GraphDefined.WWCP.ChargingPools
             var Now           = DateTime.UtcNow;
             var _VirtualStation  = new VirtualChargingStation(ChargingStationId,
                                                               this,
+                                                              null,
+                                                              null,
+                                                              InitialAdminStatus,
+                                                              InitialStatus,
+                                                              MaxAdminStatusListSize,
+                                                              MaxStatusListSize,
+                                                              SelfCheckTimeSpan);
+
+            Configurator?.Invoke(_VirtualStation);
+
+            if (_Stations.Add(_VirtualStation))
+            {
+
+                //_VirtualEVSE.OnPropertyChanged        += (Timestamp, Sender, PropertyName, OldValue, NewValue)
+                //                                           => UpdateEVSEData(Timestamp, Sender as VirtualEVSE, PropertyName, OldValue, NewValue);
+                //
+                //_VirtualEVSE.OnStatusChanged          += UpdateEVSEStatus;
+                //_VirtualEVSE.OnAdminStatusChanged     += UpdateEVSEAdminStatus;
+                //_VirtualEVSE.OnNewReservation         += SendNewReservation;
+                //_VirtualEVSE.OnNewChargingSession     += SendNewChargingSession;
+                //_VirtualEVSE.OnNewChargeDetailRecord  += SendNewChargeDetailRecord;
+
+                OnSuccess?.Invoke(_VirtualStation);
+
+                return _VirtualStation;
+
+            }
+
+            return null;
+
+        }
+
+        #endregion
+
+        #region CreateVirtualStation(ChargingStation, Configurator = null, OnSuccess = null, OnError = null)
+
+        /// <summary>
+        /// Create and register a new charging station having the given
+        /// unique charging station identification.
+        /// </summary>
+        /// <param name="ChargingStation">A charging station.</param>
+        /// <param name="Configurator">An optional delegate to configure the new charging station after its creation.</param>
+        /// <param name="OnSuccess">An optional delegate called after successful creation of the charging station.</param>
+        /// <param name="OnError">An optional delegate for signaling errors.</param>
+        public VirtualChargingStation CreateVirtualStation(ChargingStation_Id                               ChargingStationId,
+                                                           PgpSecretKeyRing                                 SecretKeyRing            = null,
+                                                           PgpPublicKeyRing                                 PublicKeyRing            = null,
+                                                           ChargingStationAdminStatusTypes                  InitialAdminStatus       = ChargingStationAdminStatusTypes.Operational,
+                                                           ChargingStationStatusTypes                       InitialStatus            = ChargingStationStatusTypes.Available,
+                                                           UInt16                                           MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
+                                                           UInt16                                           MaxStatusListSize        = DefaultMaxStatusListSize,
+                                                           TimeSpan?                                        SelfCheckTimeSpan        = null,
+                                                           Action<VirtualChargingStation>                   Configurator             = null,
+                                                           Action<VirtualChargingStation>                   OnSuccess                = null,
+                                                           Action<VirtualChargingStation, ChargingStation_Id>  OnError                  = null)
+        {
+
+            #region Initial checks
+
+            if (_Stations.Any(station => station.Id == ChargingStationId))
+            {
+                throw new Exception("StationAlreadyExistsInPool");
+                //if (OnError == null)
+                //    throw new ChargingStationAlreadyExistsInStation(this.ChargingStation, ChargingStation.Id);
+                //else
+                //    OnError?.Invoke(this, ChargingStation.Id);
+            }
+
+            #endregion
+
+            var Now              = DateTime.UtcNow;
+            var _VirtualStation  = new VirtualChargingStation(ChargingStationId,
+                                                              this,
+                                                              SecretKeyRing,
+                                                              PublicKeyRing,
                                                               InitialAdminStatus,
                                                               InitialStatus,
                                                               MaxAdminStatusListSize,

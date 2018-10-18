@@ -60,13 +60,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <summary>
         /// The maximum time span for a reservation.
         /// </summary>
-        public  static readonly TimeSpan MaxReservationDuration  = TimeSpan.FromMinutes(15);
+        public  static readonly TimeSpan  MaxReservationDuration  = TimeSpan.FromMinutes(15);
 
-        private static readonly Random   _random                 = new Random(DateTime.UtcNow.Millisecond);
+        private static readonly Random    _random                 = new Random(DateTime.UtcNow.Millisecond);
+
+        private                 Object    EnergyMeterLock;
+        private                 Timer     EnergyMeterTimer;
 
         #endregion
 
         #region Properties
+
+        public PgpSecretKeyRing  SecretKeyRing          { get; }
+
+        public PgpPublicKeyRing  PublicKeyRing          { get; }
+
+        public TimeSpan          EnergyMeterInterval    { get; }
+
 
         #region Description
 
@@ -332,8 +342,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        public PgpSecretKeyRingBundle SecretKeys   { get; set; }
-        public PgpPublicKeyRingBundle PublicKeys   { get; set; }
+        //public PgpSecretKeyRingBundle SecretKeys   { get; set; }
+        //public PgpPublicKeyRingBundle PublicKeys   { get; set; }
         public String                 Passphrase   { get; set; }
 
 
@@ -519,10 +529,12 @@ namespace org.GraphDefined.WWCP.ChargingStations
         internal VirtualEVSE(EVSE_Id                 Id,
                              VirtualChargingStation  ChargingStation,
                              EnergyMeter_Id          EnergyMeterId,
-                             EVSEAdminStatusTypes    InitialAdminStatus      = EVSEAdminStatusTypes.Operational,
-                             EVSEStatusTypes         InitialStatus           = EVSEStatusTypes.Available,
-                             UInt16                  MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize,
-                             UInt16                  MaxStatusListSize       = DefaultMaxStatusListSize)
+                             PgpSecretKeyRing        SecretKeyRing            = null,
+                             PgpPublicKeyRing        PublicKeyRing            = null,
+                             EVSEAdminStatusTypes    InitialAdminStatus       = EVSEAdminStatusTypes.Operational,
+                             EVSEStatusTypes         InitialStatus            = EVSEStatusTypes.Available,
+                             UInt16                  MaxAdminStatusListSize   = DefaultMaxAdminStatusListSize,
+                             UInt16                  MaxStatusListSize        = DefaultMaxStatusListSize)
 
             : base(Id)
 
@@ -556,9 +568,50 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
+            EnergyMeterLock      = new Object();
+            EnergyMeterTimer     = new Timer(ReadEnergyMeter, null, Timeout.Infinite, Timeout.Infinite);
+            EnergyMeterInterval  = TimeSpan.FromSeconds(30);
+
         }
 
         #endregion
+
+
+        #region (private, Timer) ReadEnergyMeter(Status)
+
+        private void ReadEnergyMeter(Object Status)
+        {
+
+            Thread.CurrentThread.Priority = ThreadPriority.BelowNormal;
+
+            if (Monitor.TryEnter(EnergyMeterLock))
+            {
+
+                try
+                {
+
+                    ChargingSession.AddEnergyMeterValue(new Timestamped<Single>(DateTime.UtcNow, 1));
+
+                }
+                catch (Exception e)
+                {
+                    DebugX.LogT("'ReadEnergyMeter' led to an exception: " + e.Message + Environment.NewLine + e.StackTrace);
+                }
+
+                finally
+                {
+                    Monitor.Exit(EnergyMeterLock);
+                }
+
+            }
+
+            else
+                DebugX.LogT("'ReadEnergyMeter' skipped!");
+
+        }
+
+        #endregion
+
 
 
         #region Data/(Admin-)Status management
@@ -1182,6 +1235,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                               IdentificationStart  = eMAId.HasValue ? AuthIdentification.FromRemoteIdentification(eMAId.Value) : null,
                                           };
 
+                        ChargingSession.AddEnergyMeterValue(new Timestamped<Single>(DateTime.UtcNow, 0));
+                        EnergyMeterTimer.Change(EnergyMeterInterval, EnergyMeterInterval);
+
                         return RemoteStartEVSEResult.Success(_ChargingSession);
 
                     #endregion
@@ -1222,6 +1278,8 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                         Reservation.ChargingSession = ChargingSession;
 
+                        ChargingSession.AddEnergyMeterValue(new Timestamped<Single>(DateTime.UtcNow, 0));
+                        EnergyMeterTimer.Change(EnergyMeterInterval, EnergyMeterInterval);
 
                         return RemoteStartEVSEResult.Success(_ChargingSession);
 
@@ -1384,9 +1442,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                         if (ChargingSession.Id == SessionId)
                         {
 
+                            EnergyMeterTimer.Change(Timeout.Infinite, Timeout.Infinite);
+
                             var Now                  = DateTime.UtcNow;
                             var Duration             = Now - _ChargingSession.SessionTime.StartTime;
                             var Consumption          = (Single) Math.Round(Duration.TotalHours * MaxPower, 2);
+
+                            ChargingSession.AddEnergyMeterValue(new Timestamped<Single>(Now, 0));
 
                             var _ChargeDetailRecord  = new ChargeDetailRecord(SessionId:                 _ChargingSession.Id,
                                                                               Reservation:               _ChargingSession.Reservation,
@@ -1403,32 +1465,21 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                                 IdentificationStart:       _ChargingSession.IdentificationStart,
                                                                                 IdentificationStop:        _ChargingSession.IdentificationStop,
 
-                                                                              EnergyMeterId:             EnergyMeter_Id.Parse("default"),
-                                                                              EnergyMeteringValues:      new Timestamped<Single>[] {
-                                                                                                             new Timestamped<Single>(_ChargingSession.SessionTime.StartTime,           0),
-                                                                                                             new Timestamped<Single>(Now,                                    Consumption)
-                                                                                                         },
-                                                                              SignedMeteringValues:      new SignedMeteringValue[] {
-
-                                                                                                             new SignedMeteringValue(_ChargingSession.SessionTime.StartTime,
-                                                                                                                                     0,
+                                                                              EnergyMeterId:             EnergyMeterId,
+                                                                              EnergyMeteringValues:      ChargingSession.EnergyMeteringValues,
+                                                                              SignedMeteringValues:      ChargingSession.EnergyMeteringValues.Select(metervalue =>
+                                                                                                             new SignedMeteringValue(metervalue.Timestamp,
+                                                                                                                                     metervalue.Value,
                                                                                                                                      EnergyMeterId.Value,
                                                                                                                                      Id,
                                                                                                                                      _ChargingSession.IdentificationStart,
-                                                                                                                                     PublicKeys.First().First()).
-                                                                                                                 Sign(SecretKeys.First().First(),
-                                                                                                                      Passphrase),
+                                                                                                                                     PublicKeyRing.First()).
+                                                                                                                 Sign(SecretKeyRing.First(),
+                                                                                                                      Passphrase))
+                                                                                                               //                      PublicKeys.First().First()).
+                                                                                                               //  Sign(SecretKeys.First().First(),
+                                                                                                               //       Passphrase),
 
-                                                                                                             new SignedMeteringValue(Now,
-                                                                                                                                     Consumption,
-                                                                                                                                     EnergyMeterId.Value,
-                                                                                                                                     Id,
-                                                                                                                                     _ChargingSession.IdentificationStart,
-                                                                                                                                     PublicKeys.First().First()).
-                                                                                                                 Sign(SecretKeys.First().First(),
-                                                                                                                      Passphrase),
-
-                                                                                                         }
 
                                                                              );
 
