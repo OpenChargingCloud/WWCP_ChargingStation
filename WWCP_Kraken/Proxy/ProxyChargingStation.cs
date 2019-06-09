@@ -50,14 +50,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Data
 
-        public const           String    DefaultHostname                 = "ahzf.de";
-        public static readonly IPPort    DefaultTCPPort                  = IPPort.Parse(3004);
-        public const           String    DefaultVirtualHost              = DefaultHostname;
-        public static readonly HTTPURI   DefaultURIPrefix                = HTTPURI.Parse("/ext/BoschEBike");
-        public const           String    HTTPLogin                       = "boschsi";
-        public const           String    HTTPPassword                    = "fad/09q23w!rf";
-        public static readonly TimeSpan  DefaultRequestTimeout           = TimeSpan.FromSeconds(180);
-        public const           String    UserAgent                       = "GraphDefined OpenChargingCloud";
+        public static readonly HTTPHostname  DefaultHostname                 = HTTPHostname.Parse("graphdefined.com");
+        public static readonly IPPort        DefaultTCPPort                  = IPPort.Parse(3004);
+        public static readonly HTTPHostname  DefaultVirtualHost              = DefaultHostname;
+        public static readonly HTTPURI       DefaultURIPrefix                = HTTPURI.Parse("/ext/BoschEBike");
+        public const           String        HTTPLogin                       = "boschsi";
+        public const           String        HTTPPassword                    = "fad/09q23w!rf";
+        public static readonly TimeSpan      DefaultRequestTimeout           = TimeSpan.FromSeconds(180);
+        public const           String        UserAgent                       = "GraphDefined OpenChargingCloud";
 
         private readonly Timer EVSEStatusImportTimer;
 
@@ -98,13 +98,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     UInt16                               MaxAdminStatusListSize       = DefaultMaxAdminStatusListSize,
                                     IPTransport                          IPTransport                  = IPTransport.IPv4only,
                                     DNSClient                            DNSClient                    = null,
-                                    String                               Hostname                     = DefaultHostname,
+                                    HTTPHostname?                        Hostname                     = null,
                                     IPPort?                              TCPPort                      = null,
                                     String                               Service                      = null,
                                     RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
                                     LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                     X509Certificate                      ClientCert                   = null,
-                                    String                               VirtualHost                  = DefaultVirtualHost,
+                                    HTTPHostname?                        VirtualHost                  = null,
                                     HTTPURI?                             URIPrefix                    = null,
                                     TimeSpan?                            RequestTimeout               = null)
 
@@ -113,15 +113,15 @@ namespace org.GraphDefined.WWCP.ChargingStations
                    MaxStatusListSize,
                    MaxAdminStatusListSize,
                    IPTransport,
-                   DNSClient != null              ? DNSClient      : new DNSClient(SearchForIPv4DNSServers: true,
-                                                                                   SearchForIPv6DNSServers: false),
-                   Hostname.IsNotNullOrEmpty()    ? Hostname       : DefaultHostname,
+                   DNSClient ?? new DNSClient(SearchForIPv4DNSServers: true,
+                                              SearchForIPv6DNSServers: false),
+                   Hostname  ?? DefaultHostname,
                    TCPPort   != null              ? TCPPort        : DefaultTCPPort,
                    Service,
                    RemoteCertificateValidator,
                    LocalCertificateSelector,
                    ClientCert,
-                   VirtualHost.IsNotNullOrEmpty() ? VirtualHost    : DefaultVirtualHost,
+                   VirtualHost.HasValue           ? VirtualHost    : Hostname,
                    URIPrefix ?? DefaultURIPrefix,
                    RequestTimeout.HasValue        ? RequestTimeout : DefaultRequestTimeout)
 
@@ -217,6 +217,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -227,7 +228,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.GET(URIPrefix + "/EVSEStatus",
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host         = VirtualHost;
+                                                                       requestbuilder.Host         = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
@@ -340,6 +341,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -350,7 +352,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.GET(URIPrefix + "/Reservations",
 
                                                                   requestbuilder => {
-                                                                      requestbuilder.Host         = VirtualHost;
+                                                                      requestbuilder.Host         = VirtualHostname ?? Hostname;
                                                                       requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                       requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                   }),
@@ -499,6 +501,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -509,7 +512,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + ("/EVSEs/" + MapOutgoingId(EVSEId) + "/Reservation"),
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
@@ -770,6 +773,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -780,7 +784,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + ("/ChargingStations/" + (RemoteChargingStationId != null ? RemoteChargingStationId : Id) + "/Reservation"),
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
@@ -1025,6 +1029,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -1035,7 +1040,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + ("/Reservations/" + ReservationId + "/Delete"),
 
                                                                      requestbuilder => {
-                                                                         requestbuilder.Host           = VirtualHost;
+                                                                         requestbuilder.Host           = VirtualHostname ?? Hostname;
                                                                          requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                          requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                          requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
@@ -1143,6 +1148,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -1153,7 +1159,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + "/EVSEs/" + MapOutgoingId(EVSEId).ToString() + "/RemoteStart",
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
@@ -1349,6 +1355,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -1359,7 +1366,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.POST(URIPrefix + ("/EVSEs/" + MapOutgoingId(EVSEId) + "/RemoteStop"),
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host           = VirtualHost;
+                                                                       requestbuilder.Host           = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Authorization  = new HTTPBasicAuthentication(HTTPLogin, HTTPPassword);
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType    = HTTPContentType.JSON_UTF8;
@@ -1486,6 +1493,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 LocalCertificateSelector,
                                                 ClientCert,
@@ -1496,7 +1504,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                      Execute(client => client.GET(URIPrefix + "/AuthLists/12345678",
 
                                                                    requestbuilder => {
-                                                                       requestbuilder.Host         = VirtualHost;
+                                                                       requestbuilder.Host         = VirtualHostname ?? Hostname;
                                                                        requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                        requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    }),
@@ -1574,13 +1582,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 DNSClient: DNSClient).
 
                                  Execute(client => client.POST(URIPrefix + "/AuthLists/12345678",
 
                                                                requestbuilder => {
-                                                                   requestbuilder.Host         = VirtualHost;
+                                                                   requestbuilder.Host         = VirtualHostname ?? Hostname;
                                                                    requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                    requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                    requestbuilder.Content      = JSONObject.Create(
@@ -1784,13 +1793,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             var response = await new HTTPClient(Hostname,
                                                 TCPPort,
+                                                VirtualHostname,
                                                 RemoteCertificateValidator,
                                                 DNSClient: DNSClient).
 
                                  Execute(client => client.DELETE(URIPrefix + "/AuthLists/12345678",
 
                                                                  requestbuilder => {
-                                                                     requestbuilder.Host         = VirtualHost;
+                                                                     requestbuilder.Host         = VirtualHostname ?? Hostname;
                                                                      requestbuilder.Accept.Add(HTTPContentType.JSON_UTF8);
                                                                      requestbuilder.ContentType  = HTTPContentType.JSON_UTF8;
                                                                      requestbuilder.Content      = JSONObject.Create(

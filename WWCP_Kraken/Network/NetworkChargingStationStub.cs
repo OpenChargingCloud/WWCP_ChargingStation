@@ -73,22 +73,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Properties
 
-        #region Id
-
-        private ChargingStation_Id _Id;
-
         /// <summary>
         /// The unique identification of this network charging station.
         /// </summary>
-        public ChargingStation_Id Id
-        {
-            get
-            {
-                return _Id;
-            }
-        }
-
-        #endregion
+        public ChargingStation_Id Id { get; }
 
         #region Description
 
@@ -122,119 +110,30 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
+        public IPTransport                          IPTransport                     { get; }
 
-        #region IPTransport
+        public DNSClient                            DNSClient                       { get; }
 
-        private readonly IPTransport _IPTransport;
+        public HTTPHostname                         Hostname                        { get; }
 
-        public IPTransport IPTransport
-        {
-            get
-            {
-                return _IPTransport;
-            }
-        }
+        public HTTPURI                              URIPrefix                       { get; }
 
-        #endregion
+        public HTTPHostname?                        VirtualHostname                 { get; }
 
-        #region DNSClient
+        public IPPort                               TCPPort                         { get; }
 
-        private readonly DNSClient _DNSClient;
-
-        public DNSClient DNSClient
-        {
-            get
-            {
-                return _DNSClient;
-            }
-        }
-
-        #endregion
-
-        #region Hostname
-
-        private readonly String _Hostname;
-
-        public String Hostname
-        {
-            get
-            {
-                return _Hostname;
-            }
-        }
-
-        #endregion
-
-        #region TCPPort
-
-        private readonly IPPort _TCPPort;
-
-        public IPPort TCPPort
-        {
-            get
-            {
-                return _TCPPort;
-            }
-        }
-
-        #endregion
-
-        #region Service
-
-        private readonly String _Service;
-
-        public String Service
-        {
-            get
-            {
-                return _Service;
-            }
-        }
-
-        #endregion
+        public String                               Service                         { get; }
 
         /// <summary>
         /// A delegate to verify the remote TLS certificate.
         /// </summary>
-        public RemoteCertificateValidationCallback RemoteCertificateValidator { get; }
+        public RemoteCertificateValidationCallback  RemoteCertificateValidator      { get; }
 
-        public LocalCertificateSelectionCallback LocalCertificateSelector { get; }
+        public LocalCertificateSelectionCallback    LocalCertificateSelector        { get; }
 
-        public X509Certificate ClientCert { get; }
+        public X509Certificate                      ClientCert                      { get; }
 
-        #region VirtualHost
-
-        private readonly String _VirtualHost;
-
-        public String VirtualHost
-        {
-            get
-            {
-                return _VirtualHost;
-            }
-        }
-
-        #endregion
-
-        #region URIPrefix
-
-        public HTTPURI URIPrefix { get; }
-
-        #endregion
-
-        #region RequestTimeout
-
-        private readonly TimeSpan _RequestTimeout;
-
-        public TimeSpan RequestTimeout
-        {
-            get
-            {
-                return _RequestTimeout;
-            }
-        }
-
-        #endregion
+        public TimeSpan                             RequestTimeout                  { get; }
 
 
         #region Status
@@ -585,7 +484,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            this._Id                    = ChargingStation.Id;
+            this.Id                     = ChargingStation.Id;
             this._ChargingStation       = ChargingStation;
             this._EVSEs                 = new HashSet<IRemoteEVSE>();
 
@@ -625,13 +524,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           UInt16                               MaxAdminStatusListSize       = DefaultMaxAdminStatusListSize,
                                           IPTransport                          IPTransport                  = IPTransport.IPv4only,
                                           DNSClient                            DNSClient                    = null,
-                                          String                               Hostname                     = null,
+                                          HTTPHostname?                        Hostname                     = null,
                                           IPPort?                              TCPPort                      = null,
                                           String                               Service                      = null,
                                           RemoteCertificateValidationCallback  RemoteCertificateValidator   = null,
                                           LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                           X509Certificate                      ClientCert                   = null,
-                                          String                               VirtualHost                  = null,
+                                          HTTPHostname?                        VirtualHostname              = null,
                                           HTTPURI?                             URIPrefix                    = null,
                                           TimeSpan?                            RequestTimeout               = null)
 
@@ -639,18 +538,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         {
 
-            this._IPTransport                 = IPTransport;
-            this._DNSClient                   = DNSClient ?? new DNSClient(SearchForIPv4DNSServers: true,
-                                                                           SearchForIPv6DNSServers: false);
-            this._Hostname                    = Hostname;
-            this._TCPPort                     = TCPPort ?? DefaultTCPPort;
-            this._Service                     = Service;
-            this.RemoteCertificateValidator   = RemoteCertificateValidator;
-            this.LocalCertificateSelector     = LocalCertificateSelector;
-            this.ClientCert                   = ClientCert;
-            this._VirtualHost                 = VirtualHost.IsNotNullOrEmpty() ? VirtualHost        : Hostname;
-            this.URIPrefix                    = URIPrefix ?? DefaultURIPrefix;
-            this._RequestTimeout              = RequestTimeout.HasValue          ? RequestTimeout.Value : DefaultRequestTimeout;
+            this.IPTransport                 = IPTransport;
+            this.DNSClient                   = DNSClient      ?? new DNSClient(SearchForIPv4DNSServers: true,
+                                                                               SearchForIPv6DNSServers: false);
+            this.Hostname                    = Hostname.Value;
+            this.TCPPort                     = TCPPort        ?? DefaultTCPPort;
+            this.Service                     = Service;
+            this.RemoteCertificateValidator  = RemoteCertificateValidator;
+            this.LocalCertificateSelector    = LocalCertificateSelector;
+            this.ClientCert                  = ClientCert;
+            this.VirtualHostname             = VirtualHostname;
+            this.URIPrefix                   = URIPrefix      ?? DefaultURIPrefix;
+            this.RequestTimeout              = RequestTimeout ?? DefaultRequestTimeout;
 
             this._SelfCheckTimeSpan           = SelfCheckTimeSpan != null && SelfCheckTimeSpan.HasValue ? SelfCheckTimeSpan.Value : DefaultSelfCheckTimeSpan;
             this._SelfCheckTimer              = new Timer(SelfCheck, null, _SelfCheckTimeSpan, _SelfCheckTimeSpan);
@@ -856,9 +755,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public EVSE_Id MapOutgoingId(EVSE_Id EVSEIdOut)
         {
 
-            EVSE_Id EVSEIdIn;
-
-            if (MapOutgoing.TryGetValue(EVSEIdOut, out EVSEIdIn))
+            if (MapOutgoing.TryGetValue(EVSEIdOut, out EVSE_Id EVSEIdIn))
                 return EVSEIdIn;
 
             return EVSEIdOut;
@@ -868,9 +765,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public EVSE_Id MapIncomingId(EVSE_Id EVSEIdIn)
         {
 
-            EVSE_Id EVSEIdOut;
-
-            if (MapIncoming.TryGetValue(EVSEIdIn, out EVSEIdOut))
+            if (MapIncoming.TryGetValue(EVSEIdIn, out EVSE_Id EVSEIdOut))
                 return EVSEIdOut;
 
             return EVSEIdIn;
