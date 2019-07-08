@@ -65,7 +65,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// </summary>
         public static readonly TimeSpan DefaultSelfCheckTimeSpan = TimeSpan.FromSeconds(5);
 
-        private static readonly HTTPURI DefaultURIPrefix = HTTPURI.Parse("/");
+        private static readonly HTTPPath DefaultURIPrefix = HTTPPath.Parse("/");
 
         private Timer _SelfCheckTimer;
 
@@ -116,7 +116,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         public HTTPHostname                         Hostname                        { get; }
 
-        public HTTPURI                              URIPrefix                       { get; }
+        public HTTPPath                              URIPrefix                       { get; }
 
         public HTTPHostname?                        VirtualHostname                 { get; }
 
@@ -531,7 +531,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                           LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                           X509Certificate                      ClientCert                   = null,
                                           HTTPHostname?                        VirtualHostname              = null,
-                                          HTTPURI?                             URIPrefix                    = null,
+                                          HTTPPath?                             URIPrefix                    = null,
                                           TimeSpan?                            RequestTimeout               = null)
 
             : this(ChargingStation, MaxStatusListSize, MaxAdminStatusListSize)

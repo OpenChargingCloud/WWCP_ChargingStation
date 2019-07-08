@@ -60,7 +60,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// The default HTTP server URI prefix.
         /// </summary>
-        public static readonly HTTPURI          DefaultURIPrefix                    = HTTPURI.Parse("/emsp");
+        public static readonly HTTPPath          DefaultURIPrefix                    = HTTPPath.Parse("/emsp");
 
         /// <summary>
         /// The default HTTP logfile.
@@ -99,7 +99,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// A common URI prefix for all URIs within this API.
         /// </summary>
-        public HTTPURI                    URIPrefix       { get; }
+        public HTTPPath                    URIPrefix       { get; }
 
         /// <summary>
         /// The DNS resolver to use.
@@ -218,7 +218,7 @@ namespace org.GraphDefined.WWCP.EMSP
                            String                            HTTPServerName                    = DefaultHTTPServerName,
                            IPPort?                           HTTPServerPort                    = null,
                            HTTPHostname?                     HTTPHostname                      = null,
-                           HTTPURI?                          URIPrefix                         = null,
+                           HTTPPath?                          URIPrefix                         = null,
 
                            String                            ServerThreadName                  = null,
                            ThreadPriority                    ServerThreadPriority              = ThreadPriority.AboveNormal,
@@ -263,8 +263,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
         private ProviderAPI(eMobilityServiceProvider  EMSP,
                             HTTPServer                HTTPServer,
-                            HTTPHostname?             Hostname  = null,
-                            HTTPURI?                  URIPrefix     = null)
+                            HTTPHostname?             Hostname    = null,
+                            HTTPPath?                 URIPrefix   = null)
         {
 
             this.EMSP          = EMSP       ?? throw new ArgumentNullException(nameof(EMSP),       "The given e-mobility service provider must not be null!");
@@ -295,7 +295,7 @@ namespace org.GraphDefined.WWCP.EMSP
         public static ProviderAPI AttachToHTTPAPI(eMobilityServiceProvider  EMSP,
                                                   HTTPServer                HTTPServer,
                                                   HTTPHostname?             Hostname   = null,
-                                                  HTTPURI?                  URIPrefix  = null)
+                                                  HTTPPath?                  URIPrefix  = null)
 
             => new ProviderAPI(EMSP,
                                HTTPServer,
@@ -766,7 +766,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                              AccessControlAllowOrigin   = "*",
                                                              AccessControlAllowMethods  = "POST",
                                                              AccessControlAllowHeaders  = "Content-Type, Accept, Authorization",
-                                                             Location                   = HTTPURI.Parse("~/ext/BoschEBike/Reservations/" + result.Reservation.Id.ToString()),
+                                                             Location                   = HTTPPath.Parse("~/ext/BoschEBike/Reservations/" + result.Reservation.Id.ToString()),
                                                              Connection                 = "close",
                                                              ContentType                = HTTPContentType.JSON_UTF8,
                                                              Content                    = JSONObject.Create(

@@ -53,7 +53,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public static readonly HTTPHostname  DefaultHostname                 = HTTPHostname.Parse("graphdefined.com");
         public static readonly IPPort        DefaultTCPPort                  = IPPort.Parse(3004);
         public static readonly HTTPHostname  DefaultVirtualHost              = DefaultHostname;
-        public static readonly HTTPURI       DefaultURIPrefix                = HTTPURI.Parse("/ext/BoschEBike");
+        public static readonly HTTPPath       DefaultURIPrefix                = HTTPPath.Parse("/ext/BoschEBike");
         public const           String        HTTPLogin                       = "boschsi";
         public const           String        HTTPPassword                    = "fad/09q23w!rf";
         public static readonly TimeSpan      DefaultRequestTimeout           = TimeSpan.FromSeconds(180);
@@ -105,7 +105,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                     LocalCertificateSelectionCallback    LocalCertificateSelector     = null,
                                     X509Certificate                      ClientCert                   = null,
                                     HTTPHostname?                        VirtualHost                  = null,
-                                    HTTPURI?                             URIPrefix                    = null,
+                                    HTTPPath?                             URIPrefix                    = null,
                                     TimeSpan?                            RequestTimeout               = null)
 
             : base(ChargingStation,
