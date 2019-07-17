@@ -482,13 +482,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ReservationId        [optional]
 
-                                                 if (JSON.ParseOptionalN("ReservationId",
-                                                                         "Charging reservation identification",
-                                                                         HTTPServer.DefaultServerName,
-                                                                         ChargingReservation_Id.TryParse,
-                                                                         out ReservationId,
-                                                                         Request,
-                                                                         out _HTTPResponse))
+                                                 if (JSON.ParseOptionalStruct2("ReservationId",
+                                                                              "Charging reservation identification",
+                                                                              HTTPServer.DefaultServerName,
+                                                                              ChargingReservation_Id.TryParse,
+                                                                              out ReservationId,
+                                                                              Request,
+                                                                              out _HTTPResponse))
                                                  {
 
                                                      if (_HTTPResponse != null)
@@ -562,13 +562,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                      #region Check ChargingProductId    [optional]
 
-                                                     if (JSON.ParseOptionalN("ChargingProductId",
-                                                                             "Charging product identification",
-                                                                             HTTPServer.DefaultServerName,
-                                                                             ChargingProduct_Id.TryParse,
-                                                                             out ChargingProductId,
-                                                                             Request,
-                                                                             out _HTTPResponse))
+                                                     if (JSON.ParseOptionalStruct2("ChargingProductId",
+                                                                                  "Charging product identification",
+                                                                                  HTTPServer.DefaultServerName,
+                                                                                  ChargingProduct_Id.TryParse,
+                                                                                  out ChargingProductId,
+                                                                                  Request,
+                                                                                  out _HTTPResponse))
                                                      {
 
                                                          if (_HTTPResponse != null)
@@ -1033,29 +1033,31 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Check ChargingProductId  [optional]
 
-                                                 if (!JSON.ParseOptionalN("ChargingProductId",
-                                                                          "Charging product identification",
-                                                                          HTTPServer.DefaultServerName,
-                                                                          ChargingProduct_Id.TryParse,
-                                                                          out ChargingProductId,
-                                                                          Request,
-                                                                          out _HTTPResponse))
-
+                                                 if (!JSON.ParseOptionalStruct2("ChargingProductId",
+                                                                               "Charging product identification",
+                                                                               HTTPServer.DefaultServerName,
+                                                                               ChargingProduct_Id.TryParse,
+                                                                               out ChargingProductId,
+                                                                               Request,
+                                                                               out _HTTPResponse))
+                                                 {
                                                      return SendEVSERemoteStarted(_HTTPResponse);
+                                                 }
 
                                                  #endregion
 
                                                  #region Check ReservationId      [optional]
 
-                                                 if (!JSON.ParseOptionalN("ReservationId",
-                                                                          "Charging reservation identification",
-                                                                          HTTPServer.DefaultServerName,
-                                                                          ChargingReservation_Id.TryParse,
-                                                                          out ReservationId,
-                                                                          Request,
-                                                                          out _HTTPResponse))
-
+                                                 if (!JSON.ParseOptionalStruct2("ReservationId",
+                                                                               "Charging reservation identification",
+                                                                               HTTPServer.DefaultServerName,
+                                                                               ChargingReservation_Id.TryParse,
+                                                                               out ReservationId,
+                                                                               Request,
+                                                                               out _HTTPResponse))
+                                                 {
                                                      return SendEVSERemoteStarted(_HTTPResponse);
+                                                 }
 
                                                  #endregion
 
@@ -1073,7 +1075,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #endregion
 
-                                                 #region Parse eMAId             [mandatory]
+                                                 #region Parse eMAId              [mandatory]
 
                                                  if (!JSON.ParseMandatory("eMAId",
                                                                           "e-Mobility account identification",
@@ -1334,15 +1336,16 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Parse eMAId              [optional]
 
-                                                 if (!JSON.ParseOptionalN("eMAId",
-                                                                          "e-Mobility account identification",
-                                                                          HTTPServer.DefaultServerName,
-                                                                          eMobilityAccount_Id.TryParse,
-                                                                          out eMAId,
-                                                                          Request,
-                                                                          out _HTTPResponse))
-
+                                                 if (!JSON.ParseOptionalStruct2("eMAId",
+                                                                               "e-Mobility account identification",
+                                                                               HTTPServer.DefaultServerName,
+                                                                               eMobilityAccount_Id.TryParse,
+                                                                               out eMAId,
+                                                                               Request,
+                                                                               out _HTTPResponse))
+                                                 {
                                                      return SendEVSERemoteStarted(_HTTPResponse);
+                                                 }
 
                                                  #endregion
 
