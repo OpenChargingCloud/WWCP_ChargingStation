@@ -739,7 +739,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                              StartTime,
                                                                              Duration,
                                                                              ReservationId,
-                                                                             AuthIdentification.FromRemoteIdentification(eMAId),
+                                                                             RemoteAuthentication.FromRemoteIdentification(eMAId),
                                                                              ChargingProductId.HasValue    // of IntendedCharging
                                                                                  ? new ChargingProduct(ChargingProductId.Value)
                                                                                  : null,
@@ -1103,7 +1103,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                                        : null,
                                                                                    ReservationId,
                                                                                    SessionId,
-                                                                                   eMAId,
+                                                                                   RemoteAuthentication.FromRemoteIdentification(eMAId),
 
                                                                                    Request.Timestamp,
                                                                                    Request.CancellationToken,
@@ -1362,7 +1362,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              var response = await EMSP.RemoteStop(EVSEId,
                                                                                   SessionId,
                                                                                   ReservationHandling.Close, //ReservationHandling.KeepAlive(TimeSpan.FromMinutes(1)), // ToDo: Parse this property!
-                                                                                  eMAId,
+                                                                                  RemoteAuthentication.FromRemoteIdentification(eMAId),
 
                                                                                   Request.Timestamp,
                                                                                   Request.CancellationToken,

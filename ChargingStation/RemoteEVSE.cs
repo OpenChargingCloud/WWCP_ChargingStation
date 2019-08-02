@@ -859,7 +859,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                      CancellationToken                 CancellationToken,
                                                      EventTracking_Id                  EventTrackingId,
                                                      eMobilityProvider_Id              ProviderId,
-                                                     AuthIdentification                Identification,
+                                                     RemoteAuthentication              RemoteAuthentication,
                                                      ChargingReservation_Id            ReservationId,
                                                      DateTime?                         StartTime,
                                                      TimeSpan?                         Duration,
@@ -899,13 +899,13 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
                     this._Reservation = new ChargingReservation(ReservationId,
                                                                 Timestamp,
-                                                                StartTime.HasValue ? StartTime.Value : DateTime.Now,
-                                                                Duration. HasValue ? Duration. Value : MaxReservationDuration,
-                                                                (StartTime.HasValue ? StartTime.Value : DateTime.Now) + (Duration.HasValue ? Duration.Value : MaxReservationDuration),
+                                                                StartTime ?? DateTime.Now,
+                                                                Duration  ?? MaxReservationDuration,
+                                                                (StartTime ?? DateTime.Now) + (Duration ?? MaxReservationDuration),
                                                                 TimeSpan.FromSeconds(0),
                                                                 ChargingReservationLevel.EVSE,
                                                                 ProviderId,
-                                                                Identification,
+                                                                RemoteAuthentication,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,
@@ -937,7 +937,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingProductId">The unique identification of the choosen charging product at the given EVSE.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
-        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <param name="RemoteAuthentication">The unique identification of the e-mobility account.</param>
         /// <returns>A RemoteStartResult task.</returns>
         public async Task<RemoteStartEVSEResult> RemoteStart(DateTime                Timestamp,
                                                              CancellationToken       CancellationToken,
@@ -946,7 +946,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                              ChargingReservation_Id  ReservationId,
                                                              ChargingSession_Id      SessionId,
                                                              eMobilityProvider_Id    ProviderId,
-                                                             eMobilityAccount_Id     eMAId,
+                                                             RemoteAuthentication    RemoteAuthentication,
                                                              TimeSpan?               RequestTimeout  = null)
         {
 

@@ -41,11 +41,11 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Data
 
-        private readonly ConcurrentDictionary<ChargingPool_Id,    ChargingPool>                  ChargingPools;
+        private readonly ConcurrentDictionary<ChargingPool_Id,     ChargingPool>                  ChargingPools;
 
-        private readonly ConcurrentDictionary<AuthIdentification, TokenAuthorizationResultType>  AuthorizationDatabase;
-        private readonly ConcurrentDictionary<ChargingSession_Id, SessionInfo>                   SessionDatabase;
-        private readonly ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>            ChargeDetailRecordDatabase;
+        private readonly ConcurrentDictionary<LocalAuthentication, TokenAuthorizationResultType>  AuthorizationDatabase;
+        private readonly ConcurrentDictionary<ChargingSession_Id,  SessionInfo>                   SessionDatabase;
+        private readonly ConcurrentDictionary<ChargingSession_Id,  ChargeDetailRecord>            ChargeDetailRecordDatabase;
 
         #endregion
 
@@ -65,28 +65,28 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region AllTokens
 
-        public IEnumerable<KeyValuePair<AuthIdentification, TokenAuthorizationResultType>> AllTokens
+        public IEnumerable<KeyValuePair<LocalAuthentication, TokenAuthorizationResultType>> AllTokens
             => AuthorizationDatabase;
 
         #endregion
 
         #region AuthorizedTokens
 
-        public IEnumerable<KeyValuePair<AuthIdentification, TokenAuthorizationResultType>> AuthorizedTokens
+        public IEnumerable<KeyValuePair<LocalAuthentication, TokenAuthorizationResultType>> AuthorizedTokens
             => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Authorized);
 
         #endregion
 
         #region NotAuthorizedTokens
 
-        public IEnumerable<KeyValuePair<AuthIdentification, TokenAuthorizationResultType>> NotAuthorizedTokens
+        public IEnumerable<KeyValuePair<LocalAuthentication, TokenAuthorizationResultType>> NotAuthorizedTokens
             => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.NotAuthorized);
 
         #endregion
 
         #region BlockedTokens
 
-        public IEnumerable<KeyValuePair<AuthIdentification, TokenAuthorizationResultType>> BlockedTokens
+        public IEnumerable<KeyValuePair<LocalAuthentication, TokenAuthorizationResultType>> BlockedTokens
             => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Blocked);
 
         #endregion
@@ -211,11 +211,11 @@ namespace org.GraphDefined.WWCP.EMSP
             this.Id                          = Id;
             this.RoamingNetwork              = RoamingNetwork;
 
-            this.ChargingPools               = new ConcurrentDictionary<ChargingPool_Id,    ChargingPool>();
+            this.ChargingPools               = new ConcurrentDictionary<ChargingPool_Id,     ChargingPool>();
 
-            this.AuthorizationDatabase       = new ConcurrentDictionary<AuthIdentification, TokenAuthorizationResultType>();
-            this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id, SessionInfo>();
-            this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id, ChargeDetailRecord>();
+            this.AuthorizationDatabase       = new ConcurrentDictionary<LocalAuthentication, TokenAuthorizationResultType>();
+            this.SessionDatabase             = new ConcurrentDictionary<ChargingSession_Id,  SessionInfo>();
+            this.ChargeDetailRecordDatabase  = new ConcurrentDictionary<ChargingSession_Id,  ChargeDetailRecord>();
 
         }
 
@@ -224,14 +224,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region User and credential management
 
-        #region AddToken(AuthIdentification, AuthenticationResult = AuthenticationResult.Allowed)
+        #region AddToken(LocalAuthentication, AuthenticationResult = AuthenticationResult.Allowed)
 
-        public Boolean AddToken(AuthIdentification            AuthIdentification,
+        public Boolean AddToken(LocalAuthentication           LocalAuthentication,
                                 TokenAuthorizationResultType  AuthenticationResult = TokenAuthorizationResultType.Authorized)
         {
 
-            if (!AuthorizationDatabase.ContainsKey(AuthIdentification))
-                return AuthorizationDatabase.TryAdd(AuthIdentification, AuthenticationResult);
+            if (!AuthorizationDatabase.ContainsKey(LocalAuthentication))
+                return AuthorizationDatabase.TryAdd(LocalAuthentication, AuthenticationResult);
 
             return false;
 
@@ -241,13 +241,9 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region RemoveToken(Token)
 
-        public Boolean RemoveToken(AuthIdentification AuthIdentification)
+        public Boolean RemoveToken(LocalAuthentication LocalAuthentication)
         {
-
-            TokenAuthorizationResultType _AuthorizationResult;
-
-            return AuthorizationDatabase.TryRemove(AuthIdentification, out _AuthorizationResult);
-
+            return AuthorizationDatabase.TryRemove(LocalAuthentication, out TokenAuthorizationResultType _AuthorizationResult);
         }
 
         #endregion
@@ -1876,12 +1872,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #region Receive AuthorizeStarts/-Stops
 
-        #region AuthorizeStart(AuthIdentification,                    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+        #region AuthorizeStart(LocalAuthentication,                    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
 
         /// <summary>
         /// Create an AuthorizeStart request.
         /// </summary>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="ChargingProduct">An optional charging product.</param>
         /// <param name="SessionId">An optional session identification.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
@@ -1892,7 +1888,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<AuthStartResult>
 
-            IReceiveAuthorizeStartStop.AuthorizeStart(AuthIdentification           AuthIdentification,
+            IReceiveAuthorizeStartStop.AuthorizeStart(LocalAuthentication          LocalAuthentication,
                                                       ChargingProduct              ChargingProduct,
                                                       ChargingSession_Id?          SessionId,
                                                       ChargingStationOperator_Id?  OperatorId,
@@ -1906,8 +1902,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Initial checks
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             AuthStartResult result;
 
@@ -1930,7 +1926,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      ChargingProduct,
                                                      SessionId,
                                                      RequestTimeout ?? RequestTimeout.Value))).
@@ -1945,7 +1941,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out TokenAuthorizationResultType AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out TokenAuthorizationResultType AuthenticationResult))
             {
 
                 #region Authorized
@@ -1956,7 +1952,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthIdentification?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
 
                     result = AuthStartResult.Authorized(Id,
                                                         this,
@@ -2018,7 +2014,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      ChargingProduct,
                                                      SessionId,
                                                      RequestTimeout ?? RequestTimeout.Value,
@@ -2040,12 +2036,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStart(AuthIdentification, EVSEId,            ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+        #region AuthorizeStart(LocalAuthentication, EVSEId,            ChargingProduct = null, SessionId = null, OperatorId = null, ...)
 
         /// <summary>
         /// Create an AuthorizeStart request at the given EVSE.
         /// </summary>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="EVSEId">The unique identification of an EVSE.</param>
         /// <param name="ChargingProduct">An optional charging product.</param>
         /// <param name="SessionId">An optional session identification.</param>
@@ -2057,7 +2053,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<AuthStartEVSEResult>
 
-            IReceiveAuthorizeStartStop.AuthorizeStart(AuthIdentification           AuthIdentification,
+            IReceiveAuthorizeStartStop.AuthorizeStart(LocalAuthentication          LocalAuthentication,
                                                       EVSE_Id                      EVSEId,
                                                       ChargingProduct              ChargingProduct,
                                                       ChargingSession_Id?          SessionId,
@@ -2072,8 +2068,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Initial checks
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             TokenAuthorizationResultType AuthenticationResult;
             AuthStartEVSEResult          result;
@@ -2097,7 +2093,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      EVSEId,
                                                      ChargingProduct,
                                                      SessionId,
@@ -2114,7 +2110,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Authorized
@@ -2125,7 +2121,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthIdentification?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
 
                     result = AuthStartEVSEResult.Authorized(Id,
                                                             this,
@@ -2187,7 +2183,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      EVSEId,
                                                      ChargingProduct,
                                                      SessionId,
@@ -2211,12 +2207,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStart(AuthIdentification, ChargingStationId, ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+        #region AuthorizeStart(LocalAuthentication, ChargingStationId, ChargingProduct = null, SessionId = null, OperatorId = null, ...)
 
         /// <summary>
         /// Create an AuthorizeStart request at the given charging station.
         /// </summary>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="ChargingStationId">The unique identification of a charging station.</param>
         /// <param name="ChargingProduct">An optional charging product.</param>
         /// <param name="SessionId">An optional session identification.</param>
@@ -2228,7 +2224,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<AuthStartChargingStationResult>
 
-            IReceiveAuthorizeStartStop.AuthorizeStart(AuthIdentification           AuthIdentification,
+            IReceiveAuthorizeStartStop.AuthorizeStart(LocalAuthentication          LocalAuthentication,
                                                       ChargingStation_Id           ChargingStationId,
                                                       ChargingProduct              ChargingProduct,
                                                       ChargingSession_Id?          SessionId,
@@ -2243,8 +2239,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Initial checks
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             TokenAuthorizationResultType AuthenticationResult;
             AuthStartChargingStationResult          result;
@@ -2268,7 +2264,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      ChargingStationId,
                                                      ChargingProduct,
                                                      SessionId,
@@ -2284,7 +2280,7 @@ namespace org.GraphDefined.WWCP.EMSP
             #endregion
 
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Authorized
@@ -2295,7 +2291,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthIdentification?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
 
                     result = AuthStartChargingStationResult.Authorized(Id,
                                                                        this,
@@ -2357,7 +2353,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      EventTrackingId,
                                                      RoamingNetwork.Id,
                                                      OperatorId,
-                                                     AuthIdentification,
+                                                     LocalAuthentication,
                                                      ChargingStationId,
                                                      ChargingProduct,
                                                      SessionId,
@@ -2380,12 +2376,12 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStart(AuthIdentification, ChargingPoolId,    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
+        #region AuthorizeStart(LocalAuthentication, ChargingPoolId,    ChargingProduct = null, SessionId = null, OperatorId = null, ...)
 
         /// <summary>
         /// Create an AuthorizeStart request at the given charging pool.
         /// </summary>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="ChargingPoolId">The unique identification of a charging pool.</param>
         /// <param name="ChargingProduct">An optional charging product.</param>
         /// <param name="SessionId">An optional session identification.</param>
@@ -2397,7 +2393,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<AuthStartChargingPoolResult>
 
-            IReceiveAuthorizeStartStop.AuthorizeStart(AuthIdentification           AuthIdentification,
+            IReceiveAuthorizeStartStop.AuthorizeStart(LocalAuthentication          LocalAuthentication,
                                                       ChargingPool_Id              ChargingPoolId,
                                                       ChargingProduct              ChargingProduct,
                                                       ChargingSession_Id?          SessionId,
@@ -2412,14 +2408,14 @@ namespace org.GraphDefined.WWCP.EMSP
 
             #region Initial checks
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             #endregion
 
             TokenAuthorizationResultType AuthenticationResult;
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Authorized
@@ -2430,7 +2426,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(AuthIdentification?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
 
                     return AuthStartChargingPoolResult.Authorized(Id,
                                                                   this,
@@ -2482,13 +2478,13 @@ namespace org.GraphDefined.WWCP.EMSP
         //        UID than the UID which started the session!
         //        (e.g. car sharing)
 
-        #region AuthorizeStop (SessionId, AuthIdentification,                    OperatorId = null, ...)
+        #region AuthorizeStop (SessionId, LocalAuthentication,                    OperatorId = null, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
         /// </summary>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        /// <param name="AuthIdentification">A user identification.</param>
+        /// <param name="LocalAuthentication">A user identification.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
@@ -2498,7 +2494,7 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<AuthStopResult>
 
             IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
-                                                     AuthIdentification           AuthIdentification,
+                                                     LocalAuthentication          LocalAuthentication,
                                                      ChargingStationOperator_Id?  OperatorId,
 
                                                      DateTime?                    Timestamp,
@@ -2512,8 +2508,8 @@ namespace org.GraphDefined.WWCP.EMSP
             if (SessionId          == null)
                 throw new ArgumentNullException(nameof(SessionId),  "The given charging session identification must not be null!");
 
-            if (AuthIdentification == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             #endregion
 
@@ -2530,7 +2526,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             TokenAuthorizationResultType AuthenticationResult;
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Token is authorized
@@ -2539,8 +2535,8 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (AuthIdentification?.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification?.AuthToken))
+                    if (LocalAuthentication?.AuthToken != null &&
+                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication?.AuthToken))
                         return AuthStopResult.Authorized(Id,
                                                          this,
                                                          SessionId:   SessionId,
@@ -2594,13 +2590,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStop (SessionId, AuthIdentification, EVSEId,            OperatorId = null, ...)
+        #region AuthorizeStop (SessionId, LocalAuthentication, EVSEId,            OperatorId = null, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
         /// </summary>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="EVSEId">An EVSE identification.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
@@ -2611,7 +2607,7 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<AuthStopEVSEResult>
 
             IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
-                                                     AuthIdentification           AuthIdentification,
+                                                     LocalAuthentication          LocalAuthentication,
                                                      EVSE_Id                      EVSEId,
                                                      ChargingStationOperator_Id?  OperatorId,
 
@@ -2627,8 +2623,8 @@ namespace org.GraphDefined.WWCP.EMSP
             if (SessionId           == null)
                 throw new ArgumentNullException(nameof(SessionId),           "The given charging session identification must not be null!");
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             #endregion
 
@@ -2645,7 +2641,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             TokenAuthorizationResultType AuthenticationResult;
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Token is authorized
@@ -2654,8 +2650,8 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (AuthIdentification.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
+                    if (LocalAuthentication.AuthToken != null &&
+                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
                         return AuthStopEVSEResult.Authorized(Id,
                                                              this,
                                                              SessionId:   SessionId,
@@ -2709,13 +2705,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStop (SessionId, AuthIdentification, ChargingStationId, OperatorId = null, ...)
+        #region AuthorizeStop (SessionId, LocalAuthentication, ChargingStationId, OperatorId = null, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
         /// </summary>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="ChargingStationId">An charging station identification.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
@@ -2726,7 +2722,7 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<AuthStopChargingStationResult>
 
             IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
-                                                     AuthIdentification           AuthIdentification,
+                                                     LocalAuthentication          LocalAuthentication,
                                                      ChargingStation_Id           ChargingStationId,
                                                      ChargingStationOperator_Id?  OperatorId,
 
@@ -2742,8 +2738,8 @@ namespace org.GraphDefined.WWCP.EMSP
             if (SessionId           == null)
                 throw new ArgumentNullException(nameof(SessionId),           "The given charging session identification must not be null!");
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             #endregion
 
@@ -2760,7 +2756,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             TokenAuthorizationResultType AuthenticationResult;
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Token is authorized
@@ -2769,8 +2765,8 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (AuthIdentification.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
+                    if (LocalAuthentication.AuthToken != null &&
+                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
                         return AuthStopChargingStationResult.Authorized(Id,
                                                                         this,
                                                                         SessionId:   SessionId,
@@ -2824,13 +2820,13 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region AuthorizeStop (SessionId, AuthIdentification, ChargingPoolId,    OperatorId = null, ...)
+        #region AuthorizeStop (SessionId, LocalAuthentication, ChargingPoolId,    OperatorId = null, ...)
 
         /// <summary>
         /// Create an authorize stop request at the given EVSE.
         /// </summary>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
-        /// <param name="AuthIdentification">An user identification.</param>
+        /// <param name="LocalAuthentication">An user identification.</param>
         /// <param name="ChargingPoolId">An charging station identification.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
@@ -2841,7 +2837,7 @@ namespace org.GraphDefined.WWCP.EMSP
         async Task<AuthStopChargingPoolResult>
 
             IReceiveAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
-                                                     AuthIdentification           AuthIdentification,
+                                                     LocalAuthentication          LocalAuthentication,
                                                      ChargingPool_Id              ChargingPoolId,
                                                      ChargingStationOperator_Id?  OperatorId,
 
@@ -2857,8 +2853,8 @@ namespace org.GraphDefined.WWCP.EMSP
             if (SessionId           == null)
                 throw new ArgumentNullException(nameof(SessionId),           "The given charging session identification must not be null!");
 
-            if (AuthIdentification  == null)
-                throw new ArgumentNullException(nameof(AuthIdentification),  "The given authentication token must not be null!");
+            if (LocalAuthentication  == null)
+                throw new ArgumentNullException(nameof(LocalAuthentication),  "The given authentication token must not be null!");
 
             #endregion
 
@@ -2875,7 +2871,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             TokenAuthorizationResultType AuthenticationResult;
 
-            if (AuthorizationDatabase.TryGetValue(AuthIdentification, out AuthenticationResult))
+            if (AuthorizationDatabase.TryGetValue(LocalAuthentication, out AuthenticationResult))
             {
 
                 #region Token is authorized
@@ -2884,8 +2880,8 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (AuthIdentification.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(AuthIdentification.AuthToken))
+                    if (LocalAuthentication.AuthToken != null &&
+                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
                         return AuthStopChargingPoolResult.Authorized(Id,
                                                                      this,
                                                                      SessionId:   SessionId,
@@ -3041,7 +3037,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="StartTime">The starting time of the reservation.</param>
         /// <param name="Duration">The duration of the reservation.</param>
         /// <param name="ReservationId">An optional unique identification of the reservation. Mandatory for updates.</param>
-        /// <param name="Identification">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
+        /// <param name="RemoteAuthentication">An optional unique identification of e-Mobility account/customer requesting this reservation.</param>
         /// <param name="ChargingProduct">The charging product to be reserved.</param>
         /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
         /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
@@ -3054,19 +3050,19 @@ namespace org.GraphDefined.WWCP.EMSP
         public async Task<ReservationResult>
 
             Reserve(EVSE_Id                           EVSEId,
-                    DateTime?                         StartTime           = null,
-                    TimeSpan?                         Duration            = null,
-                    ChargingReservation_Id?           ReservationId       = null,
-                    AuthIdentification                Identification      = null,
-                    ChargingProduct                   ChargingProduct     = null,
-                    IEnumerable<Auth_Token>           AuthTokens          = null,
-                    IEnumerable<eMobilityAccount_Id>  eMAIds              = null,
-                    IEnumerable<UInt32>               PINs                = null,
+                    DateTime?                         StartTime              = null,
+                    TimeSpan?                         Duration               = null,
+                    ChargingReservation_Id?           ReservationId          = null,
+                    RemoteAuthentication              RemoteAuthentication   = null,
+                    ChargingProduct                   ChargingProduct        = null,
+                    IEnumerable<Auth_Token>           AuthTokens             = null,
+                    IEnumerable<eMobilityAccount_Id>  eMAIds                 = null,
+                    IEnumerable<UInt32>               PINs                   = null,
 
-                    DateTime?                         Timestamp           = null,
-                    CancellationToken?                CancellationToken   = null,
-                    EventTracking_Id                  EventTrackingId     = null,
-                    TimeSpan?                         RequestTimeout      = null)
+                    DateTime?                         Timestamp              = null,
+                    CancellationToken?                CancellationToken      = null,
+                    EventTracking_Id                  EventTrackingId        = null,
+                    TimeSpan?                         RequestTimeout         = null)
 
         {
 
@@ -3097,7 +3093,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              StartTime,
                                              Duration,
                                              Id,
-                                             Identification,
+                                             RemoteAuthentication,
                                              ChargingProduct,
                                              AuthTokens,
                                              eMAIds,
@@ -3119,7 +3115,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                              Duration,
                                              ReservationId,
                                              Id,
-                                             Identification,
+                                             RemoteAuthentication,
                                              ChargingProduct,
                                              AuthTokens,
                                              eMAIds,
@@ -3148,7 +3144,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                StartTime,
                                                Duration,
                                                Id,
-                                               Identification,
+                                               RemoteAuthentication,
                                                ChargingProduct,
                                                AuthTokens,
                                                eMAIds,
@@ -3223,7 +3219,7 @@ namespace org.GraphDefined.WWCP.EMSP
         #endregion
 
 
-        #region RemoteStart(EVSEId, ChargingProduct = null, ReservationId = null, SessionId = null, eMAId = null, ...)
+        #region RemoteStart(EVSEId, ChargingProduct = null, ReservationId = null, SessionId = null, RemoteAuthentication = null, ...)
 
         /// <summary>
         /// Start a charging session at the given EVSE.
@@ -3232,7 +3228,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="ChargingProduct">The choosen charging product.</param>
         /// <param name="ReservationId">The unique identification for a charging reservation.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
-        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <param name="RemoteAuthentication">The unique identification of the e-mobility account.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -3241,15 +3237,15 @@ namespace org.GraphDefined.WWCP.EMSP
         public async Task<RemoteStartEVSEResult>
 
             RemoteStart(EVSE_Id                  EVSEId,
-                        ChargingProduct          ChargingProduct     = null,
-                        ChargingReservation_Id?  ReservationId       = null,
-                        ChargingSession_Id?      SessionId           = null,
-                        eMobilityAccount_Id?     eMAId               = null,
+                        ChargingProduct          ChargingProduct        = null,
+                        ChargingReservation_Id?  ReservationId          = null,
+                        ChargingSession_Id?      SessionId              = null,
+                        RemoteAuthentication     RemoteAuthentication   = null,
 
-                        DateTime?                Timestamp           = null,
-                        CancellationToken?       CancellationToken   = null,
-                        EventTracking_Id         EventTrackingId     = null,
-                        TimeSpan?                RequestTimeout      = null)
+                        DateTime?                Timestamp              = null,
+                        CancellationToken?       CancellationToken      = null,
+                        EventTracking_Id         EventTrackingId        = null,
+                        TimeSpan?                RequestTimeout         = null)
 
         {
 
@@ -3280,7 +3276,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                  ReservationId,
                                                  SessionId,
                                                  Id,
-                                                 eMAId,
+                                                 RemoteAuthentication,
                                                  RequestTimeout);
 
             }
@@ -3298,7 +3294,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                  ReservationId,
                                                  SessionId,
                                                  Id,
-                                                 eMAId,
+                                                 RemoteAuthentication,
                                                  null,
 
                                                  Timestamp,
@@ -3324,7 +3320,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                   ReservationId,
                                                   SessionId,
                                                   Id,
-                                                  eMAId,
+                                                  RemoteAuthentication,
                                                   RequestTimeout,
                                                   response,
                                                   EndTime - StartTime);
@@ -3343,7 +3339,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region RemoteStop (EVSEId, SessionId, ReservationHandling, eMAId = null, ...)
+        #region RemoteStop (EVSEId, SessionId, ReservationHandling, RemoteAuthentication = null, ...)
 
         /// <summary>
         /// Stop the given charging session at the given EVSE.
@@ -3351,7 +3347,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="EVSEId">The unique identification of the EVSE to be stopped.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="ReservationHandling">Whether to remove the reservation after session end, or to keep it open for some more time.</param>
-        /// <param name="eMAId">The unique identification of the e-mobility account.</param>
+        /// <param name="RemoteAuthentication">The unique identification of the e-mobility account.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
         /// <param name="CancellationToken">An optional token to cancel this request.</param>
@@ -3362,12 +3358,12 @@ namespace org.GraphDefined.WWCP.EMSP
             RemoteStop(EVSE_Id               EVSEId,
                        ChargingSession_Id    SessionId,
                        ReservationHandling   ReservationHandling,
-                       eMobilityAccount_Id?  eMAId               = null,
+                       RemoteAuthentication  RemoteAuthentication   = null,
 
-                       DateTime?             Timestamp           = null,
-                       CancellationToken?    CancellationToken   = null,
-                       EventTracking_Id      EventTrackingId     = null,
-                       TimeSpan?             RequestTimeout      = null)
+                       DateTime?             Timestamp              = null,
+                       CancellationToken?    CancellationToken      = null,
+                       EventTracking_Id      EventTrackingId        = null,
+                       TimeSpan?             RequestTimeout         = null)
 
         {
 
@@ -3400,7 +3396,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                          SessionId,
                                          ReservationHandling,
                                          Id,
-                                         eMAId,
+                                         RemoteAuthentication,
                                          RequestTimeout);
 
             }
@@ -3416,7 +3412,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            SessionId,
                                                            ReservationHandling,
                                                            Id,
-                                                           eMAId,
+                                                           RemoteAuthentication,
 
                                                            Timestamp,
                                                            CancellationToken,
@@ -3440,7 +3436,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                             SessionId,
                                             ReservationHandling,
                                             Id,
-                                            eMAId,
+                                            RemoteAuthentication,
                                             RequestTimeout,
                                             response,
                                             EndTime - StartTime);
