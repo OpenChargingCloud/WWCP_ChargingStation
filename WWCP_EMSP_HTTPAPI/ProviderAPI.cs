@@ -669,12 +669,10 @@ namespace org.GraphDefined.WWCP.EMSP
                                                          if (_HTTPResponse != null)
                                                              return SendEVSEReserved(_HTTPResponse);
 
-                                                         eMobilityAccount_Id? eMAId2 = null;
-
                                                          foreach (var jtoken in eMAIdsJSON)
                                                          {
 
-                                                             if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMAId2))
+                                                             if (!eMobilityAccount_Id.TryParse(jtoken.Value<String>(), out eMobilityAccount_Id eMAId2))
                                                                  return SendEVSEReserved(
                                                                      new HTTPResponse.Builder(Request) {
                                                                          HTTPStatusCode  = HTTPStatusCode.BadRequest,
@@ -682,7 +680,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                          Content         = new JObject(new JProperty("description", "Invalid AuthorizedIds/eMAIds '" + jtoken.Value<String>() + "' section!")).ToUTF8Bytes()
                                                                      });
 
-                                                             eMAIds.Add(eMAId2.Value);
+                                                             eMAIds.Add(eMAId2);
 
                                                          }
 

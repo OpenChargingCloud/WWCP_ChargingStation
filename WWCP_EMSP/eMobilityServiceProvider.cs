@@ -1952,7 +1952,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication));
 
                     result = AuthStartResult.Authorized(Id,
                                                         this,
@@ -2121,7 +2121,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication));
 
                     result = AuthStartEVSEResult.Authorized(Id,
                                                             this,
@@ -2291,7 +2291,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication));
 
                     result = AuthStartChargingStationResult.Authorized(Id,
                                                                        this,
@@ -2426,7 +2426,7 @@ namespace org.GraphDefined.WWCP.EMSP
                     if (!SessionId.HasValue)
                         SessionId = ChargingSession_Id.New;
 
-                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication?.AuthToken));
+                    SessionDatabase.TryAdd(SessionId.Value, new SessionInfo(LocalAuthentication));
 
                     return AuthStartChargingPoolResult.Authorized(Id,
                                                                   this,
@@ -2535,8 +2535,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (LocalAuthentication?.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication?.AuthToken))
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication))
                         return AuthStopResult.Authorized(Id,
                                                          this,
                                                          SessionId:   SessionId,
@@ -2650,8 +2649,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (LocalAuthentication.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication))
                         return AuthStopEVSEResult.Authorized(Id,
                                                              this,
                                                              SessionId:   SessionId,
@@ -2765,8 +2763,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (LocalAuthentication.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication))
                         return AuthStopChargingStationResult.Authorized(Id,
                                                                         this,
                                                                         SessionId:   SessionId,
@@ -2880,8 +2877,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 {
 
                     // Authorized
-                    if (LocalAuthentication.AuthToken != null &&
-                        SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication.AuthToken))
+                    if (SessionInfo.ListOfAuthStopTokens.Contains(LocalAuthentication))
                         return AuthStopChargingPoolResult.Authorized(Id,
                                                                      this,
                                                                      SessionId:   SessionId,
