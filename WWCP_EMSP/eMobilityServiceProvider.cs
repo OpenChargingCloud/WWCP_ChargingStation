@@ -138,12 +138,12 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <summary>
         /// An event fired whenever an EVSE is being reserved.
         /// </summary>
-        public event OnReserveEVSERequestDelegate              OnReserveEVSERequest;
+        public event OnReserveRequestDelegate              OnReserveEVSERequest;
 
         /// <summary>
         /// An event fired whenever an EVSE was reserved.
         /// </summary>
-        public event OnReserveEVSEResponseDelegate             OnReservedEVSEResponse;
+        public event OnReserveResponseDelegate             OnReservedEVSEResponse;
 
         #endregion
 
@@ -3200,9 +3200,9 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                   RequestTimeout);
 
 
-            //var OnReservationCancelledLocal = OnReservationCancelled;
-            //if (OnReservationCancelledLocal != null)
-            //    OnReservationCancelledLocal(DateTime.UtcNow,
+            //var OnCancelReservationResponseLocal = OnCancelReservationResponse;
+            //if (OnCancelReservationResponseLocal != null)
+            //    OnCancelReservationResponseLocal(DateTime.UtcNow,
             //                                this,
             //                                EventTracking_Id.New,
             //                                ReservationId,

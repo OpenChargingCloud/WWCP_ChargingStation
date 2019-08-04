@@ -135,12 +135,12 @@ namespace org.GraphDefined.WWCP.SmartCity
         /// <summary>
         /// An event fired whenever an EVSE is being reserved.
         /// </summary>
-        public event OnReserveEVSERequestDelegate              OnReserveEVSE;
+        public event OnReserveRequestDelegate              OnReserveEVSE;
 
         /// <summary>
         /// An event fired whenever an EVSE was reserved.
         /// </summary>
-        public event OnReserveEVSEResponseDelegate             OnEVSEReserved;
+        public event OnReserveResponseDelegate             OnEVSEReserved;
 
         #endregion
 

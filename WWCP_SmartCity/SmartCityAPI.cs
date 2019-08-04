@@ -132,19 +132,19 @@
 //        #region OnCancelReservation
 
 //        /// <summary>
-//        /// An event sent whenever a reservation will be cancelled by an EVSE operator.
+//        /// An event sent whenever a reservation will be canceled by an EVSE operator.
 //        /// </summary>
 //        public event RequestLogHandler            OnReservationCancel;
 
 //        /// <summary>
-//        /// An event sent whenever a reservation will be cancelled by an EVSE operator.
+//        /// An event sent whenever a reservation will be canceled by an EVSE operator.
 //        /// </summary>
 //        public event OnCancelReservationDelegate  OnCancelReservation;
 
 //        /// <summary>
-//        /// An event sent whenever a reservation was cancelled by an EVSE operator.
+//        /// An event sent whenever a reservation was canceled by an EVSE operator.
 //        /// </summary>
-//        public event AccessLogHandler             OnReservationCancelled;
+//        public event AccessLogHandler             OnCancelReservationResponse;
 
 //        #endregion
 
@@ -1738,7 +1738,7 @@
 //        protected internal HTTPResponse SendReservationCancelled(HTTPResponse Response)
 //        {
 
-//            OnReservationCancelled?.Invoke(Response.Timestamp,
+//            OnCancelReservationResponse?.Invoke(Response.Timestamp,
 //                                           this.HTTPServer,
 //                                           Response.HTTPRequest,
 //                                           Response);
