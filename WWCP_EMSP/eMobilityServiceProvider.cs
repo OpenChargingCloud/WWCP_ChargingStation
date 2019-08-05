@@ -100,6 +100,10 @@ namespace org.GraphDefined.WWCP.EMSP
         /// </summary>
         public RoamingNetwork RoamingNetwork { get; }
 
+        public IEnumerable<ChargingReservation> Reservations => throw new NotImplementedException();
+
+        public IEnumerable<ChargingSession> ChargingSessions => throw new NotImplementedException();
+
         #endregion
 
         #region Events
@@ -199,6 +203,18 @@ namespace org.GraphDefined.WWCP.EMSP
 
         public event OnAuthorizeChargingStationStopRequestDelegate    OnAuthorizeChargingStationStopRequest;
         public event OnAuthorizeChargingStationStopResponseDelegate   OnAuthorizeChargingStationStopResponse;
+        public event OnReserveRequestDelegate OnReserveRequest;
+        public event OnReserveResponseDelegate OnReserveResponse;
+        public event OnNewReservationDelegate OnNewReservation;
+        public event OnCancelReservationRequestDelegate OnCancelReservationRequest;
+        public event OnCancelReservationResponseDelegate OnCancelReservationResponse;
+        public event OnReservationCanceledDelegate OnReservationCanceled;
+        public event OnRemoteStartRequestDelegate OnRemoteStartRequest;
+        public event OnRemoteStartResponseDelegate OnRemoteStartResponse;
+        public event OnNewChargingSessionDelegate OnNewChargingSession;
+        public event OnRemoteStopRequestDelegate OnRemoteStopRequest;
+        public event OnRemoteStopResponseDelegate OnRemoteStopResponse;
+        public event OnNewChargeDetailRecordDelegate OnNewChargeDetailRecord;
 
         #endregion
 
@@ -3447,6 +3463,36 @@ namespace org.GraphDefined.WWCP.EMSP
 
             return response;
 
+        }
+
+        public bool TryGetChargingReservationById(ChargingReservation_Id ReservationId, out ChargingReservation ChargingReservation)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ReservationResult> Reserve(ChargingLocation ChargingLocation, ChargingReservationLevel ReservationLevel = ChargingReservationLevel.EVSE, DateTime? StartTime = null, TimeSpan? Duration = null, ChargingReservation_Id? ReservationId = null, eMobilityProvider_Id? ProviderId = null, RemoteAuthentication RemoteAuthentication = null, ChargingProduct ChargingProduct = null, IEnumerable<Auth_Token> AuthTokens = null, IEnumerable<eMobilityAccount_Id> eMAIds = null, IEnumerable<uint> PINs = null, DateTime? Timestamp = null, CancellationToken? CancellationToken = null, EventTracking_Id EventTrackingId = null, TimeSpan? RequestTimeout = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<CancelReservationResult> CancelReservation(ChargingReservation_Id ReservationId, ChargingReservationCancellationReason Reason, eMobilityProvider_Id? ProviderId = null, DateTime? Timestamp = null, CancellationToken? CancellationToken = null, EventTracking_Id EventTrackingId = null, TimeSpan? RequestTimeout = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGetChargingSessionById(ChargingSession_Id ChargingSessionId, out ChargingSession ChargingSession)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoteStartResult> RemoteStart(ChargingLocation ChargingLocation, ChargingProduct ChargingProduct = null, ChargingReservation_Id? ReservationId = null, ChargingSession_Id? SessionId = null, eMobilityProvider_Id? ProviderId = null, RemoteAuthentication RemoteAuthentication = null, DateTime? Timestamp = null, CancellationToken? CancellationToken = null, EventTracking_Id EventTrackingId = null, TimeSpan? RequestTimeout = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<RemoteStopResult> RemoteStop(ChargingSession_Id SessionId, ReservationHandling? ReservationHandling = null, eMobilityProvider_Id? ProviderId = null, RemoteAuthentication RemoteAuthentication = null, DateTime? Timestamp = null, CancellationToken? CancellationToken = null, EventTracking_Id EventTrackingId = null, TimeSpan? RequestTimeout = null)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

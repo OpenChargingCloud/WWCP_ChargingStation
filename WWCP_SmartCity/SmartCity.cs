@@ -146,29 +146,26 @@ namespace org.GraphDefined.WWCP.SmartCity
 
         #region OnRemote...Start / OnRemote...Started
 
-        /// <summary>
-        /// An event fired whenever a remote start EVSE command was received.
-        /// </summary>
-        public event OnRemoteStartEVSERequestDelegate              OnRemoteEVSEStart;
+        ///// <summary>
+        ///// An event fired whenever a remote start EVSE command was received.
+        ///// </summary>
+        //public event OnRemoteStartEVSERequestDelegate              OnRemoteEVSEStart;
 
-        /// <summary>
-        /// An event fired whenever a remote start EVSE command completed.
-        /// </summary>
-        public event OnRemoteStartEVSEResponseDelegate             OnRemoteEVSEStarted;
+        ///// <summary>
+        ///// An event fired whenever a remote start EVSE command completed.
+        ///// </summary>
+        //public event OnRemoteStartEVSEResponseDelegate             OnRemoteEVSEStarted;
 
-        #endregion
 
-        #region OnRemote...Stop / OnRemote...Stopped
+        ///// <summary>
+        ///// An event fired whenever a remote stop EVSE command was received.
+        ///// </summary>
+        //public event OnRemoteStopEVSERequestDelegate                OnRemoteEVSEStop;
 
-        /// <summary>
-        /// An event fired whenever a remote stop EVSE command was received.
-        /// </summary>
-        public event OnRemoteStopEVSERequestDelegate                OnRemoteEVSEStop;
-
-        /// <summary>
-        /// An event fired whenever a remote stop EVSE command completed.
-        /// </summary>
-        public event OnRemoteStopEVSEResponseDelegate             OnRemoteEVSEStopped;
+        ///// <summary>
+        ///// An event fired whenever a remote stop EVSE command completed.
+        ///// </summary>
+        //public event OnRemoteStopEVSEResponseDelegate             OnRemoteEVSEStopped;
 
         #endregion
 
