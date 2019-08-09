@@ -43,17 +43,17 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="SessionId">The unique identification for this charging session.</param>
     /// <param name="eMAId">The unique identification of the e-mobility account.</param>
     /// <param name="ChargingProductId">The unique identification of the choosen charging product.</param>
-    /// <param name="QueryTimeout">An optional timeout for this request.</param>
-    public delegate Task<RemoteStartEVSEResult> OnRemoteStartDelegate(DateTime                Timestamp,
-                                                                      ProviderAPI             Sender,
-                                                                      CancellationToken       CancellationToken,
-                                                                      EventTracking_Id        EventTrackingId,
-                                                                      EVSE_Id                 EVSEId,
-                                                                      ChargingProduct_Id      ChargingProductId,
-                                                                      ChargingReservation_Id  ReservationId,
-                                                                      ChargingSession_Id      SessionId,
-                                                                      eMobilityAccount_Id                  eMAId,
-                                                                      TimeSpan?               QueryTimeout  = null);
+    /// <param name="RequestTimeout">An optional timeout for this request.</param>
+    public delegate Task<RemoteStartResult> OnRemoteStartDelegate(DateTime                Timestamp,
+                                                                  ProviderAPI             Sender,
+                                                                  CancellationToken       CancellationToken,
+                                                                  EventTracking_Id        EventTrackingId,
+                                                                  EVSE_Id                 EVSEId,
+                                                                  ChargingProduct_Id      ChargingProductId,
+                                                                  ChargingReservation_Id  ReservationId,
+                                                                  ChargingSession_Id      SessionId,
+                                                                  RemoteAuthentication    RemoteAuthentication,
+                                                                  TimeSpan?               RequestTimeout  = null);
 
 
     /// <summary>
@@ -67,16 +67,16 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="ReservationHandling">Whether to remove the reservation after session end, or to keep it open for some more time.</param>
     /// <param name="SessionId">The unique identification for this charging session.</param>
     /// <param name="eMAId">The unique identification of the e-mobility account.</param>
-    /// <param name="QueryTimeout">An optional timeout for this request.</param>
-    public delegate Task<RemoteStopEVSEResult> OnRemoteStopDelegate(DateTime             Timestamp,
-                                                                    ProviderAPI          Sender,
-                                                                    CancellationToken    CancellationToken,
-                                                                    EventTracking_Id     EventTrackingId,
-                                                                    EVSE_Id              EVSEId,
-                                                                    ReservationHandling  ReservationHandling,
-                                                                    ChargingSession_Id   SessionId,
-                                                                    eMobilityAccount_Id               eMAId,
-                                                                    TimeSpan?            QueryTimeout  = null);
+    /// <param name="RequestTimeout">An optional timeout for this request.</param>
+    public delegate Task<RemoteStopResult> OnRemoteStopDelegate(DateTime              Timestamp,
+                                                                ProviderAPI           Sender,
+                                                                CancellationToken     CancellationToken,
+                                                                EventTracking_Id      EventTrackingId,
+                                                                EVSE_Id               EVSEId,
+                                                                ReservationHandling   ReservationHandling,
+                                                                ChargingSession_Id    SessionId,
+                                                                RemoteAuthentication  RemoteAuthentication,
+                                                                TimeSpan?             RequestTimeout  = null);
 
 
     /// <summary>
@@ -95,21 +95,21 @@ namespace org.GraphDefined.WWCP.EMSP
     /// <param name="AuthTokens">A list of authentication tokens, who can use this reservation.</param>
     /// <param name="eMAIds">A list of eMobility account identifications, who can use this reservation.</param>
     /// <param name="PINs">A list of PINs, who can be entered into a pinpad to use this reservation.</param>
-    /// <param name="QueryTimeout">An optional timeout for this request.</param>
-    public delegate Task<ReservationResult> OnReserveEVSEDelegate(DateTime                 Timestamp,
-                                                                  ProviderAPI              Sender,
-                                                                  CancellationToken        CancellationToken,
-                                                                  EventTracking_Id         EventTrackingId,
-                                                                  EVSE_Id                  EVSEId,
-                                                                  DateTime?                StartTime,
-                                                                  TimeSpan?                Duration,
-                                                                  ChargingReservation_Id   ReservationId,
-                                                                  eMobilityAccount_Id                   eMAId,
-                                                                  ChargingProduct_Id       ChargingProductId,
-                                                                  IEnumerable<Auth_Token>  AuthTokens,
-                                                                  IEnumerable<eMobilityAccount_Id>      eMAIds,
-                                                                  IEnumerable<UInt32>      PINs,
-                                                                  TimeSpan?                QueryTimeout  = null);
+    /// <param name="RequestTimeout">An optional timeout for this request.</param>
+    public delegate Task<ReservationResult> OnReserveEVSEDelegate(DateTime                          Timestamp,
+                                                                  ProviderAPI                       Sender,
+                                                                  CancellationToken                 CancellationToken,
+                                                                  EventTracking_Id                  EventTrackingId,
+                                                                  EVSE_Id                           EVSEId,
+                                                                  DateTime?                         StartTime,
+                                                                  TimeSpan?                         Duration,
+                                                                  ChargingReservation_Id            ReservationId,
+                                                                  RemoteAuthentication              RemoteAuthentication,
+                                                                  ChargingProduct_Id                ChargingProductId,
+                                                                  IEnumerable<Auth_Token>           AuthTokens,
+                                                                  IEnumerable<eMobilityAccount_Id>  eMAIds,
+                                                                  IEnumerable<UInt32>               PINs,
+                                                                  TimeSpan?                         RequestTimeout  = null);
 
 
     public delegate Task<CancelReservationResult> OnCancelReservationDelegate(DateTime                               Timestamp,
@@ -118,7 +118,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                               EventTracking_Id                       EventTrackingId,
                                                                               ChargingReservation_Id                 ChargingReservationId,
                                                                               ChargingReservationCancellationReason  Reason,
-                                                                              TimeSpan?                              QueryTimeout  = null);
+                                                                              TimeSpan?                              RequestTimeout  = null);
 
     public delegate Task<CancelReservationResult> OnDeleteReservationDelegate(DateTime                               Timestamp,
                                                                               ProviderAPI                            Sender,
@@ -126,6 +126,6 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                               EventTracking_Id                       EventTrackingId,
                                                                               ChargingReservation_Id                 ChargingReservationId,
                                                                               eMobilityAccount_Id                    eMAId,
-                                                                              TimeSpan?                              QueryTimeout  = null);
+                                                                              TimeSpan?                              RequestTimeout  = null);
 
 }

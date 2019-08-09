@@ -733,10 +733,12 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var result = await EMSP.Reserve(EVSEId,
+                                             var result = await EMSP.Reserve(ChargingLocation.FromEVSEId(EVSEId),
+                                                                             ChargingReservationLevel.EVSE,
                                                                              StartTime,
                                                                              Duration,
                                                                              ReservationId,
+                                                                             null,
                                                                              RemoteAuthentication.FromRemoteIdentification(eMAId),
                                                                              ChargingProductId.HasValue    // of IntendedCharging
                                                                                  ? new ChargingProduct(ChargingProductId.Value)
@@ -1095,12 +1097,13 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var response = await EMSP.RemoteStart(EVSEId,
+                                             var response = await EMSP.RemoteStart(ChargingLocation.FromEVSEId(EVSEId),
                                                                                    ChargingProductId.HasValue
                                                                                        ? new ChargingProduct(ChargingProductId.Value)
                                                                                        : null,
                                                                                    ReservationId,
                                                                                    SessionId,
+                                                                                   null,
                                                                                    RemoteAuthentication.FromRemoteIdentification(eMAId),
 
                                                                                    Request.Timestamp,
@@ -1113,7 +1116,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Success
 
-                                                 case RemoteStartEVSEResultType.Success:
+                                                 case RemoteStartResultType.Success:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Created,
@@ -1132,7 +1135,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidCredentials
 
-                                                 case RemoteStartEVSEResultType.InvalidCredentials:
+                                                 case RemoteStartResultType.InvalidCredentials:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
@@ -1151,7 +1154,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region AlreadyInUse
 
-                                                 case RemoteStartEVSEResultType.AlreadyInUse:
+                                                 case RemoteStartResultType.AlreadyInUse:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1170,7 +1173,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Reserved
 
-                                                 case RemoteStartEVSEResultType.Reserved:
+                                                 case RemoteStartResultType.Reserved:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1189,7 +1192,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region OutOfService
 
-                                                 case RemoteStartEVSEResultType.OutOfService:
+                                                 case RemoteStartResultType.OutOfService:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1208,7 +1211,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Timeout
 
-                                                 case RemoteStartEVSEResultType.Timeout:
+                                                 case RemoteStartResultType.Timeout:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
@@ -1357,9 +1360,10 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #endregion
 
 
-                                             var response = await EMSP.RemoteStop(EVSEId,
+                                             var response = await EMSP.RemoteStop(//EVSEId,
                                                                                   SessionId,
                                                                                   ReservationHandling.Close, //ReservationHandling.KeepAlive(TimeSpan.FromMinutes(1)), // ToDo: Parse this property!
+                                                                                  null,
                                                                                   RemoteAuthentication.FromRemoteIdentification(eMAId),
 
                                                                                   Request.Timestamp,
@@ -1372,7 +1376,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Success
 
-                                                 case RemoteStopEVSEResultType.Success:
+                                                 case RemoteStopResultType.Success:
 
                                                      if (response.ReservationHandling.IsKeepAlive == false)
                                                          return SendEVSERemoteStopped(
@@ -1404,7 +1408,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidCredentials
 
-                                                 case RemoteStopEVSEResultType.InvalidCredentials:
+                                                 case RemoteStopResultType.InvalidCredentials:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
@@ -1423,7 +1427,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidSessionId
 
-                                                 case RemoteStopEVSEResultType.InvalidSessionId:
+                                                 case RemoteStopResultType.InvalidSessionId:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1442,7 +1446,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region OutOfService
 
-                                                 case RemoteStopEVSEResultType.OutOfService:
+                                                 case RemoteStopResultType.OutOfService:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1461,7 +1465,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Offline
 
-                                                 case RemoteStopEVSEResultType.Offline:
+                                                 case RemoteStopResultType.Offline:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1570,7 +1574,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                   EventTracking_Id                       EventTrackingId,
                                   ChargingReservation_Id                 ReservationId,
                                   ChargingReservationCancellationReason  Reason,
-                                  TimeSpan?                              QueryTimeout  = null)
+                                  TimeSpan?                              RequestTimeout  = null)
 
         {
 
@@ -1588,10 +1592,10 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       EventTrackingId,
                                                       ReservationId,
                                                       Reason,
-                                                      QueryTimeout)));
+                                                      RequestTimeout)));
 
             return results.
-                   //    Where(result => result.Result != RemoteStopEVSEResultType.Unspecified).
+                   //    Where(result => result.Result != RemoteStopResultType.Unspecified).
                        First();
 
         }

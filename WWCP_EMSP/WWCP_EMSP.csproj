@@ -47,9 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="APIDelegates.cs" />
     <Compile Include="Helper.cs" />
     <Compile Include="eMobilityServiceProvider.cs" />
+    <Compile Include="IO.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProviderAPI.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BouncyCastle\crypto\crypto.csproj">
@@ -72,6 +75,65 @@
       <Project>{33836742-af1d-4aa4-963f-b0a8e60e6480}</Project>
       <Name>WWCP_Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="compilerconfig.json.defaults">
+      <DependentUpon>compilerconfig.json</DependentUpon>
+    </None>
+    <None Include="HTTPRoot\css\EVSEStatus.scss" />
+    <None Include="HTTPRoot\css\Infotext.scss" />
+    <None Include="HTTPRoot\css\styles.scss" />
+    <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.js.map" />
+    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js.map">
+      <DependentUpon>CreateMap.ts</DependentUpon>
+    </EmbeddedResource>
+    <None Include="tsconfig.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HTTPRoot\css\styles.css">
+      <DependentUpon>styles.scss</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="HTTPRoot\css\styles.min.css">
+      <DependentUpon>styles.css</DependentUpon>
+    </Content>
+    <EmbeddedResource Include="HTTPRoot\robots.txt" />
+    <EmbeddedResource Include="HTTPRoot\js\ChargingMap.js">
+      <DependentUpon>CreateMap.ts</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="HTTPRoot\index.html" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\Typ_3A.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\T23.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\Socket_Type-2.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\Schuko_plug.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\Schuko.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\IEC_Typ_2_Cable.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\IEC_Typ_2.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\IEC_Typ_1.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\CHAdeMO.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\CEE_Rot.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\CEE_Blau.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\Ladestecker\CCS_Typ_2.svg" />
+    <EmbeddedResource Include="HTTPRoot\images\clouds-bg.jpg" />
+    <EmbeddedResource Include="HTTPRoot\humans.txt" />
+    <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HTTPRoot\HTTPWorker\HTTPWorker.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HTTPRoot\js\CreateMap.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HTTPRoot\js\Networking.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="HTTPRoot\js\WWCPClient.ts" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="HTTPRoot\libs\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

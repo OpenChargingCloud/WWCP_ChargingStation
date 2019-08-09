@@ -238,7 +238,7 @@ namespace org.GraphDefined.WWCP.EMSP
                 return false;
 
 
-            if (!RoamingNetwork.TryGetReservationById(ChargingReservationId, out ChargingReservation))
+            if (!RoamingNetwork.ReservationsStore.TryGetLatest(ChargingReservationId, out ChargingReservation))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {

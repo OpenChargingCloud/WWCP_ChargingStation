@@ -906,6 +906,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                                 ChargingReservationLevel.EVSE,
                                                                 ProviderId,
                                                                 RemoteAuthentication,
+                                                                null, //RoamingNetwork.Id,
                                                                 null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
                                                                 null, //ChargingStation.ChargingPool.Id,
                                                                 ChargingStation.Id,
@@ -939,18 +940,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <param name="RemoteAuthentication">The unique identification of the e-mobility account.</param>
         /// <returns>A RemoteStartResult task.</returns>
-        public async Task<RemoteStartEVSEResult> RemoteStart(DateTime                Timestamp,
-                                                             CancellationToken       CancellationToken,
-                                                             EventTracking_Id        EventTrackingId,
-                                                             ChargingProduct_Id      ChargingProductId,
-                                                             ChargingReservation_Id  ReservationId,
-                                                             ChargingSession_Id      SessionId,
-                                                             eMobilityProvider_Id    ProviderId,
-                                                             RemoteAuthentication    RemoteAuthentication,
-                                                             TimeSpan?               RequestTimeout  = null)
+        public async Task<RemoteStartResult> RemoteStart(DateTime                Timestamp,
+                                                         CancellationToken       CancellationToken,
+                                                         EventTracking_Id        EventTrackingId,
+                                                         ChargingProduct_Id      ChargingProductId,
+                                                         ChargingReservation_Id  ReservationId,
+                                                         ChargingSession_Id      SessionId,
+                                                         eMobilityProvider_Id    ProviderId,
+                                                         RemoteAuthentication    RemoteAuthentication,
+                                                         TimeSpan?               RequestTimeout  = null)
         {
 
-            return RemoteStartEVSEResult.Offline;
+            return RemoteStartResult.Offline;
 
             //if (_ChargingStation == null)
             //    return RemoteStartEVSEResult.Offline;
@@ -980,16 +981,16 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ReservationHandling">Whether to remove the reservation after session end, or to keep it open for some more time.</param>
         /// <param name="SessionId">The unique identification for this charging session.</param>
         /// <returns>A RemoteStopResult task.</returns>
-        public async Task<RemoteStopEVSEResult> RemoteStop(DateTime              Timestamp,
-                                                           CancellationToken     CancellationToken,
-                                                           EventTracking_Id      EventTrackingId,
-                                                           ChargingSession_Id    SessionId,
-                                                           ReservationHandling   ReservationHandling,
-                                                           eMobilityProvider_Id  ProviderId,
-                                                           TimeSpan?             RequestTimeout  = null)
+        public async Task<RemoteStopResult> RemoteStop(DateTime              Timestamp,
+                                                       CancellationToken     CancellationToken,
+                                                       EventTracking_Id      EventTrackingId,
+                                                       ChargingSession_Id    SessionId,
+                                                       ReservationHandling   ReservationHandling,
+                                                       eMobilityProvider_Id  ProviderId,
+                                                       TimeSpan?             RequestTimeout  = null)
         {
 
-            return RemoteStopEVSEResult.Offline(SessionId);
+            return RemoteStopResult.Offline(SessionId);
 
             //if (_ChargingStation == null)
             //    return RemoteStopEVSEResult.Offline(SessionId);
