@@ -278,7 +278,7 @@ namespace org.GraphDefined.WWCP.EMSP
             HTTPServer.ResponseLog  += (HTTPProcessor, ServerTimestamp, Request, Response)                       => ResponseLog.WhenAll(HTTPProcessor, ServerTimestamp, Request, Response);
             HTTPServer.ErrorLog     += (HTTPProcessor, ServerTimestamp, Request, Response, Error, LastException) => ErrorLog.   WhenAll(HTTPProcessor, ServerTimestamp, Request, Response, Error, LastException);
 
-            RegisterURITemplates();
+            RegisterURLTemplates();
 
         }
 
@@ -304,15 +304,15 @@ namespace org.GraphDefined.WWCP.EMSP
 
         #endregion
 
-        #region (private) RegisterURITemplates()
+        #region (private) RegisterURLTemplates()
 
-        private void RegisterURITemplates()
+        private void RegisterURLTemplates()
         {
 
             DebugLog  = HTTPServer.AddJSONEventSource(EventIdentification:      HTTPEventSource_Id.Parse("DebugLog"),
                                                       MaxNumberOfCachedEvents:  50000,
                                                       RetryIntervall:           TimeSpan.FromSeconds(5),
-                                                      URITemplate:              URIPrefix + "/DebugLog");
+                                                      URLTemplate:              URIPrefix + "/DebugLog");
 
             #region / (HTTPRoot)
 
