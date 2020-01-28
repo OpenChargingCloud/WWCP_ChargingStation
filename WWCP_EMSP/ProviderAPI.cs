@@ -1115,7 +1115,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Success
 
-                                                 case RemoteStartResultType.Success:
+                                                 case RemoteStartResultTypes.Success:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Created,
@@ -1134,7 +1134,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidCredentials
 
-                                                 case RemoteStartResultType.InvalidCredentials:
+                                                 case RemoteStartResultTypes.InvalidCredentials:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
@@ -1153,7 +1153,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region AlreadyInUse
 
-                                                 case RemoteStartResultType.AlreadyInUse:
+                                                 case RemoteStartResultTypes.AlreadyInUse:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1172,7 +1172,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Reserved
 
-                                                 case RemoteStartResultType.Reserved:
+                                                 case RemoteStartResultTypes.Reserved:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1191,7 +1191,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region OutOfService
 
-                                                 case RemoteStartResultType.OutOfService:
+                                                 case RemoteStartResultTypes.OutOfService:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1210,7 +1210,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Timeout
 
-                                                 case RemoteStartResultType.Timeout:
+                                                 case RemoteStartResultTypes.Timeout:
                                                      return SendEVSERemoteStarted(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.RequestTimeout,
@@ -1375,7 +1375,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Success
 
-                                                 case RemoteStopResultType.Success:
+                                                 case RemoteStopResultTypes.Success:
 
                                                      if (response.ReservationHandling.IsKeepAlive == false)
                                                          return SendEVSERemoteStopped(
@@ -1407,7 +1407,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidCredentials
 
-                                                 case RemoteStopResultType.InvalidCredentials:
+                                                 case RemoteStopResultTypes.InvalidCredentials:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Unauthorized,
@@ -1426,7 +1426,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region InvalidSessionId
 
-                                                 case RemoteStopResultType.InvalidSessionId:
+                                                 case RemoteStopResultTypes.InvalidSessionId:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1445,7 +1445,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region OutOfService
 
-                                                 case RemoteStopResultType.OutOfService:
+                                                 case RemoteStopResultTypes.OutOfService:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1464,7 +1464,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                                  #region Offline
 
-                                                 case RemoteStopResultType.Offline:
+                                                 case RemoteStopResultTypes.Offline:
                                                      return SendEVSERemoteStopped(
                                                          new HTTPResponse.Builder(Request) {
                                                              HTTPStatusCode             = HTTPStatusCode.Conflict,
@@ -1594,7 +1594,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       RequestTimeout)));
 
             return results.
-                   //    Where(result => result.Result != RemoteStopResultType.Unspecified).
+                   //    Where(result => result.Result != RemoteStopResultTypes.Unspecified).
                        First();
 
         }
