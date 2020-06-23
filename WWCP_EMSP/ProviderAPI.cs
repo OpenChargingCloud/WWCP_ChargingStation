@@ -1183,7 +1183,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                              AccessControlAllowHeaders  = "Content-Type, Accept, Authorization",
                                                              ContentType                = HTTPContentType.JSON_UTF8,
                                                              Content                    = JSONObject.Create(
-                                                                                              new JProperty("description", response.Message.IsNotNullOrEmpty() ? response.Message : "The EVSE is reserved!")
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "The EVSE is reserved!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 
@@ -1244,7 +1244,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                                                   ? new JProperty("SessionId",  response.Session.Id.ToString())
                                                                                                   : null,
                                                                                               new JProperty("Result",      response.Result.ToString()),
-                                                                                              new JProperty("description", response.Message.IsNotNullOrEmpty() ? response.Message : "General error!")
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "General error!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 
@@ -1498,7 +1498,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                                                   ? new JProperty("SessionId",  response.SessionId.ToString())
                                                                                                   : null,
                                                                                               new JProperty("Result",      response.Result.ToString()),
-                                                                                              new JProperty("description", response.Message.IsNotNullOrEmpty() ? response.Message : "General error!")
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "General error!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 
