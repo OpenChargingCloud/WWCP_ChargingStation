@@ -790,7 +790,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public void SetStatus(IEnumerable<Timestamped<EVSEStatusTypes>>  NewStatusList,
                               ChangeMethods                              ChangeMethod = ChangeMethods.Replace)
         {
-            _StatusSchedule.Insert(NewStatusList, ChangeMethod);
+            _StatusSchedule.Insert(NewStatusList);//, ChangeMethod);
         }
 
         #endregion
@@ -845,9 +845,9 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
         public void SetAdminStatus(IEnumerable<Timestamped<EVSEAdminStatusTypes>>  NewAdminStatusList,
-                                   ChangeMethods                                  ChangeMethod = ChangeMethods.Replace)
+                                   ChangeMethods                                   ChangeMethod = ChangeMethods.Replace)
         {
-            _AdminStatusSchedule.Insert(NewAdminStatusList, ChangeMethod);
+            _AdminStatusSchedule.Insert(NewAdminStatusList);//, ChangeMethod);
         }
 
         #endregion
