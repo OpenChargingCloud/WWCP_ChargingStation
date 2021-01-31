@@ -382,8 +382,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #region Check HTTP Basic Authentication
 
                                              if (Request.Authorization          == null        ||
-                                                 Request.Authorization.Username != HTTPLogin   ||
-                                                 Request.Authorization.Password != HTTPPassword)
+                                                (Request.Authorization as HTTPBasicAuthentication).Username != HTTPLogin   ||
+                                                (Request.Authorization as HTTPBasicAuthentication).Password != HTTPPassword)
                                              {
 
                                                  return SendEVSERemoteStarted(
@@ -401,8 +401,8 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Get EVSEId URI parameter
 
-                                             HTTPResponse  _HTTPResponse;
-                                             EVSE_Id       EVSEId;
+                                             HTTPResponse.Builder  _HTTPResponse;
+                                             EVSE_Id               EVSEId;
 
                                              if (!Request.ParseEVSEId(DefaultHTTPServerName,
                                                                       out EVSEId,
@@ -986,8 +986,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #region Check HTTP Basic Authentication
 
                                              if (Request.Authorization          == null        ||
-                                                 Request.Authorization.Username != HTTPLogin   ||
-                                                 Request.Authorization.Password != HTTPPassword)
+                                                (Request.Authorization as HTTPBasicAuthentication).Username != HTTPLogin   ||
+                                                (Request.Authorization as HTTPBasicAuthentication).Password != HTTPPassword)
                                              {
 
                                                  return SendEVSERemoteStarted(
@@ -1005,7 +1005,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Get EVSEId URI parameter
 
-                                             HTTPResponse  _HTTPResponse;
+                                             HTTPResponse.Builder _HTTPResponse;
                                              EVSE_Id       EVSEId;
 
                                              if (!Request.ParseEVSEId(DefaultHTTPServerName,
@@ -1183,7 +1183,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                              AccessControlAllowHeaders  = "Content-Type, Accept, Authorization",
                                                              ContentType                = HTTPContentType.JSON_UTF8,
                                                              Content                    = JSONObject.Create(
-                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "The EVSE is reserved!"))
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.en, "The EVSE is reserved!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 
@@ -1244,7 +1244,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                                                   ? new JProperty("SessionId",  response.Session.Id.ToString())
                                                                                                   : null,
                                                                                               new JProperty("Result",      response.Result.ToString()),
-                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "General error!"))
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.en, "General error!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 
@@ -1278,8 +1278,8 @@ namespace org.GraphDefined.WWCP.EMSP
                                              #region Check HTTP Basic Authentication
 
                                              if (Request.Authorization          == null        ||
-                                                 Request.Authorization.Username != HTTPLogin   ||
-                                                 Request.Authorization.Password != HTTPPassword)
+                                                 (Request.Authorization as HTTPBasicAuthentication).Username != HTTPLogin   ||
+                                                 (Request.Authorization as HTTPBasicAuthentication).Password != HTTPPassword)
                                              {
 
                                                  return SendEVSERemoteStopped(
@@ -1297,7 +1297,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
                                              #region Get EVSEId URI parameter
 
-                                             HTTPResponse  _HTTPResponse;
+                                             HTTPResponse.Builder _HTTPResponse;
                                              EVSE_Id       EVSEId;
 
                                              if (!Request.ParseEVSEId(DefaultHTTPServerName,
@@ -1498,7 +1498,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                                                   ? new JProperty("SessionId",  response.SessionId.ToString())
                                                                                                   : null,
                                                                                               new JProperty("Result",      response.Result.ToString()),
-                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.eng, "General error!"))
+                                                                                              new JProperty("description", response.Description.IsNeitherNullNorEmpty() ? response.Description : I18NString.Create(Languages.en, "General error!"))
                                                                                           ).ToUTF8Bytes()
                                                          });
 

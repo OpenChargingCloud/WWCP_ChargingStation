@@ -290,7 +290,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(EVSE                EVSE,
+            IReceivePOIData.SetStaticData(EVSE                EVSE,
 
                                        DateTime?           Timestamp,
                                        CancellationToken?  CancellationToken,
@@ -325,7 +325,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(EVSE                EVSE,
+            IReceivePOIData.AddStaticData(EVSE                EVSE,
 
                                        DateTime?           Timestamp,
                                        CancellationToken?  CancellationToken,
@@ -364,7 +364,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(EVSE                EVSE,
+            IReceivePOIData.UpdateStaticData(EVSE                EVSE,
                                           String              PropertyName,
                                           Object              OldValue,
                                           Object              NewValue,
@@ -402,7 +402,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(EVSE                EVSE,
+            IReceivePOIData.DeleteStaticData(EVSE                EVSE,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -438,7 +438,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceivePOIData.SetStaticData(IEnumerable<EVSE>   EVSEs,
 
                                        DateTime?           Timestamp,
                                        CancellationToken?  CancellationToken,
@@ -473,7 +473,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceivePOIData.AddStaticData(IEnumerable<EVSE>   EVSEs,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -508,7 +508,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceivePOIData.UpdateStaticData(IEnumerable<EVSE>   EVSEs,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -543,7 +543,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
+            IReceivePOIData.DeleteStaticData(IEnumerable<EVSE>   EVSEs,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -651,7 +651,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(ChargingStation     ChargingStation,
+            IReceivePOIData.SetStaticData(ChargingStation     ChargingStation,
 
                                        DateTime?           Timestamp,
                                        CancellationToken?  CancellationToken,
@@ -686,7 +686,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(ChargingStation     ChargingStation,
+            IReceivePOIData.AddStaticData(ChargingStation     ChargingStation,
 
                                        DateTime?           Timestamp,
                                        CancellationToken?  CancellationToken,
@@ -724,7 +724,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(ChargingStation     ChargingStation,
+            IReceivePOIData.UpdateStaticData(ChargingStation     ChargingStation,
                                           String              PropertyName,
                                           Object              OldValue,
                                           Object              NewValue,
@@ -762,7 +762,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(ChargingStation     ChargingStation,
+            IReceivePOIData.DeleteStaticData(ChargingStation     ChargingStation,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -798,7 +798,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceivePOIData.SetStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                           DateTime?                     Timestamp,
                                           CancellationToken?            CancellationToken,
@@ -833,7 +833,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceivePOIData.AddStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                           DateTime?                     Timestamp,
                                           CancellationToken?            CancellationToken,
@@ -868,7 +868,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceivePOIData.UpdateStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                              DateTime?                     Timestamp,
                                              CancellationToken?            CancellationToken,
@@ -903,7 +903,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
+            IReceivePOIData.DeleteStaticData(IEnumerable<ChargingStation>  ChargingStations,
 
                                              DateTime?                     Timestamp,
                                              CancellationToken?            CancellationToken,
@@ -1003,7 +1003,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(ChargingPool        ChargingPool,
+            IReceivePOIData.SetStaticData(ChargingPool        ChargingPool,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1038,7 +1038,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(ChargingPool        ChargingPool,
+            IReceivePOIData.AddStaticData(ChargingPool        ChargingPool,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1076,7 +1076,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(ChargingPool        ChargingPool,
+            IReceivePOIData.UpdateStaticData(ChargingPool        ChargingPool,
                                              String              PropertyName,
                                              Object              OldValue,
                                              Object              NewValue,
@@ -1114,7 +1114,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(ChargingPool        ChargingPool,
+            IReceivePOIData.DeleteStaticData(ChargingPool        ChargingPool,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1150,7 +1150,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceivePOIData.SetStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                           DateTime?                  Timestamp,
                                           CancellationToken?         CancellationToken,
@@ -1185,7 +1185,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceivePOIData.AddStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                           DateTime?                  Timestamp,
                                           CancellationToken?         CancellationToken,
@@ -1220,7 +1220,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceivePOIData.UpdateStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                              DateTime?                  Timestamp,
                                              CancellationToken?         CancellationToken,
@@ -1255,7 +1255,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
+            IReceivePOIData.DeleteStaticData(IEnumerable<ChargingPool>  ChargingPools,
 
                                              DateTime?                  Timestamp,
                                              CancellationToken?         CancellationToken,
@@ -1353,7 +1353,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceivePOIData.SetStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1388,7 +1388,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceivePOIData.AddStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                           DateTime?                Timestamp,
                                           CancellationToken?       CancellationToken,
@@ -1423,7 +1423,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceivePOIData.UpdateStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1458,7 +1458,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
+            IReceivePOIData.DeleteStaticData(ChargingStationOperator  ChargingStationOperator,
 
                                              DateTime?                Timestamp,
                                              CancellationToken?       CancellationToken,
@@ -1494,7 +1494,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceivePOIData.SetStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1529,7 +1529,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceivePOIData.AddStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                           DateTime?                             Timestamp,
                                           CancellationToken?                    CancellationToken,
@@ -1565,7 +1565,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceivePOIData.UpdateStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
@@ -1600,7 +1600,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
+            IReceivePOIData.DeleteStaticData(IEnumerable<ChargingStationOperator>  ChargingStationOperators,
 
                                              DateTime?                             Timestamp,
                                              CancellationToken?                    CancellationToken,
@@ -1700,7 +1700,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.SetStaticData(RoamingNetwork      RoamingNetwork,
+            IReceivePOIData.SetStaticData(RoamingNetwork      RoamingNetwork,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1735,7 +1735,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.AddStaticData(RoamingNetwork      RoamingNetwork,
+            IReceivePOIData.AddStaticData(RoamingNetwork      RoamingNetwork,
 
                                           DateTime?           Timestamp,
                                           CancellationToken?  CancellationToken,
@@ -1770,7 +1770,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
+            IReceivePOIData.UpdateStaticData(RoamingNetwork      RoamingNetwork,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1805,7 +1805,7 @@ namespace org.GraphDefined.WWCP.EMSP
         /// <param name="RequestTimeout">An optional timeout for this request.</param>
         async Task<PushEVSEDataResult>
 
-            IReceiveData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
+            IReceivePOIData.DeleteStaticData(RoamingNetwork      RoamingNetwork,
 
                                              DateTime?           Timestamp,
                                              CancellationToken?  CancellationToken,
@@ -1996,7 +1996,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      this,
                                                      ProviderId:   Id,
                                                      SessionId:    SessionId,
-                                                     Description:  I18NString.Create(Languages.eng, "Token is blocked!"));
+                                                     Description:  I18NString.Create(Languages.en, "Token is blocked!"));
 
                 #endregion
 
@@ -2018,7 +2018,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                            this,
                                                            ProviderId:   Id,
                                                            SessionId:    SessionId,
-                                                           Description:  I18NString.Create(Languages.eng, "Unkown token!"));
+                                                           Description:  I18NString.Create(Languages.en, "Unkown token!"));
 
             #endregion
 
@@ -2138,7 +2138,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                                 this,
                                                                 SessionId:    SessionId,
                                                                 ProviderId:   Id,
-                                                                Description:  I18NString.Create(Languages.eng, "Invalid token for given session identification!"));
+                                                                Description:  I18NString.Create(Languages.en, "Invalid token for given session identification!"));
 
                 }
 
@@ -2151,7 +2151,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                       this,
                                                       SessionId:    SessionId,
                                                       ProviderId:   Id,
-                                                      Description:  I18NString.Create(Languages.eng,  "Token is blocked!"));
+                                                      Description:  I18NString.Create(Languages.en,  "Token is blocked!"));
 
                 #endregion
 
@@ -2172,7 +2172,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                     this,
                                                     SessionId:    SessionId,
                                                     ProviderId:   Id,
-                                                    Description:  I18NString.Create(Languages.eng, "Unkown token!"));
+                                                    Description:  I18NString.Create(Languages.en, "Unkown token!"));
 
             #endregion
 

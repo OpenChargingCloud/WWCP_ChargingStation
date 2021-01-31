@@ -42,12 +42,12 @@ namespace org.GraphDefined.WWCP.EMSP
         public static Boolean ParseChargingPoolId(this HTTPRequest     HTTPRequest,
                                                   String               DefaultServerName,
                                                   out ChargingPool_Id  ChargingPoolId,
-                                                  out HTTPResponse     HTTPResponse)
+                                                  out HTTPResponse.Builder HTTPResponse)
         {
 
             HTTPResponse = null;
 
-            if (HTTPRequest.ParsedURIParameters.Length < 1)
+            if (HTTPRequest.ParsedURLParameters.Length < 1)
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -61,7 +61,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             }
 
-            if (!ChargingPool_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingPoolId))
+            if (!ChargingPool_Id.TryParse(HTTPRequest.ParsedURLParameters[0], out ChargingPoolId))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -87,12 +87,12 @@ namespace org.GraphDefined.WWCP.EMSP
         public static Boolean ParseChargingStationId(this HTTPRequest        HTTPRequest,
                                                      String                  DefaultServerName,
                                                      out ChargingStation_Id  ChargingStationId,
-                                                     out HTTPResponse        HTTPResponse)
+                                                     out HTTPResponse.Builder HTTPResponse)
         {
 
             HTTPResponse       = null;
 
-            if (HTTPRequest.ParsedURIParameters.Length < 1)
+            if (HTTPRequest.ParsedURLParameters.Length < 1)
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -107,7 +107,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             }
 
-            if (!ChargingStation_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingStationId))
+            if (!ChargingStation_Id.TryParse(HTTPRequest.ParsedURLParameters[0], out ChargingStationId))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -133,13 +133,13 @@ namespace org.GraphDefined.WWCP.EMSP
         public static Boolean ParseEVSEId(this HTTPRequest  HTTPRequest,
                                           String            DefaultServerName,
                                           out EVSE_Id       EVSEId,
-                                          out HTTPResponse  HTTPResponse)
+                                          out HTTPResponse.Builder  HTTPResponse)
         {
 
             EVSEId        = default(EVSE_Id);
             HTTPResponse  = null;
 
-            if (HTTPRequest.ParsedURIParameters.Length < 1)
+            if (HTTPRequest.ParsedURLParameters.Length < 1)
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -152,7 +152,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             }
 
-            if (!EVSE_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out EVSEId))
+            if (!EVSE_Id.TryParse(HTTPRequest.ParsedURLParameters[0], out EVSEId))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -180,13 +180,13 @@ namespace org.GraphDefined.WWCP.EMSP
         public static Boolean ParseChargingReservationId(this HTTPRequest            HTTPRequest,
                                                          String                      DefaultServerName,
                                                          out ChargingReservation_Id  ChargingReservationId,
-                                                         out HTTPResponse            HTTPResponse)
+                                                         out HTTPResponse.Builder HTTPResponse)
         {
 
             ChargingReservationId  = default(ChargingReservation_Id);
             HTTPResponse           = null;
 
-            if (HTTPRequest.ParsedURIParameters.Length < 1)
+            if (HTTPRequest.ParsedURLParameters.Length < 1)
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -199,7 +199,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             }
 
-            if (!ChargingReservation_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingReservationId))
+            if (!ChargingReservation_Id.TryParse(HTTPRequest.ParsedURLParameters[0], out ChargingReservationId))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -226,7 +226,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                        String                   DefaultServerName,
                                                        RoamingNetwork           RoamingNetwork,
                                                        out ChargingReservation  ChargingReservation,
-                                                       out HTTPResponse         HTTPResponse)
+                                                       out HTTPResponse.Builder HTTPResponse)
         {
 
             var ChargingReservationId  = default(ChargingReservation_Id);
@@ -266,14 +266,14 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      String                  DefaultServerName,
                                                      RoamingNetwork          RoamingNetwork,
                                                      out ChargingSession_Id  ChargingSessionId,
-                                                     out HTTPResponse        HTTPResponse)
+                                                     out HTTPResponse.Builder HTTPResponse)
         {
 
             var ChargingReservationId  = default(ChargingReservation_Id);
                 ChargingSessionId      = default(ChargingSession_Id);
                 HTTPResponse           = null;
 
-            if (HTTPRequest.ParsedURIParameters.Length < 1)
+            if (HTTPRequest.ParsedURLParameters.Length < 1)
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
@@ -286,7 +286,7 @@ namespace org.GraphDefined.WWCP.EMSP
 
             }
 
-            if (!ChargingSession_Id.TryParse(HTTPRequest.ParsedURIParameters[0], out ChargingSessionId))
+            if (!ChargingSession_Id.TryParse(HTTPRequest.ParsedURLParameters[0], out ChargingSessionId))
             {
 
                 HTTPResponse = new HTTPResponse.Builder(HTTPRequest) {
