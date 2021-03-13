@@ -1898,9 +1898,10 @@ namespace org.GraphDefined.WWCP.EMSP
         /// Create an AuthorizeStart request at the given EVSE.
         /// </summary>
         /// <param name="LocalAuthentication">An user identification.</param>
-        /// <param name="EVSEId">The unique identification of an EVSE.</param>
+        /// <param name="ChargingLocation">The charging location.</param>
         /// <param name="ChargingProduct">An optional charging product.</param>
         /// <param name="SessionId">An optional session identification.</param>
+        /// <param name="CPOPartnerSessionId">An optional session identification of the CPO.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
@@ -1913,6 +1914,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                ChargingLocation             ChargingLocation,
                                                ChargingProduct              ChargingProduct,
                                                ChargingSession_Id?          SessionId,
+                                               ChargingSession_Id?          CPOPartnerSessionId,
                                                ChargingStationOperator_Id?  OperatorId,
 
                                                DateTime?                    Timestamp,
@@ -1954,6 +1956,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      ChargingLocation,
                                                      ChargingProduct,
                                                      SessionId,
+                                                     CPOPartnerSessionId,
                                                      new ISendAuthorizeStartStop[0],
                                                      RequestTimeout ?? RequestTimeout.Value))).
                                        ConfigureAwait(false);
@@ -2046,6 +2049,7 @@ namespace org.GraphDefined.WWCP.EMSP
                                                      ChargingLocation,
                                                      ChargingProduct,
                                                      SessionId,
+                                                     CPOPartnerSessionId,
                                                      new ISendAuthorizeStartStop[0],
                                                      RequestTimeout ?? RequestTimeout.Value,
                                                      result,
@@ -2077,7 +2081,8 @@ namespace org.GraphDefined.WWCP.EMSP
         /// </summary>
         /// <param name="SessionId">The session identification from the AuthorizeStart request.</param>
         /// <param name="LocalAuthentication">An user identification.</param>
-        /// <param name="EVSEId">An EVSE identification.</param>
+        /// <param name="ChargingLocation">The charging location.</param>
+        /// <param name="CPOPartnerSessionId">An optional session identification of the CPO.</param>
         /// <param name="OperatorId">An optional charging station operator identification.</param>
         /// 
         /// <param name="Timestamp">The optional timestamp of the request.</param>
@@ -2089,6 +2094,7 @@ namespace org.GraphDefined.WWCP.EMSP
             IAuthorizeStartStop.AuthorizeStop(ChargingSession_Id           SessionId,
                                               LocalAuthentication          LocalAuthentication,
                                               ChargingLocation             ChargingLocation,
+                                              ChargingSession_Id?          CPOPartnerSessionId,
                                               ChargingStationOperator_Id?  OperatorId,
 
                                               DateTime?                    Timestamp,
