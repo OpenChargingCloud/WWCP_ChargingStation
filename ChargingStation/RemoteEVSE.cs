@@ -951,7 +951,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                          TimeSpan?               RequestTimeout  = null)
         {
 
-            return RemoteStartResult.Offline;
+            return RemoteStartResult.Offline();
 
             //if (_ChargingStation == null)
             //    return RemoteStartEVSEResult.Offline;
@@ -1093,7 +1093,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// Compares two instances of this object.
         /// </summary>
         /// <param name="Object">An object to compare with.</param>
-        public Int32 CompareTo(Object Object)
+        public override Int32 CompareTo(Object Object)
         {
 
             if (Object == null)
@@ -1101,7 +1101,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             // Check if the given object is a virtual EVSE.
             var RemoteEVSE = Object as RemoteEVSE;
-            if ((Object) RemoteEVSE == null)
+            if (RemoteEVSE is null)
                 throw new ArgumentException("The given object is not a virtual EVSE!");
 
             return CompareTo(RemoteEVSE);
@@ -1119,7 +1119,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         public Int32 CompareTo(RemoteEVSE RemoteEVSE)
         {
 
-            if ((Object) RemoteEVSE == null)
+            if (RemoteEVSE is null)
                 throw new ArgumentNullException(nameof(RemoteEVSE),  "The given virtual EVSE must not be null!");
 
             return Id.CompareTo(RemoteEVSE.Id);

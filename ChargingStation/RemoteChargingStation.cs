@@ -338,16 +338,14 @@ namespace org.GraphDefined.WWCP.ChargingStations
             this._Id         = Id;
             this._Status     = ChargingStationStatusTypes.Offline;
 
-            this._TCPClient  = new TCPClient(DNSName:            EVSEOperatorDNS,
+            this._TCPClient  = new TCPClient(RemoteHost:         EVSEOperatorDNS,
                                              ServiceName:        "WWCP",
                                              UseIPv4:            UseIPv4,
                                              UseIPv6:            UseIPv6,
                                              PreferIPv6:         PreferIPv6,
                                              ConnectionTimeout:  EVSEOperatorTimeout,
-                                             DNSClient:          (DNSClient != null)
-                                                                     ? DNSClient
-                                                                     : new DNSClient(SearchForIPv4DNSServers: true,
-                                                                                     SearchForIPv6DNSServers: false),
+                                             DNSClient:          DNSClient ?? new DNSClient(SearchForIPv4DNSServers: true,
+                                                                                            SearchForIPv6DNSServers: false),
                                              AutoConnect:        false);
 
             this._DNSClient = DNSClient;
