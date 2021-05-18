@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 
 using org.GraphDefined.Vanaheimr.Illias;
+using org.GraphDefined.Vanaheimr.Hermod.HTTP;
 
 #endregion
 
@@ -90,6 +91,8 @@ namespace org.GraphDefined.WWCP.EMSP
             => AuthorizationDatabase.Where(v => v.Value == TokenAuthorizationResultType.Blocked);
 
         #endregion
+
+        public HTTPClientLogger HTTPLogger { get; }
 
         #endregion
 
