@@ -1967,7 +1967,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeStartRequest));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeStartRequest));
             }
 
             #endregion
@@ -2062,7 +2062,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeStartResponse));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnAuthorizeStartResponse));
             }
 
             #endregion
@@ -2357,7 +2357,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveRequest));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnReserveRequest));
             }
 
             #endregion
@@ -2411,7 +2411,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnReserveResponse));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnReserveResponse));
             }
 
             #endregion
@@ -2536,7 +2536,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStartRequest));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStartRequest));
             }
 
             #endregion
@@ -2583,7 +2583,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStartResponse));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStartResponse));
             }
 
             #endregion
@@ -2651,7 +2651,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStopRequest));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStopRequest));
             }
 
             #endregion
@@ -2693,7 +2693,7 @@ namespace org.GraphDefined.WWCP.EMSP
             }
             catch (Exception e)
             {
-                e.Log(nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStopResponse));
+                DebugX.LogException(e, nameof(eMobilityServiceProvider) + "." + nameof(OnRemoteStopResponse));
             }
 
             #endregion
