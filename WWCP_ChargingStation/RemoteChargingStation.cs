@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright (c) 2014-2018 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ * Copyright (c) 2014-2023 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * This file is part of WWCP ChargingStation <https://github.com/OpenChargingCloud/WWCP_ChargingStation>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ using org.GraphDefined.Vanaheimr.Hermod;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.ChargingStations
+namespace cloud.charging.open.protocols.WWCP.ChargingStations
 {
 
     /// <summary>
@@ -239,25 +239,25 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Connected
 
-        public event CSConnectedDelegate Connected;
+        //public event CSConnectedDelegate Connected;
 
         #endregion
 
         #region EVSEOperatorTimeoutReached
 
-        public event CSEVSEOperatorTimeoutReachedDelegate EVSEOperatorTimeoutReached;
+        //public event CSEVSEOperatorTimeoutReachedDelegate EVSEOperatorTimeoutReached;
 
         #endregion
 
         #region Disconnected
 
-        public event CSDisconnectedDelegate Disconnected;
+        //public event CSDisconnectedDelegate Disconnected;
 
         #endregion
 
         #region StateChanged
 
-        public event CSStateChangedDelegate StateChanged;
+        //public event CSStateChangedDelegate StateChanged;
 
         #endregion
 

@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright (c) 2014 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WorldWideChargingCLI <http://www.github.com/GraphDefined/WorldWideChargingCLI>
+ * Copyright (c) 2014-2023 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * This file is part of WWCP ChargingStation <https://github.com/OpenChargingCloud/WWCP_ChargingStation>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,8 @@
 
 #region Usings
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using org.GraphDefined.WWCP_STA;
-using org.GraphDefined.WWCP;
+using cloud.charging.open.protocols.WWCP;
+using cloud.charging.open.protocols.WWCP.ChargingStations;
 
 #endregion
 
@@ -38,7 +32,7 @@ namespace org.GraphDefined
 
         #region ChargingStation_Connected(ChargingStation)
 
-        private static void ChargingStation_Connected(WWCP_STA.ChargingStation  ChargingStation)
+        private static void ChargingStation_Connected(RemoteChargingStation ChargingStation)
         {
             Console.WriteLine("'" + ChargingStation.Id + "' connected to '" + ChargingStation.EVSEOperatorDNS + "'");
         }
@@ -47,7 +41,7 @@ namespace org.GraphDefined
 
         #region ChargingStation_Disconnected(ChargingStation)
 
-        private static void ChargingStation_Disconnected(WWCP_STA.ChargingStation  ChargingStation)
+        private static void ChargingStation_Disconnected(RemoteChargingStation ChargingStation)
         {
             Console.WriteLine("'" + ChargingStation.Id + "' disconnected from '" + ChargingStation.EVSEOperatorDNS + "'");
         }
@@ -56,9 +50,9 @@ namespace org.GraphDefined
 
         #region ChargingStation_StateChanged(ChargingStation, OldState, NewState)
 
-        private static void ChargingStation_StateChanged(WWCP_STA.ChargingStation  ChargingStation,
-                                                         ChargingStationState      OldState,
-                                                         ChargingStationState      NewState)
+        private static void ChargingStation_StateChanged(RemoteChargingStation  ChargingStation,
+                                                         ChargingStationStatus  OldState,
+                                                         ChargingStationStatus  NewState)
         {
             Console.WriteLine("'" + ChargingStation.Id + "' changed from " + OldState + " to " + NewState);
         }
@@ -70,12 +64,12 @@ namespace org.GraphDefined
         public static void Main(String[] Arguments)
         {
 
-            var ChargingStation01 = new WWCP_STA.ChargingStation(Id:              ChargingStation_Id.Parse("+49*822*12345*"),
-                                                                 EVSEOperatorDNS: "backend.ev.graphdefined.org");
+            var ChargingStation01 = new RemoteChargingStation(Id:               ChargingStation_Id.Parse("DE*GEF*S12345*"),
+                                                              EVSEOperatorDNS:  "backend.ev.graphdefined.org");
 
-            ChargingStation01.Connected     += ChargingStation_Connected;
-            ChargingStation01.Disconnected  += ChargingStation_Disconnected;
-            ChargingStation01.StateChanged  += ChargingStation_StateChanged;
+            //ChargingStation01.Connected     += ChargingStation_Connected;
+            //ChargingStation01.Disconnected  += ChargingStation_Disconnected;
+            //ChargingStation01.StateChanged  += ChargingStation_StateChanged;
 
             ChargingStation01.Connect();
 

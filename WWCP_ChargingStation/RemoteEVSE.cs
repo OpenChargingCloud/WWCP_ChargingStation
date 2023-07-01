@@ -1,6 +1,6 @@
 ﻿/*
- * Copyright (c) 2014-2018 GraphDefined GmbH <achim.friedland@graphdefined.com>
- * This file is part of WWCP Cloud <https://github.com/GraphDefined/WWCP_Cloud>
+ * Copyright (c) 2014-2023 GraphDefined GmbH <achim.friedland@graphdefined.com>
+ * This file is part of WWCP ChargingStation <https://github.com/OpenChargingCloud/WWCP_ChargingStation>
  *
  * Licensed under the Affero GPL license, Version 3.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,13 @@
 
 #region Usings
 
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.Concurrent;
-
 using org.GraphDefined.Vanaheimr.Illias;
 using org.GraphDefined.Vanaheimr.Illias.Votes;
 using org.GraphDefined.Vanaheimr.Styx.Arrows;
-using org.GraphDefined.Vanaheimr.Hermod;
 
 #endregion
 
-namespace org.GraphDefined.WWCP.ChargingStations
+namespace cloud.charging.open.protocols.WWCP.ChargingStations
 {
 
     /// <summary>
@@ -39,11 +31,11 @@ namespace org.GraphDefined.WWCP.ChargingStations
     /// This is meant to be one electrical circuit which can charge a electric vehicle
     /// independently. Thus there could be multiple interdependent power sockets.
     /// </summary>
-    public class RemoteEVSE : AEMobilityEntity<EVSE_Id>,
-                                   IEquatable<RemoteEVSE>, IComparable<RemoteEVSE>, IComparable,
-                                   IEnumerable<SocketOutlet>,
-                                   IStatus<EVSEStatusTypes>
-                     //              IRemoteEVSE
+    public class RemoteEVSE : AEMobilityEntity<EVSE_Id, EVSEAdminStatus, EVSEStatus>,
+                              IEquatable<RemoteEVSE>, IComparable<RemoteEVSE>, IComparable,
+                              IEnumerable<ChargingConnector>
+                              //IStatus<EVSEStatusTypes>
+                     //         IRemoteEVSE
     {
 
         #region Data
@@ -328,23 +320,23 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region SocketOutlets
+        #region ChargingConnectors
 
-        private ReactiveSet<SocketOutlet> _SocketOutlets;
+        private ReactiveSet<ChargingConnector> _ChargingConnectors;
 
-        public ReactiveSet<SocketOutlet> SocketOutlets
+        public ReactiveSet<ChargingConnector> ChargingConnectors
         {
 
             get
             {
-                return _SocketOutlets;
+                return _ChargingConnectors;
             }
 
             set
             {
 
-                if (_SocketOutlets != value)
-                    SetProperty(ref _SocketOutlets, value);
+                if (_ChargingConnectors != value)
+                    SetProperty(ref _ChargingConnectors, value);
 
             }
 
@@ -363,7 +355,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
         {
             get
             {
-                return _Reservation.Id;
+                return chargingReservation.Id;
             }
         }
 
@@ -371,7 +363,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reservation
 
-        private ChargingReservation _Reservation;
+        private ChargingReservation chargingReservation;
 
         /// <summary>
         /// The charging reservation.
@@ -382,18 +374,18 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             get
             {
-                return _Reservation;
+                return chargingReservation;
             }
 
             set
             {
 
-                if (_Reservation == value)
+                if (chargingReservation == value)
                     return;
 
-                _Reservation = value;
+                chargingReservation = value;
 
-                if (_Reservation != null)
+                if (chargingReservation != null)
                     SetStatus(EVSEStatusTypes.Reserved);
                 else
                     SetStatus(EVSEStatusTypes.Available);
@@ -627,35 +619,35 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #endregion
 
-        #region SocketOutletAddition
+        #region ChargingConnectorAddition
 
-        internal readonly IVotingNotificator<DateTime, EVSE, SocketOutlet, Boolean> SocketOutletAddition;
+        internal readonly IVotingNotificator<DateTime, EVSE, ChargingConnector, Boolean> ChargingConnectorAddition;
 
         /// <summary>
         /// Called whenever a socket outlet will be or was added.
         /// </summary>
-        public IVotingSender<DateTime, EVSE, SocketOutlet, Boolean> OnSocketOutletAddition
+        public IVotingSender<DateTime, EVSE, ChargingConnector, Boolean> OnChargingConnectorAddition
         {
             get
             {
-                return SocketOutletAddition;
+                return ChargingConnectorAddition;
             }
         }
 
         #endregion
 
-        #region SocketOutletRemoval
+        #region ChargingConnectorRemoval
 
-        internal readonly IVotingNotificator<DateTime, EVSE, SocketOutlet, Boolean> SocketOutletRemoval;
+        internal readonly IVotingNotificator<DateTime, EVSE, ChargingConnector, Boolean> ChargingConnectorRemoval;
 
         /// <summary>
         /// Called whenever a socket outlet will be or was removed.
         /// </summary>
-        public IVotingSender<DateTime, EVSE, SocketOutlet, Boolean> OnSocketOutletRemoval
+        public IVotingSender<DateTime, EVSE, ChargingConnector, Boolean> OnChargingConnectorRemoval
         {
             get
             {
-                return SocketOutletRemoval;
+                return ChargingConnectorRemoval;
             }
         }
 
@@ -672,10 +664,10 @@ namespace org.GraphDefined.WWCP.ChargingStations
         /// <param name="ChargingStation">The parent charging station.</param>
         /// <param name="MaxStatusListSize">The maximum size of the EVSE status list.</param>
         /// <param name="MaxAdminStatusListSize">The maximum size of the EVSE admin status list.</param>
-        internal RemoteEVSE(EVSE_Id                     Id,
+        internal RemoteEVSE(EVSE_Id                Id,
                             RemoteChargingStation  ChargingStation,
-                            UInt16                      MaxStatusListSize       = DefaultMaxEVSEStatusListSize,
-                            UInt16                      MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
+                            UInt16                 MaxStatusListSize       = DefaultMaxEVSEStatusListSize,
+                            UInt16                 MaxAdminStatusListSize  = DefaultMaxAdminStatusListSize)
 
             : base(Id)
 
@@ -694,7 +686,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             this._Description           = new I18NString();
             this._ChargingModes         = new ReactiveSet<ChargingModes>();
-            this._SocketOutlets         = new ReactiveSet<SocketOutlet>();
+            this._ChargingConnectors         = new ReactiveSet<ChargingConnector>();
 
             this._StatusSchedule        = new StatusSchedule<EVSEStatusTypes>(MaxStatusListSize);
             this._StatusSchedule.Insert(EVSEStatusTypes.Unspecified);
@@ -706,31 +698,31 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #region Init events
 
-            this.SocketOutletAddition   = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
-            this.SocketOutletRemoval    = new VotingNotificator<DateTime, EVSE, SocketOutlet, Boolean>(() => new VetoVote(), true);
+            this.ChargingConnectorAddition   = new VotingNotificator<DateTime, EVSE, ChargingConnector, Boolean>(() => new VetoVote(), true);
+            this.ChargingConnectorRemoval    = new VotingNotificator<DateTime, EVSE, ChargingConnector, Boolean>(() => new VetoVote(), true);
 
             #endregion
 
             #region Link events
 
-            this._StatusSchedule.     OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
-                                                          => UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
+            //this._StatusSchedule.     OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
+            //                                              => UpdateStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
 
-            this._AdminStatusSchedule.OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
-                                                          => UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
+            //this._AdminStatusSchedule.OnStatusChanged += (Timestamp, EventTrackingId, StatusSchedule, OldStatus, NewStatus)
+            //                                              => UpdateAdminStatus(Timestamp, EventTrackingId, OldStatus, NewStatus);
 
 
-            //this.SocketOutletAddition.OnVoting        += (timestamp, evse, outlet, vote)
-            //                                              => ChargingStation.SocketOutletAddition.SendVoting      (timestamp, evse, outlet, vote);
+            //this.ChargingConnectorAddition.OnVoting        += (timestamp, evse, outlet, vote)
+            //                                              => ChargingStation.ChargingConnectorAddition.SendVoting      (timestamp, evse, outlet, vote);
             //
-            //this.SocketOutletAddition.OnNotification  += (timestamp, evse, outlet)
-            //                                              => ChargingStation.SocketOutletAddition.SendNotification(timestamp, evse, outlet);
+            //this.ChargingConnectorAddition.OnNotification  += (timestamp, evse, outlet)
+            //                                              => ChargingStation.ChargingConnectorAddition.SendNotification(timestamp, evse, outlet);
             //
-            //this.SocketOutletRemoval. OnVoting        += (timestamp, evse, outlet, vote)
-            //                                              => ChargingStation.SocketOutletRemoval. SendVoting      (timestamp, evse, outlet, vote);
+            //this.ChargingConnectorRemoval. OnVoting        += (timestamp, evse, outlet, vote)
+            //                                              => ChargingStation.ChargingConnectorRemoval. SendVoting      (timestamp, evse, outlet, vote);
             //
-            //this.SocketOutletRemoval. OnNotification  += (timestamp, evse, outlet)
-            //                                              => ChargingStation.SocketOutletRemoval. SendNotification(timestamp, evse, outlet);
+            //this.ChargingConnectorRemoval. OnNotification  += (timestamp, evse, outlet)
+            //                                              => ChargingStation.ChargingConnectorRemoval. SendNotification(timestamp, evse, outlet);
 
             #endregion
 
@@ -855,24 +847,24 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
         #region Reserve(...)
 
-        public async Task<ReservationResult> Reserve(DateTime                          Timestamp,
-                                                     CancellationToken                 CancellationToken,
-                                                     EventTracking_Id                  EventTrackingId,
-                                                     eMobilityProvider_Id              ProviderId,
-                                                     RemoteAuthentication              RemoteAuthentication,
-                                                     ChargingReservation_Id            ReservationId,
-                                                     DateTime?                         StartTime,
-                                                     TimeSpan?                         Duration,
-                                                     ChargingProduct                   ChargingProduct  = null,
-                                                     IEnumerable<Auth_Token>           AuthTokens       = null,
-                                                     IEnumerable<eMobilityAccount_Id>  eMAIds           = null,
-                                                     IEnumerable<UInt32>               PINs             = null,
-                                                     TimeSpan?                         RequestTimeout   = null)
+        public async Task<ReservationResult> Reserve(DateTime                            Timestamp,
+                                                     CancellationToken                   CancellationToken,
+                                                     EventTracking_Id                    EventTrackingId,
+                                                     EMobilityProvider_Id                ProviderId,
+                                                     RemoteAuthentication                RemoteAuthentication,
+                                                     ChargingReservation_Id              ReservationId,
+                                                     DateTime?                           StartTime,
+                                                     TimeSpan?                           Duration,
+                                                     ChargingProduct?                    ChargingProduct   = null,
+                                                     IEnumerable<AuthenticationToken>?   AuthTokens        = null,
+                                                     IEnumerable<EMobilityAccount_Id>?   eMAIds            = null,
+                                                     IEnumerable<UInt32>?                PINs              = null,
+                                                     TimeSpan?                           RequestTimeout    = null)
         {
 
             #region Try to remove an existing reservation if this is an update!
 
-            if (ReservationId != null && _Reservation.Id != ReservationId)
+            if (ReservationId != null && chargingReservation.Id != ReservationId)
             {
 
                 return ReservationResult.UnknownChargingReservationId;
@@ -883,47 +875,45 @@ namespace org.GraphDefined.WWCP.ChargingStations
 
             #endregion
 
-            switch (Status.Value)
+            if (Status.Value == EVSEStatusTypes.OutOfService)
+                return ReservationResult.OutOfService;
+
+            else if (Status.Value == EVSEStatusTypes.Charging)
+                return ReservationResult.AlreadyInUse;
+
+            else if (Status.Value == EVSEStatusTypes.Reserved)
+                return ReservationResult.AlreadyReserved;
+
+            else if (Status.Value == EVSEStatusTypes.Available)
             {
 
-                case EVSEStatusTypes.OutOfService:
-                    return ReservationResult.OutOfService;
+                this.chargingReservation = new ChargingReservation(ReservationId,
+                                                            Timestamp,
+                                                            StartTime ?? DateTime.Now,
+                                                            Duration ?? MaxReservationDuration,
+                                                            (StartTime ?? DateTime.Now) + (Duration ?? MaxReservationDuration),
+                                                            TimeSpan.FromSeconds(0),
+                                                            ChargingReservationLevel.EVSE,
+                                                            ProviderId,
+                                                            RemoteAuthentication,
+                                                            null, //RoamingNetwork.Id,
+                                                            null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
+                                                            null, //ChargingStation.ChargingPool.Id,
+                                                            ChargingStation.Id,
+                                                            Id,
+                                                            ChargingProduct,
+                                                            AuthTokens,
+                                                            eMAIds,
+                                                            PINs);
 
-                case EVSEStatusTypes.Charging:
-                    return ReservationResult.AlreadyInUse;
+                SetStatus(EVSEStatusTypes.Reserved);
 
-                case EVSEStatusTypes.Reserved:
-                    return ReservationResult.AlreadyReserved;
-
-                case EVSEStatusTypes.Available:
-
-                    this._Reservation = new ChargingReservation(ReservationId,
-                                                                Timestamp,
-                                                                StartTime ?? DateTime.Now,
-                                                                Duration  ?? MaxReservationDuration,
-                                                                (StartTime ?? DateTime.Now) + (Duration ?? MaxReservationDuration),
-                                                                TimeSpan.FromSeconds(0),
-                                                                ChargingReservationLevel.EVSE,
-                                                                ProviderId,
-                                                                RemoteAuthentication,
-                                                                null, //RoamingNetwork.Id,
-                                                                null, //ChargingStation.ChargingPool.EVSEOperator.RoamingNetwork,
-                                                                null, //ChargingStation.ChargingPool.Id,
-                                                                ChargingStation.Id,
-                                                                Id,
-                                                                ChargingProduct,
-                                                                AuthTokens,
-                                                                eMAIds,
-                                                                PINs);
-
-                    SetStatus(EVSEStatusTypes.Reserved);
-
-                    return ReservationResult.Success(_Reservation);
-
-                default:
-                    return ReservationResult.Error();
+                return ReservationResult.Success(chargingReservation);
 
             }
+
+            else
+                return ReservationResult.Error();
 
         }
 
@@ -946,7 +936,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                          ChargingProduct_Id      ChargingProductId,
                                                          ChargingReservation_Id  ReservationId,
                                                          ChargingSession_Id      SessionId,
-                                                         eMobilityProvider_Id    ProviderId,
+                                                         EMobilityProvider_Id    ProviderId,
                                                          RemoteAuthentication    RemoteAuthentication,
                                                          TimeSpan?               RequestTimeout  = null)
         {
@@ -986,7 +976,7 @@ namespace org.GraphDefined.WWCP.ChargingStations
                                                        EventTracking_Id      EventTrackingId,
                                                        ChargingSession_Id    SessionId,
                                                        ReservationHandling   ReservationHandling,
-                                                       eMobilityProvider_Id  ProviderId,
+                                                       EMobilityProvider_Id  ProviderId,
                                                        TimeSpan?             RequestTimeout  = null)
         {
 
@@ -1064,22 +1054,22 @@ namespace org.GraphDefined.WWCP.ChargingStations
         #endregion
 
 
-        #region IEnumerable<SocketOutlet> Members
+        #region IEnumerable<ChargingConnector> Members
 
         /// <summary>
         /// Return a socket outlet enumerator.
         /// </summary>
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
-            return _SocketOutlets.GetEnumerator();
+            return _ChargingConnectors.GetEnumerator();
         }
 
         /// <summary>
         /// Return a socket outlet enumerator.
         /// </summary>
-        public IEnumerator<SocketOutlet> GetEnumerator()
+        public IEnumerator<ChargingConnector> GetEnumerator()
         {
-            return _SocketOutlets.GetEnumerator();
+            return _ChargingConnectors.GetEnumerator();
         }
 
         #endregion
