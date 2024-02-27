@@ -941,7 +941,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
                                                          TimeSpan?               RequestTimeout  = null)
         {
 
-            return RemoteStartResult.Offline();
+            return RemoteStartResult.Offline(System_Id.Remote);
 
             //if (_ChargingStation == null)
             //    return RemoteStartEVSEResult.Offline;
@@ -980,7 +980,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
                                                        TimeSpan?             RequestTimeout  = null)
         {
 
-            return RemoteStopResult.Offline(SessionId);
+            return RemoteStopResult.Offline(SessionId, System_Id.Remote);
 
             //if (_ChargingStation == null)
             //    return RemoteStopEVSEResult.Offline(SessionId);
