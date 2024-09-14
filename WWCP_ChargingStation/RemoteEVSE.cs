@@ -34,7 +34,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
     public class RemoteEVSE : AEMobilityEntity<EVSE_Id, EVSEAdminStatus, EVSEStatus>,
                               IEquatable<RemoteEVSE>, IComparable<RemoteEVSE>, IComparable,
                               IEnumerable<ChargingConnector>
-                              //IStatus<EVSEStatusTypes>
+                              //IStatus<EVSEStatusType>
                      //         IRemoteEVSE
     {
 
@@ -385,10 +385,10 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
 
                 chargingReservation = value;
 
-                if (chargingReservation != null)
-                    SetStatus(EVSEStatusTypes.Reserved);
+                if (chargingReservation is not null)
+                    SetStatus(EVSEStatusType.Reserved);
                 else
-                    SetStatus(EVSEStatusTypes.Available);
+                    SetStatus(EVSEStatusType.Available);
 
             }
 
@@ -419,9 +419,9 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
                     SetProperty(ref _CurrentChargingSession, value);
 
                 if (_CurrentChargingSession != null)
-                    SetStatus(EVSEStatusTypes.Charging);
+                    SetStatus(EVSEStatusType.Charging);
                 else
-                    SetStatus(EVSEStatusTypes.Available);
+                    SetStatus(EVSEStatusType.Available);
 
             }
 
@@ -436,7 +436,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// The current EVSE status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<EVSEStatusTypes> Status
+        public Timestamped<EVSEStatusType> Status
         {
 
             get
@@ -455,12 +455,12 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
 
         #region StatusSchedule
 
-        private StatusSchedule<EVSEStatusTypes> _StatusSchedule;
+        private StatusSchedule<EVSEStatusType> _StatusSchedule;
 
         /// <summary>
         /// The EVSE status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<EVSEStatusTypes>> StatusSchedule
+        public IEnumerable<Timestamped<EVSEStatusType>> StatusSchedule
         {
             get
             {
@@ -576,7 +576,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// <param name="EVSE">The EVSE.</param>
         /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
         /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnStatusChangedDelegate(DateTime Timestamp, EventTracking_Id EventTrackingId, RemoteEVSE EVSE, Timestamped<EVSEStatusTypes> OldEVSEStatus, Timestamped<EVSEStatusTypes> NewEVSEStatus);
+        public delegate void OnStatusChangedDelegate(DateTime Timestamp, EventTracking_Id EventTrackingId, RemoteEVSE EVSE, Timestamped<EVSEStatusType> OldEVSEStatus, Timestamped<EVSEStatusType> NewEVSEStatus);
 
         /// <summary>
         /// An event fired whenever the dynamic status of the EVSE changed.
@@ -688,8 +688,8 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
             this._ChargingModes         = new ReactiveSet<ChargingModes>();
             this._ChargingConnectors         = new ReactiveSet<ChargingConnector>();
 
-            this._StatusSchedule        = new StatusSchedule<EVSEStatusTypes>(MaxStatusListSize);
-            this._StatusSchedule.Insert(EVSEStatusTypes.Unspecified);
+            this._StatusSchedule        = new StatusSchedule<EVSEStatusType>(MaxStatusListSize);
+            this._StatusSchedule.Insert(EVSEStatusType.Unspecified);
 
             this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxStatusListSize);
             this._AdminStatusSchedule.Insert(EVSEAdminStatusTypes.Unspecified);
@@ -737,7 +737,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
-        public void SetStatus(EVSEStatusTypes  NewStatus)
+        public void SetStatus(EVSEStatusType  NewStatus)
         {
             _StatusSchedule.Insert(NewStatus);
         }
@@ -750,7 +750,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// Set the current status.
         /// </summary>
         /// <param name="NewTimestampedStatus">A new timestamped status.</param>
-        public void SetStatus(Timestamped<EVSEStatusTypes> NewTimestampedStatus)
+        public void SetStatus(Timestamped<EVSEStatusType> NewTimestampedStatus)
         {
             _StatusSchedule.Insert(NewTimestampedStatus);
         }
@@ -764,7 +764,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatus">A new status.</param>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        public void SetStatus(EVSEStatusTypes  NewStatus,
+        public void SetStatus(EVSEStatusType  NewStatus,
                               DateTime        Timestamp)
         {
             _StatusSchedule.Insert(NewStatus, Timestamp);
@@ -779,7 +779,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewStatusList">A list of new timestamped status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetStatus(IEnumerable<Timestamped<EVSEStatusTypes>>  NewStatusList,
+        public void SetStatus(IEnumerable<Timestamped<EVSEStatusType>>  NewStatusList,
                               ChangeMethods                              ChangeMethod = ChangeMethods.Replace)
         {
             _StatusSchedule.Insert(NewStatusList);//, ChangeMethod);
@@ -875,16 +875,16 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
 
             #endregion
 
-            if (Status.Value == EVSEStatusTypes.OutOfService)
+            if (Status.Value == EVSEStatusType.OutOfService)
                 return ReservationResult.OutOfService;
 
-            else if (Status.Value == EVSEStatusTypes.Charging)
+            else if (Status.Value == EVSEStatusType.Charging)
                 return ReservationResult.AlreadyInUse;
 
-            else if (Status.Value == EVSEStatusTypes.Reserved)
+            else if (Status.Value == EVSEStatusType.Reserved)
                 return ReservationResult.AlreadyReserved;
 
-            else if (Status.Value == EVSEStatusTypes.Available)
+            else if (Status.Value == EVSEStatusType.Available)
             {
 
                 this.chargingReservation = new ChargingReservation(ReservationId,
@@ -906,7 +906,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
                                                             eMAIds,
                                                             PINs);
 
-                SetStatus(EVSEStatusTypes.Reserved);
+                SetStatus(EVSEStatusType.Reserved);
 
                 return ReservationResult.Success(chargingReservation);
 
@@ -1023,8 +1023,8 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// <param name="NewStatus">The new EVSE status.</param>
         internal async Task UpdateStatus(DateTime                      Timestamp,
                                          EventTracking_Id              EventTrackingId,
-                                         Timestamped<EVSEStatusTypes>  OldStatus,
-                                         Timestamped<EVSEStatusTypes>  NewStatus)
+                                         Timestamped<EVSEStatusType>  OldStatus,
+                                         Timestamped<EVSEStatusType>  NewStatus)
         {
 
             OnStatusChanged?.Invoke(Timestamp, EventTrackingId, this, OldStatus, NewStatus);
