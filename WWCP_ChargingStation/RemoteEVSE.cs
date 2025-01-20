@@ -476,7 +476,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// The current EVSE admin status.
         /// </summary>
         [InternalUseOnly]
-        public Timestamped<EVSEAdminStatusTypes> AdminStatus
+        public Timestamped<EVSEAdminStatusType> AdminStatus
         {
 
             get
@@ -495,12 +495,12 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
 
         #region AdminStatusSchedule
 
-        private StatusSchedule<EVSEAdminStatusTypes> _AdminStatusSchedule;
+        private StatusSchedule<EVSEAdminStatusType> _AdminStatusSchedule;
 
         /// <summary>
         /// The EVSE admin status schedule.
         /// </summary>
-        public IEnumerable<Timestamped<EVSEAdminStatusTypes>> AdminStatusSchedule
+        public IEnumerable<Timestamped<EVSEAdminStatusType>> AdminStatusSchedule
         {
             get
             {
@@ -558,7 +558,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// <param name="EVSE">The EVSE.</param>
         /// <param name="OldEVSEStatus">The old timestamped status of the EVSE.</param>
         /// <param name="NewEVSEStatus">The new timestamped status of the EVSE.</param>
-        public delegate void OnAdminStatusChangedDelegate(DateTime Timestamp, EventTracking_Id EventTrackingId, RemoteEVSE EVSE, Timestamped<EVSEAdminStatusTypes> OldEVSEStatus, Timestamped<EVSEAdminStatusTypes> NewEVSEStatus);
+        public delegate void OnAdminStatusChangedDelegate(DateTime Timestamp, EventTracking_Id EventTrackingId, RemoteEVSE EVSE, Timestamped<EVSEAdminStatusType> OldEVSEStatus, Timestamped<EVSEAdminStatusType> NewEVSEStatus);
 
         /// <summary>
         /// An event fired whenever the admin status of the EVSE changed.
@@ -691,8 +691,8 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
             this._StatusSchedule        = new StatusSchedule<EVSEStatusType>(MaxStatusListSize);
             this._StatusSchedule.Insert(EVSEStatusType.Unspecified);
 
-            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusTypes>(MaxStatusListSize);
-            this._AdminStatusSchedule.Insert(EVSEAdminStatusTypes.Unspecified);
+            this._AdminStatusSchedule   = new StatusSchedule<EVSEAdminStatusType>(MaxStatusListSize);
+            this._AdminStatusSchedule.Insert(EVSEAdminStatusType.Unspecified);
 
             #endregion
 
@@ -794,7 +794,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(EVSEAdminStatusTypes NewAdminStatus)
+        public void SetAdminStatus(EVSEAdminStatusType NewAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus);
         }
@@ -807,7 +807,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// Set the admin status.
         /// </summary>
         /// <param name="NewTimestampedAdminStatus">A new timestamped admin status.</param>
-        public void SetAdminStatus(Timestamped<EVSEAdminStatusTypes> NewTimestampedAdminStatus)
+        public void SetAdminStatus(Timestamped<EVSEAdminStatusType> NewTimestampedAdminStatus)
         {
             _AdminStatusSchedule.Insert(NewTimestampedAdminStatus);
         }
@@ -821,7 +821,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewAdminStatus">A new admin status.</param>
         /// <param name="Timestamp">The timestamp when this change was detected.</param>
-        public void SetAdminStatus(EVSEAdminStatusTypes  NewAdminStatus,
+        public void SetAdminStatus(EVSEAdminStatusType  NewAdminStatus,
                                    DateTime             Timestamp)
         {
             _AdminStatusSchedule.Insert(NewAdminStatus, Timestamp);
@@ -836,7 +836,7 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// </summary>
         /// <param name="NewAdminStatusList">A list of new timestamped admin status.</param>
         /// <param name="ChangeMethod">The change mode.</param>
-        public void SetAdminStatus(IEnumerable<Timestamped<EVSEAdminStatusTypes>>  NewAdminStatusList,
+        public void SetAdminStatus(IEnumerable<Timestamped<EVSEAdminStatusType>>  NewAdminStatusList,
                                    ChangeMethods                                   ChangeMethod = ChangeMethods.Replace)
         {
             _AdminStatusSchedule.Insert(NewAdminStatusList);//, ChangeMethod);
@@ -1043,8 +1043,8 @@ namespace cloud.charging.open.protocols.WWCP.ChargingStations
         /// <param name="NewStatus">The new EVSE admin status.</param>
         internal async Task UpdateAdminStatus(DateTime                           Timestamp,
                                               EventTracking_Id                   EventTrackingId,
-                                              Timestamped<EVSEAdminStatusTypes>  OldStatus,
-                                              Timestamped<EVSEAdminStatusTypes>  NewStatus)
+                                              Timestamped<EVSEAdminStatusType>  OldStatus,
+                                              Timestamped<EVSEAdminStatusType>  NewStatus)
         {
 
             OnAdminStatusChanged?.Invoke(Timestamp, EventTrackingId, this, OldStatus, NewStatus);
